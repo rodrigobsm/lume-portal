@@ -1,0 +1,2084 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Portal News</title>
+<style>
+  html, body {
+    margin: 0; padding: 0; height: 100%; width: 100%;
+    overflow: hidden; background: #0a0a0a; color: #ffffff;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  #stage { position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
+  .slide {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    opacity: 0; transition: opacity 0.8s ease; background: #0a0a0a;
+  }
+  .slide.active { opacity: 1; }
+  .photo {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #141414; overflow: hidden;
+  }
+  .photo-blur {
+    position: absolute; top: -6%; left: -6%; width: 112%; height: 112%;
+    background-size: cover; background-position: center;
+    -webkit-filter: blur(18px) brightness(0.6);
+    filter: blur(18px) brightness(0.6);
+  }
+  .photo-img {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover; transform-origin: center center;
+  }
+  .photo-img.kb-start { transform: scale(1); }
+  /* 15s = ROTATE_MS: o zoom dura o slide inteiro, até passar para o próximo */
+  .photo-img.kb { transform: scale(1.25); transition: transform 15s linear; }
+  .wxslide { background: #101820; }
+  .wx-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
+  .wx-sunny .wx-bg { background: linear-gradient(160deg, #1e6fb8 0%, #4aa3e0 45%, #f5b942 130%); }
+  .wx-night .wx-bg { background: linear-gradient(160deg, #0b1026 0%, #1b2a4a 60%, #3b2a5d 130%); }
+  .wx-cloudy .wx-bg { background: linear-gradient(160deg, #3a4a5a 0%, #5a6d80 60%, #8a9aa8 130%); }
+  .wx-rain .wx-bg { background: linear-gradient(160deg, #1d2f3d 0%, #33506a 60%, #4a6a8a 130%); }
+  .wx-storm .wx-bg { background: linear-gradient(160deg, #14101f 0%, #2c2340 60%, #4a3a6a 130%); }
+  .wx-snow .wx-bg { background: linear-gradient(160deg, #5a7a99 0%, #8fb0cc 60%, #d7e6f2 130%); }
+  .wx-fog .wx-bg { background: linear-gradient(160deg, #6a7378 0%, #9aa3a6 60%, #c9cdcc 130%); }
+  .wx-photo { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transform-origin: center center; }
+  .wx-photo.kb-start { transform: scale(1); }
+  .wx-photo.kb { transform: scale(1.12); transition: transform 20s linear; }
+  .wx-shade { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.45) 45%, rgba(0,0,0,0.35) 100%); }
+  .wx-content { position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 2; display: flex; flex-direction: column; justify-content: space-between; padding: 15vh 3vw 3vw 3vw; }
+  .wx-label { font-size: 1.8vw; font-weight: 700; letter-spacing: 0.25em; color: #f5b942; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
+  .wx-now { margin-top: 2vh; }
+  .wx-big { display: flex; align-items: center; gap: 1.5vw; }
+  .wx-big .wic { display: inline-flex; }
+  .wx-big .wic svg { width: 7vw; height: 7vw; min-width: 70px; min-height: 70px; }
+  .wx-temp { font-size: 11vw; font-weight: 700; line-height: 1; text-shadow: 0 2px 16px rgba(0,0,0,0.6); }
+  .wx-cond { font-size: 3vw; font-weight: 700; margin-top: 1vw; text-shadow: 0 2px 12px rgba(0,0,0,0.6); }
+  .wx-details { font-size: 2vw; color: #e8eaed; margin-top: 1vw; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
+  .wx-days { display: flex; gap: 1vw; }
+  .wx-day { flex: 1; background: rgba(0,0,0,0.45); border-radius: 1vw; padding: 1.8vw 0.5vw; text-align: center; animation: wxRise 0.7s ease both; }
+  @keyframes wxRise { from { opacity: 0; transform: translateY(2vh); } to { opacity: 1; transform: translateY(0); } }
+  .wx-day .dname { font-size: 2vw; font-weight: 700; letter-spacing: 0.08em; }
+  .wx-day .dic { display: flex; justify-content: center; margin: 0.8vw 0; }
+  .wx-day .dic svg { width: 4vw; height: 4vw; min-width: 40px; min-height: 40px; }
+  .wx-day .dmax { font-size: 2.8vw; font-weight: 700; }
+  .wx-day .dmin { font-size: 2.1vw; color: #c8cdd2; }
+  .wx-day .dpop { font-size: 1.8vw; color: #9fc5e8; margin-top: 0.3vw; }
+  .fxslide { background: #0a1f16; }
+  .fx-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(160deg, #0a1f16 0%, #123524 55%, #1d4a2f 130%); }
+  .fx-photo { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transform-origin: center center; }
+  .fx-photo.kb-start { transform: scale(1); }
+  .fx-photo.kb { transform: scale(1.12); transition: transform 20s linear; }
+  .fx-shade { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.62) 45%, rgba(0,0,0,0.55) 100%); }
+  .fx-content { position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 2; display: flex; flex-direction: column; justify-content: flex-start; gap: 1.6vh; padding: 16vh 3vw 2.5vw 3vw; }
+  .fx-top { display: flex; gap: 2vw; align-items: stretch; }
+  .fx-main { flex: 1.15; min-width: 0; }
+  .fx-chart { flex: 1; min-width: 0; min-height: 26vh; background: rgba(0,0,0,0.45); border-radius: 1vw; padding: 1vw 1.2vw 0.8vw 1.2vw; display: flex; flex-direction: column; }
+  .fx-chart-title { display: flex; justify-content: space-between; align-items: baseline; gap: 0.8vw; font-size: 1.4vw; font-weight: 700; letter-spacing: 0.12em; color: #f5b942; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
+  .fx-chart-title span { white-space: nowrap; }
+  .fx-chart-mm { font-size: 1.2vw; font-weight: 400; letter-spacing: 0; color: #c8cdd2; white-space: nowrap; }
+  .fx-chart-wrap { flex: 1; position: relative; min-height: 0; margin-top: 0.6vw; }
+  .fx-label { font-size: 1.8vw; font-weight: 700; letter-spacing: 0.25em; color: #f5b942; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
+  .fx-hero { margin-top: 1.5vh; display: flex; align-items: center; gap: 1.5vw; flex-wrap: wrap; }
+  .fx-hero .fx-eq { font-size: 3vw; font-weight: 700; text-shadow: 0 2px 12px rgba(0,0,0,0.6); }
+  .fx-hero .fx-rate { font-size: 9vw; font-weight: 700; line-height: 1; text-shadow: 0 2px 16px rgba(0,0,0,0.6); }
+  .fx-change { font-size: 1.8vw; font-weight: 700; padding: 0.4vw 1vw; border-radius: 0.6vw; }
+  .fx-change.up { background: rgba(46,160,67,0.85); color: #fff; }
+  .fx-change.down { background: rgba(218,54,51,0.85); color: #fff; }
+  .fx-details { font-size: 1.7vw; color: #e8eaed; margin-top: 0.8vw; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
+  .fx-rows { display: flex; flex-direction: column; gap: 1.2vh; }
+  .fx-rowlabel { font-size: 1.4vw; font-weight: 700; letter-spacing: 0.2em; color: #c8cdd2; text-shadow: 0 1px 8px rgba(0,0,0,0.6); margin-bottom: 0.4vw; }
+  .fx-row { display: flex; gap: 1vw; }
+  .fx-box { flex: 1; background: rgba(0,0,0,0.45); border-radius: 0.8vw; padding: 1vw 0.5vw; text-align: center; animation: wxRise 0.7s ease both; }
+  .fx-box .fname { font-size: 1.7vw; font-weight: 700; letter-spacing: 0.08em; }
+  .fx-box .fprice { font-size: 2.4vw; font-weight: 700; margin-top: 0.3vw; }
+  .fx-box .fchange { font-size: 1.5vw; margin-top: 0.2vw; }
+  .fx-box .fchange.up { color: #7ee787; }
+  .fx-box .fchange.down { color: #ff7b72; }
+  .clock-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(160deg, #0b1e3a 0%, #050914 60%, #0a1a33 130%); }
+  .clock-photo { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 94%; transform-origin: center center; }
+  .clock-photo.kb-start { transform: scale(1); }
+  .clock-photo.kb { transform: scale(1.12); transition: transform 20s linear; }
+  .clock-shade { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.45) 100%); }
+  .clock-content { position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 2; display: flex; flex-direction: column; justify-content: flex-start; gap: 3vh; padding: 13vh 3vw 3vw 3vw; }
+  .clock-label { font-size: 1.8vw; font-weight: 700; letter-spacing: 0.25em; color: #f5b942; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
+  .clock-row { display: flex; gap: 1.5vw; flex: 1; align-items: stretch; }
+  .clock-card { flex: 1; background: rgba(0,0,0,0.45); border-radius: 1vw; padding: 1.5vw 0.5vw; display: flex; flex-direction: column; align-items: center; justify-content: center; animation: wxRise 0.7s ease both; }
+  .clock-face { position: relative; width: 15.5vw; height: 15.5vw; border-radius: 50%; background: radial-gradient(circle at 50% 35%, rgba(255,255,255,0.14) 0%, rgba(0,0,0,0.55) 70%); border: 2px solid rgba(255,255,255,0.35); box-shadow: 0 4px 24px rgba(0,0,0,0.5); }
+  .clock-face .tick { position: absolute; left: 50%; top: 50%; width: 3px; height: 8%; margin-left: -1.5px; margin-top: -4%; background: rgba(255,255,255,0.9); }
+  .clock-face .cnum { position: absolute; font-size: 1.6vw; font-weight: 700; color: #fff; transform: translate(-50%, -50%); text-shadow: 0 1px 6px rgba(0,0,0,0.6); }
+  .clock-face .hand { position: absolute; left: 50%; bottom: 50%; transform-origin: 50% 100%; border-radius: 999px; }
+  .clock-face .hand.hour { width: 0.45vw; height: 26%; margin-left: -0.225vw; background: #fff; }
+  .clock-face .hand.min { width: 0.32vw; height: 38%; margin-left: -0.16vw; background: #fff; }
+  .clock-face .hand.sec { width: 0.16vw; height: 44%; margin-left: -0.08vw; background: #f5b942; transition: transform 0.25s ease-out; }
+  .clock-face .cap { position: absolute; left: 50%; top: 50%; width: 0.9vw; height: 0.9vw; margin-left: -0.45vw; margin-top: -0.45vw; border-radius: 50%; background: #f5b942; border: 2px solid rgba(0,0,0,0.4); }
+  .city { font-size: 1.7vw; font-weight: 700; letter-spacing: 0.15em; color: #f5b942; margin-top: 1.2vw; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
+  .dig { font-size: 2.5vw; font-weight: 700; margin-top: 0.4vw; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
+  .cdate { font-size: 1.3vw; color: #c8cdd2; margin-top: 0.3vw; text-transform: uppercase; }
+  .bible-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(160deg, #1a1206 0%, #2c1e0a 55%, #0a0803 130%); }
+  .bible-photo { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transform-origin: center center; }
+  .bible-photo.kb-start { transform: scale(1); }
+  .bible-photo.kb { transform: scale(1.12); transition: transform 20s linear; }
+  .bible-shade { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.45) 100%); }
+  .bible-content { position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 12vh 6vw 6vw 6vw; }
+  .bible-label { font-size: 1.8vw; font-weight: 700; letter-spacing: 0.25em; color: #f5b942; text-shadow: 0 1px 8px rgba(0,0,0,0.6); margin-bottom: 3vh; }
+  .bible-text { font-size: 4vw; line-height: 1.35; font-weight: 700; max-width: 82vw; text-shadow: 0 2px 16px rgba(0,0,0,0.7); animation: wxRise 0.8s ease both; }
+  .bible-ref { font-size: 2vw; font-weight: 700; letter-spacing: 0.2em; color: #f5b942; margin-top: 3vh; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
+  .airslide { background: #0a1f16; }
+  .air-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(160deg, #0a1f16 0%, #123524 55%, #1d4a2f 130%); }
+  .air-photo { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transform-origin: center center; }
+  .air-photo.kb-start { transform: scale(1); }
+  .air-photo.kb { transform: scale(1.12); transition: transform 20s linear; }
+  .air-shade { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.65) 45%, rgba(0,0,0,0.55) 100%); }
+  .air-content { position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 2; display: flex; flex-direction: column; justify-content: space-evenly; gap: 1.5vh; padding: 12vh 3vw 2.5vw 3vw; }
+  .air-label { font-size: 1.8vw; font-weight: 700; letter-spacing: 0.25em; color: #f5b942; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
+  .air-main { display: flex; gap: 3vw; align-items: center; }
+  .air-aqi { display: flex; flex-direction: column; align-items: center; min-width: 22vw; }
+  .air-aqi-icon svg { width: 4vw; height: 4vw; color: #f5b942; }
+  .air-aqi-num { font-size: 9.5vw; font-weight: 700; line-height: 1; text-shadow: 0 2px 16px rgba(0,0,0,0.6); }
+  .air-aqi-cat { font-size: 1.8vw; font-weight: 700; padding: 0.5vw 1.2vw; border-radius: 0.6vw; margin-top: 1vh; }
+  .air-aqi-sub { font-size: 1.4vw; color: #c8cdd2; margin-top: 0.6vw; letter-spacing: 0.15em; }
+  .air-details { flex: 1; display: flex; flex-direction: column; gap: 1.2vh; }
+  .air-row { display: flex; gap: 1vw; }
+  .air-box { flex: 1; background: rgba(0,0,0,0.45); border-radius: 0.8vw; padding: 1vw 0.5vw; text-align: center; animation: wxRise 0.7s ease both; }
+  .air-box .aname { font-size: 1.5vw; font-weight: 700; letter-spacing: 0.12em; color: #c8cdd2; }
+  .air-box .aval { font-size: 2.6vw; font-weight: 700; margin-top: 0.3vw; }
+  .air-box .aunit { font-size: 1.3vw; color: #c8cdd2; }
+  .air-box .alevel { font-size: 1.8vw; font-weight: 700; margin-top: 0.3vw; }
+  .air-pollen-label { font-size: 1.4vw; font-weight: 700; letter-spacing: 0.2em; color: #c8cdd2; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
+  .air-source { font-size: 1.2vw; color: #c8cdd2; }
+  .aicon svg { width: 2.4vw; height: 2.4vw; color: #f5b942; margin-bottom: 0.3vw; }
+  .air-rec { font-size: 1.9vw; text-align: center; color: #e8eaed; text-shadow: 0 1px 8px rgba(0,0,0,0.6); padding: 0 3vw; }
+  .air-chart { background: rgba(0,0,0,0.45); border-radius: 0.8vw; padding: 0.8vw 1.2vw; }
+  .air-chart-title { font-size: 1.4vw; font-weight: 700; letter-spacing: 0.2em; color: #c8cdd2; margin-bottom: 0.4vw; }
+  .air-chart-svg svg { width: 100%; height: 6.5vw; display: block; }
+  .air-chart-hours { display: flex; justify-content: space-between; font-size: 1.2vw; color: #c8cdd2; margin-top: 0.2vw; }
+  .mktslide { background: #0b0f16; }
+  .mkt-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(160deg, #0b0f16 0%, #131c2e 55%, #0a0e1a 130%); }
+  .mkt-photo { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transform-origin: center center; }
+  .mkt-photo.kb-start { transform: scale(1); }
+  .mkt-photo.kb { transform: scale(1.12); transition: transform 20s linear; }
+  .mkt-shade { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.65) 45%, rgba(0,0,0,0.55) 100%); }
+  .mkt-content { position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 2; display: flex; flex-direction: column; justify-content: flex-start; gap: 2vh; padding: 13vh 3vw 3vw 3vw; }
+  .mkt-label { font-size: 2.4vw; font-weight: 700; letter-spacing: 0.25em; color: #f5b942; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
+  .mkt-grid { display: flex; flex-wrap: wrap; gap: 1vw; flex: 1; align-content: stretch; }
+  .mkt-card { flex: 1 1 22%; background: rgba(0,0,0,0.5); border-radius: 0.8vw; padding: 1vw 1vw 0.8vw 1vw; display: flex; flex-direction: column; animation: wxRise 0.7s ease both; }
+  .mkt-region { font-size: 1.7vw; font-weight: 700; letter-spacing: 0.2em; color: #f5b942; }
+  .mkt-name { font-size: 2.4vw; font-weight: 700; margin-top: 0.3vw; }
+  .mkt-val { font-size: 3.4vw; font-weight: 700; margin-top: 0.4vw; }
+  .mkt-change { font-size: 2.1vw; font-weight: 700; margin-top: 0.2vw; }
+  .mkt-change.up { color: #7ee787; }
+  .mkt-change.down { color: #ff7b72; }
+  .mkt-spark { margin-top: auto; padding-top: 0.6vw; }
+  .mkt-spark svg { width: 100%; height: 3.6vw; display: block; }
+  .mkt-source { font-size: 1.6vw; color: #c8cdd2; }
+  .factslide { background: #0a0a14; }
+  .fact-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(160deg, #0a0a14 0%, #1a1430 55%, #050510 130%); }
+  .fact-photo { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transform-origin: center center; }
+  .fact-photo.kb-start { transform: scale(1); }
+  .fact-photo.kb { transform: scale(1.12); transition: transform 20s linear; }
+  .fact-shade { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.45) 100%); }
+  .fact-content { position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 12vh 6vw 6vw 6vw; }
+  .fact-label { font-size: 1.8vw; font-weight: 700; letter-spacing: 0.25em; color: #f5b942; text-shadow: 0 1px 8px rgba(0,0,0,0.6); margin-bottom: 3vh; }
+  .fact-text { font-size: 4vw; line-height: 1.35; font-weight: 700; max-width: 82vw; text-shadow: 0 2px 16px rgba(0,0,0,0.7); animation: wxRise 0.8s ease both; }
+  .fact-tag { font-size: 2vw; font-weight: 700; letter-spacing: 0.2em; color: #f5b942; margin-top: 3vh; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
+  .fact-answer { font-size: 2.4vw; font-weight: 700; color: #f5b942; margin-top: 2.5vh; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
+  .photo-dots {
+    display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background-image: radial-gradient(rgba(0,0,0,0.25) 1.2px, transparent 1.6px);
+    background-size: 5px 5px;
+  }
+  .slide.low-res .photo-dots { display: block; }
+  .topbar {
+    position: absolute; top: 0; left: 0; right: 0; z-index: 2;
+    display: flex; justify-content: space-between; align-items: flex-start;
+    padding: 2vw 3vw 6vh 3vw;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0) 100%);
+  }
+  .topright { display: flex; align-items: flex-start; gap: 1.4vw; }
+  .topright .clockbox { text-align: right; }
+  .info {
+    position: absolute; left: 0; right: 0; bottom: 0; z-index: 2;
+    padding: 9vh 3vw 2.4vw 3vw;
+    background: linear-gradient(to top, rgba(0,0,0,0.93) 0%, rgba(0,0,0,0.78) 45%, rgba(0,0,0,0.35) 75%, rgba(0,0,0,0) 100%);
+  }
+  .srcrow { display: flex; align-items: center; }
+  .srclogo {
+    width: 2.6vw; height: 2.6vw; min-width: 30px; min-height: 30px;
+    margin-right: 0.7vw; border-radius: 4px; background: #fff;
+    object-fit: contain; padding: 1px;
+  }
+  .src {
+    font-size: 2vw; font-weight: 700; letter-spacing: 0.18em;
+    text-transform: uppercase; color: #f5b942;
+    text-shadow: 0 1px 10px rgba(0,0,0,0.7);
+  }
+  .headline {
+    font-size: 7vw; line-height: 1.15; font-weight: 700;
+    margin: 0.9vw 0 0 0; word-wrap: break-word;
+    max-height: 40vh; overflow: hidden;
+    text-shadow: 0 2px 14px rgba(0,0,0,0.65);
+  }
+  .headline .caret {
+    display: inline-block; width: 0.09em; height: 0.95em; margin-left: 0.08em;
+    background: #f5b942; vertical-align: -0.08em;
+    animation: caretBlink 0.8s step-end infinite;
+  }
+  @keyframes caretBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+  .meta { color: #d0d4d9; font-size: 2vw; margin-top: 0; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
+  .metarow { display: flex; justify-content: space-between; align-items: baseline; margin-top: 0.7vw; }
+  .fresh {
+    display: inline-block; margin-left: 1vw; padding: 0.25vw 0.9vw;
+    background: #e5484d; color: #fff; font-size: 1.4vw; font-weight: 700; letter-spacing: 0.12em;
+    border-radius: 999px; animation: freshPulse 1.6s ease-in-out infinite;
+  }
+  @keyframes freshPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+  .alert {
+    display: flex; align-items: center; gap: 0.6vw; align-self: center; flex: none;
+    background: rgba(229,72,77,0.92); color: #fff; font-size: 1.7vw; font-weight: 700;
+    padding: 0.5vw 1.1vw; border-radius: 999px; max-width: 36vw;
+  }
+  .alert .warn { display: inline-flex; flex: none; }
+  .alert .warn svg { width: 1.8vw; height: 1.8vw; min-width: 20px; min-height: 20px; }
+  .alert .alertevt { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .clockbox { flex: none; }
+  .clock { font-size: 4.8vw; font-weight: 700; line-height: 1; text-shadow: 0 2px 12px rgba(0,0,0,0.6); }
+  .date { font-size: 1.9vw; color: #c8cdd2; margin-top: 0.4vw; text-transform: capitalize; }
+  .weather { font-size: 2.2vw; color: #e8eaed; display: flex; flex-direction: column; align-items: flex-start; flex: none; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
+  .weather .top { display: flex; align-items: center; }
+  .weather .cond { font-size: 1.9vw; margin-top: 0.3vw; }
+  #offline .weather { align-items: center; text-align: center; }
+  .weather .wic { display: inline-flex; align-items: center; margin-right: 0.6vw; }
+  .weather .wic svg { width: 3.4vw; height: 3.4vw; min-width: 36px; min-height: 36px; }
+  .weather .temp { font-size: 3.6vw; font-weight: 700; }
+  .counter { color: #aaa; font-size: 2vw; margin-top: 0; text-align: right; }
+  .slide.no-photo .photo { display: none; }
+  .slide.no-photo .headline { font-size: 8vw; }
+  .tapzone { position: absolute; top: 0; bottom: 0; width: 15%; z-index: 10; cursor: pointer; }
+  #tapPrev { left: 0; }
+  #tapNext { right: 0; }
+  .chev {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    font-size: 3.5vw; color: rgba(255,255,255,0.28); z-index: 11; pointer-events: none;
+  }
+  #chevPrev { left: 1.2vw; }
+  #chevNext { right: 1.2vw; }
+  #progress {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 4px;
+    background: rgba(255,255,255,0.08); z-index: 5;
+  }
+  #bar { height: 100%; width: 0%; background: #f5b942; }
+  #offline {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 4;
+    display: none; flex-direction: column; align-items: center; justify-content: center;
+    background: #0a0a0a; text-align: center; padding: 4vw;
+  }
+  body.offline #offline { display: flex; }
+  body.offline .slide { opacity: 0 !important; }
+  body.offline .topbar { display: none; }
+  #offline .msg { font-size: 2vw; color: #9aa0a6; margin-top: 1.5vw; }
+  #offline .brand { font-size: 1.2vw; letter-spacing: 0.25em; color: #666; margin-top: 2vw; }
+  @media (max-aspect-ratio: 1/1) {
+    .topbar { padding: 4vw 5vw 9vh 5vw; }
+    .topright { gap: 3vw; }
+    .info { padding: 8vh 5vw 4vw 5vw; }
+    .src { font-size: 3.8vw; }
+    .srclogo { width: 6vw; height: 6vw; }
+    .headline { font-size: 11.5vw; max-height: 32vh; }
+    .meta { font-size: 4vw; }
+    .clock { font-size: 11vw; }
+    .date { font-size: 4.2vw; }
+    .weather { font-size: 4.8vw; }
+    .weather .cond { font-size: 3.6vw; }
+    .weather .wic svg { width: 7vw; height: 7vw; }
+    .weather .temp { font-size: 7vw; }
+    .counter { font-size: 3.6vw; }
+    .fresh { font-size: 2.8vw; }
+    .alert { font-size: 3.4vw; }
+    .alert .warn svg { width: 4vw; height: 4vw; }
+    .wx-temp { font-size: 18vw; }
+    .wx-cond { font-size: 6vw; }
+    .wx-details { font-size: 4vw; }
+    .wx-label { font-size: 3.4vw; }
+    .wx-day .dname { font-size: 3.6vw; }
+    .wx-day .dmax { font-size: 4.8vw; }
+    .wx-day .dmin { font-size: 3.8vw; }
+    .wx-day .dic svg { width: 7vw; height: 7vw; }
+    .fx-rate { font-size: 18vw; }
+    .fx-hero .fx-eq { font-size: 7vw; }
+    .fx-change { font-size: 4.5vw; }
+    .fx-details { font-size: 4vw; }
+    .fx-label { font-size: 3.4vw; }
+    .fx-rowlabel { font-size: 3vw; }
+    .fx-box .fname { font-size: 3.6vw; }
+    .fx-box .fprice { font-size: 4.8vw; }
+    .fx-box .fchange { font-size: 3.4vw; }
+    .fx-top { flex-direction: column; }
+    .fx-chart { min-height: 30vh; }
+    .clock-row { flex-wrap: wrap; }
+    .clock-card { min-width: 28vw; }
+    .clock-face { width: 22vw; height: 22vw; }
+    .city { font-size: 3vw; }
+    .dig { font-size: 4.5vw; }
+    .cdate { font-size: 2.6vw; }
+    .bible-text { font-size: 7vw; }
+    .bible-ref { font-size: 3.6vw; }
+    .bible-label { font-size: 3.4vw; }
+    .air-aqi-num { font-size: 20vw; }
+    .air-label { font-size: 3.4vw; }
+    .air-box .aval { font-size: 4.8vw; }
+    .air-rec { font-size: 4vw; }
+    .aicon svg { width: 5vw; height: 5vw; }
+    .air-chart-svg svg { height: 14vw; }
+    .mkt-label { font-size: 4.2vw; }
+    .mkt-card { flex-basis: 44%; }
+    .mkt-region { font-size: 2.4vw; }
+    .mkt-name { font-size: 3.2vw; }
+    .mkt-val { font-size: 5.6vw; }
+    .mkt-change { font-size: 2.8vw; }
+    .mkt-source { font-size: 2.2vw; }
+    .fact-text { font-size: 7vw; }
+    .fact-tag { font-size: 3.6vw; }
+    .fact-label { font-size: 3.4vw; }
+    .fact-answer { font-size: 4.2vw; }
+    .chev { font-size: 8vw; }
+  }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="slide active" id="slideA">
+    <div class="photo"><div class="photo-blur"></div><img class="photo-img" alt=""><div class="photo-dots"></div></div>
+    <div class="info">
+      <div class="srcrow"><img class="srclogo" alt=""><div class="src"></div><span class="fresh" style="display:none"></span></div>
+      <h1 class="headline"></h1>
+      <div class="metarow"><div class="meta"></div><div class="counter"></div></div>
+    </div>
+  </div>
+  <div class="slide" id="slideB">
+    <div class="photo"><div class="photo-blur"></div><img class="photo-img" alt=""><div class="photo-dots"></div></div>
+    <div class="info">
+      <div class="srcrow"><img class="srclogo" alt=""><div class="src"></div><span class="fresh" style="display:none"></span></div>
+      <h1 class="headline"></h1>
+      <div class="metarow"><div class="meta"></div><div class="counter"></div></div>
+    </div>
+  </div>
+  <div class="slide wxslide" id="slideWeather">
+    <div class="wx-bg"></div>
+    <img class="wx-photo" alt="">
+    <div class="wx-shade"></div>
+    <div class="wx-content">
+      <div>
+        <div class="wx-label">PREVISÃO DO TEMPO</div>
+        <div class="wx-now">
+          <div class="wx-big"><span class="wic"></span><span class="wx-temp"></span></div>
+          <div class="wx-cond"></div>
+          <div class="wx-details"></div>
+        </div>
+      </div>
+      <div class="wx-days"></div>
+    </div>
+  </div>
+  <div class="slide fxslide" id="slideFx">
+    <div class="fx-bg"></div>
+    <img class="fx-photo" alt="">
+    <div class="fx-shade"></div>
+    <div class="fx-content">
+      <div class="fx-top">
+        <div class="fx-main">
+          <div class="fx-label">CÂMBIO</div>
+          <div class="fx-hero"><span class="fx-eq">US$ 1 =</span><span class="fx-rate"></span><span class="fx-change"></span></div>
+          <div class="fx-details"></div>
+        </div>
+        <div class="fx-chart"></div>
+      </div>
+      <div class="fx-rows"></div>
+    </div>
+  </div>
+  <div class="slide clockslide" id="slideClock">
+    <div class="clock-bg"></div>
+    <img class="clock-photo" alt="">
+    <div class="clock-shade"></div>
+    <div class="clock-content">
+      <div class="clock-label">HORÁRIO MUNDIAL</div>
+      <div class="clock-row"></div>
+    </div>
+  </div>
+  <div class="slide bibleslide" id="slideBible">
+    <div class="bible-bg"></div>
+    <img class="bible-photo" alt="">
+    <div class="bible-shade"></div>
+    <div class="bible-content">
+      <div class="bible-label">PALAVRA DO DIA</div>
+      <div class="bible-text"></div>
+      <div class="bible-ref"></div>
+    </div>
+  </div>
+  <div class="slide airslide" id="slideAir">
+    <div class="air-bg"></div>
+    <img class="air-photo" alt="">
+    <div class="air-shade"></div>
+    <div class="air-content">
+      <div class="air-label">QUALIDADE DO AR · ACWORTH, GA</div>
+      <div class="air-main">
+        <div class="air-aqi"><div class="air-aqi-icon"></div><div class="air-aqi-num"></div><div class="air-aqi-cat"></div><div class="air-aqi-sub">ÍNDICE EUA (AQI)</div></div>
+        <div class="air-details"></div>
+      </div>
+      <div class="air-rec"></div>
+      <div class="air-chart"><div class="air-chart-title">AQI AO LONGO DO DIA</div><div class="air-chart-svg"></div><div class="air-chart-hours"></div></div>
+      <div class="air-pollen-label">PÓLEN · HOJE</div>
+      <div class="air-row air-pollen"></div>
+      <div class="air-source"></div>
+    </div>
+  </div>
+  <div class="slide mktslide" id="slideMkt">
+    <div class="mkt-bg"></div>
+    <img class="mkt-photo" alt="">
+    <div class="mkt-shade"></div>
+    <div class="mkt-content">
+      <div class="mkt-label">MERCADOS DO MUNDO</div>
+      <div class="mkt-grid"></div>
+      <div class="mkt-source"></div>
+    </div>
+  </div>
+  <div class="slide factslide" id="slideFact">
+    <div class="fact-bg"></div>
+    <img class="fact-photo" alt="">
+    <div class="fact-shade"></div>
+    <div class="fact-content">
+      <div class="fact-label">VOCÊ SABIA?</div>
+      <div class="fact-text"></div>
+      <div class="fact-tag"></div>
+      <div class="fact-answer"></div>
+    </div>
+  </div>
+  <div class="topbar">
+    <div class="weather"></div>
+    <div class="alert" id="nwsAlert" style="display:none"><span class="warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg></span><span class="alertevt"></span></div>
+    <div class="topright">
+      <div class="clockbox"><div class="clock"></div><div class="date"></div></div>
+    </div>
+  </div>
+  <div class="tapzone" id="tapPrev"></div>
+  <div class="tapzone" id="tapNext"></div>
+  <div class="chev" id="chevPrev">&#8249;</div>
+  <div class="chev" id="chevNext">&#8250;</div>
+  <div id="offline">
+    <div class="clock"></div>
+    <div class="date"></div>
+    <div class="weather"></div>
+    <div class="msg">Sem conexão com as notícias no momento — tentando novamente…</div>
+    <div class="brand">PORTAL NEWS</div>
+  </div>
+</div>
+<div id="progress"><div id="bar"></div></div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+<script>
+(function () {
+  var NEWS_URL = '/api/news';
+  var WEATHER_URL = 'https://api.open-meteo.com/v1/forecast?latitude=34.0658&longitude=-84.6769&current=temperature_2m,weather_code,apparent_temperature,relative_humidity_2m,wind_speed_10m,is_day&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max,sunrise,sunset&timezone=America%2FNew_York&temperature_unit=celsius&wind_speed_unit=mph';
+  var WX_MS = 20000;
+  var FX_MS = 20000;
+  var CLOCK_MS = 20000;
+  var BIBLE_MS = 20000;
+  var AIR_MS = 20000;
+  var MKT_MS = 20000;
+  var FACT_MS = 20000;
+  var AIR_PHOTO = 'https://images.pexels.com/photos/16603821/pexels-photo-16603821.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=1260&h=750&dpr=1';
+  var MKT_PHOTO = 'https://images.pexels.com/photos/35118250/pexels-photo-35118250.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1';
+  var FACT_PHOTO = 'https://images.pexels.com/photos/22491158/pexels-photo-22491158.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1';
+  var TRIVIA_PHOTOS = {
+    'General Knowledge': 'https://images.pexels.com/photos/33034646/pexels-photo-33034646.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=1260&h=750&dpr=1',
+    'Science & Nature': 'https://images.pexels.com/photos/7722797/pexels-photo-7722797.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'Science: Computers': 'https://images.pexels.com/photos/36571389/pexels-photo-36571389.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'Science: Mathematics': 'https://images.pexels.com/photos/7722797/pexels-photo-7722797.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'Science: Gadgets': 'https://images.pexels.com/photos/7722797/pexels-photo-7722797.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'History': 'https://images.pexels.com/photos/14436278/pexels-photo-14436278.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'Geography': 'https://images.pexels.com/photos/6963694/pexels-photo-6963694.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=1260&h=750&dpr=1',
+    'Animals': 'https://images.pexels.com/photos/18000406/pexels-photo-18000406.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'Sports': 'https://images.pexels.com/photos/114296/pexels-photo-114296.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'Art': 'https://images.pexels.com/photos/19968245/pexels-photo-19968245.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'Mythology': 'https://images.pexels.com/photos/15279702/pexels-photo-15279702.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'Entertainment: Film': 'https://images.pexels.com/photos/8263327/pexels-photo-8263327.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'Entertainment: Television': 'https://images.pexels.com/photos/8263327/pexels-photo-8263327.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'Entertainment: Music': 'https://images.pexels.com/photos/8263327/pexels-photo-8263327.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'Entertainment: Books': 'https://images.pexels.com/photos/8263327/pexels-photo-8263327.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'Entertainment: Video Games': 'https://images.pexels.com/photos/8263327/pexels-photo-8263327.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'Entertainment: Japanese Anime & Manga': 'https://images.pexels.com/photos/8263327/pexels-photo-8263327.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'Entertainment: Cartoon & Animations': 'https://images.pexels.com/photos/8263327/pexels-photo-8263327.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'Entertainment: Comics': 'https://images.pexels.com/photos/8263327/pexels-photo-8263327.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'Entertainment: Board Games': 'https://images.pexels.com/photos/8263327/pexels-photo-8263327.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'Celebrities': 'https://images.pexels.com/photos/8263327/pexels-photo-8263327.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
+  };
+  var TRIVIA_CATS = {
+    'General Knowledge': 'CONHECIMENTOS GERAIS',
+    'Science & Nature': 'CIÊNCIA E NATUREZA',
+    'Science: Computers': 'COMPUTADORES',
+    'Science: Mathematics': 'MATEMÁTICA',
+    'Science: Gadgets': 'TECNOLOGIA',
+    'History': 'HISTÓRIA',
+    'Geography': 'GEOGRAFIA',
+    'Animals': 'ANIMAIS',
+    'Sports': 'ESPORTES',
+    'Art': 'ARTE',
+    'Mythology': 'MITOLOGIA',
+    'Entertainment: Film': 'CINEMA',
+    'Entertainment: Television': 'TELEVISÃO',
+    'Entertainment: Music': 'MÚSICA',
+    'Entertainment: Books': 'LIVROS',
+    'Entertainment: Video Games': 'VIDEOGAMES',
+    'Entertainment: Japanese Anime & Manga': 'ANIME E MANGÁ',
+    'Entertainment: Cartoon & Animations': 'DESENHOS',
+    'Entertainment: Comics': 'QUADRINHOS',
+    'Entertainment: Board Games': 'JOGOS DE TABULEIRO',
+    'Celebrities': 'CELEBRIDADES',
+    'Politics': 'POLÍTICA',
+    'Vehicles': 'VEÍCULOS'
+  };
+  var AIR_URL = 'https://air-quality-api.open-meteo.com/v1/air-quality?latitude=34.0658&longitude=-84.6769&current=us_aqi,pm2_5,pm10,ozone,nitrogen_dioxide,sulphur_dioxide,carbon_monoxide&hourly=us_aqi&timezone=America%2FNew_York';
+  var AIR_REFRESH_MS = 1800000;
+  var MKT_REFRESH_MS = 900000;
+  var CLOCK_PHOTO = 'https://commons.wikimedia.org/wiki/Special:FilePath/ISS-34%20Earth%27s%20atmosphere.jpg?width=1600';
+  var BIBLE_PHOTO = 'https://commons.wikimedia.org/wiki/Special:FilePath/Leonardo%20da%20Vinci%20%281452-1519%29%20-%20The%20Last%20Supper%20%281495-1498%29.jpg?width=1600';
+  var BIBLE_PHOTO_FALLBACK = 'https://commons.wikimedia.org/wiki/Special:FilePath/Holy%20Bible.jpg?width=1600';
+  var CLOCK_CITIES = [
+    { name: 'ATLANTA', tz: 'America/New_York', off: -4 },
+    { name: 'LOS ANGELES', tz: 'America/Los_Angeles', off: -7 },
+    { name: 'BRASÍLIA', tz: 'America/Sao_Paulo', off: -3 },
+    { name: 'LONDRES', tz: 'Europe/London', off: 1 },
+    { name: 'TÓQUIO', tz: 'Asia/Tokyo', off: 9 }
+  ];
+  var BIBLE_VERSES = [
+    { ref: 'JOÃO 3:16', text: 'Porque Deus tanto amou o mundo que deu o seu Filho Unigênito, para que todo o que nele crer não pereça, mas tenha a vida eterna.' },
+    { ref: 'SALMO 23:1', text: 'O Senhor é o meu pastor; de nada terei falta.' },
+    { ref: 'FILIPENSES 4:13', text: 'Tudo posso naquele que me fortalece.' },
+    { ref: 'JEREMIAS 29:11', text: 'Porque sou eu que conheço os planos que tenho para vocês, declara o Senhor, planos de fazê-los prosperar e não de lhes causar dano, planos de dar-lhes esperança e um futuro.' },
+    { ref: '1 CORÍNTIOS 13:4', text: 'O amor é paciente, o amor é bondoso. Não inveja, não se vangloria, não se orgulha.' },
+    { ref: 'MATEUS 11:28', text: 'Venham a mim, todos os que estão cansados e sobrecarregados, e eu lhes darei descanso.' },
+    { ref: 'ROMANOS 8:28', text: 'Sabemos que Deus age em todas as coisas para o bem daqueles que o amam, dos que foram chamados de acordo com o seu propósito.' },
+    { ref: 'ISAÍAS 41:10', text: 'Não tenha medo, pois estou com você; não se apavore, pois eu sou o seu Deus. Eu o fortalecerei e o ajudarei; eu o segurarei com a minha mão direita vitoriosa.' }
+  ];
+  var BIBLE_REFS = [
+    'João 3:16', 'Salmos 23:1', 'Filipenses 4:13', 'Jeremias 29:11',
+    '1 Coríntios 13:4', 'Mateus 11:28', 'Romanos 8:28', 'Isaías 41:10',
+    'Salmos 46:1', 'Provérbios 3:5', 'Mateus 5:16', 'Romanos 12:2',
+    'Filipenses 4:6', 'Isaías 40:31', 'Salmos 121:2', 'João 14:6',
+    'Romanos 15:13', '1 João 4:8', 'Hebreus 11:1', 'Tiago 1:5',
+    'Salmos 37:4', 'Mateus 6:33', 'João 10:10', 'Romanos 10:9',
+    'Efésios 2:8', 'Salmos 119:105', 'Provérbios 22:6', 'Josué 1:9',
+    'Deuteronômio 31:6', 'Salmos 27:1', 'Mateus 5:14', '2 Coríntios 5:17',
+    'Romanos 8:31', 'João 8:32', 'Mateus 28:19', 'Lucas 2:11',
+    'Apocalipse 21:4', 'Salmos 19:1', 'Isaías 43:2', '1 Pedro 5:7'
+  ];
+  var bibleNext = null;
+  var bibleLastRef = '';
+  var FACTS = [
+    { cat: 'TECNOLOGIA', text: 'O primeiro mouse da história era de madeira. Foi criado em 1964 por Douglas Engelbart.' },
+    { cat: 'TECNOLOGIA', text: 'O Google quase se chamou Backrub, porque analisava os links que apontavam para cada página.' },
+    { cat: 'TECNOLOGIA', text: 'A primeira webcam do mundo foi criada para vigiar uma cafeteira na Universidade de Cambridge.' },
+    { cat: 'TECNOLOGIA', text: 'O primeiro bug de computador de verdade foi uma mariposa encontrada dentro do Harvard Mark II, em 1947.' },
+    { cat: 'TECNOLOGIA', text: 'O Nokia 1100 é o celular mais vendido da história, com mais de 250 milhões de unidades.' },
+    { cat: 'TECNOLOGIA', text: 'O primeiro domínio .com registrado foi o Symbolics.com, em 1985.' },
+    { cat: 'TECNOLOGIA', text: 'O código QR foi inventado em 1994 no Japão para rastrear peças de carro na fábrica.' },
+    { cat: 'TECNOLOGIA', text: 'A palavra robô vem do tcheco robota, que significa trabalho forçado, e apareceu numa peça de teatro em 1920.' },
+    { cat: 'TECNOLOGIA', text: 'O primeiro programador da história foi Ada Lovelace, no século XIX, antes mesmo de existir computador.' },
+    { cat: 'TECNOLOGIA', text: 'O primeiro celular comercial, o Motorola DynaTAC, pesava quase 1,1 kg e custava cerca de 4 mil dólares em 1983.' },
+    { cat: 'TECNOLOGIA', text: 'O YouTube começou em 2005 como um site de namoro, com o slogan Tune In, Hook Up.' },
+    { cat: 'TECNOLOGIA', text: 'A Amazon começou em 1994 vendendo livros na garagem de Jeff Bezos.' },
+    { cat: 'TECNOLOGIA', text: 'O GPS só funciona com precisão por causa da Teoria da Relatividade de Einstein.' },
+    { cat: 'TECNOLOGIA', text: 'O primeiro iPhone, de 2007, não tinha App Store, nem copiar e colar, nem 3G.' },
+    { cat: 'CIÊNCIA', text: 'Um raio é cerca de cinco vezes mais quente que a superfície do Sol.' },
+    { cat: 'CIÊNCIA', text: 'A maior parte do oxigênio que respiramos vem do oceano, não das florestas.' },
+    { cat: 'CIÊNCIA', text: 'O mel nunca estraga: já encontraram potes de mel com 3 mil anos em tumbas egípcias, ainda bons para comer.' },
+    { cat: 'CIÊNCIA', text: 'Os polvos têm três corações e o sangue azul.' },
+    { cat: 'CIÊNCIA', text: 'A água-viva Turritopsis é biologicamente imortal: ela consegue voltar ao estágio de pólipo.' },
+    { cat: 'CIÊNCIA', text: 'As abelhas conseguem reconhecer rostos humanos.' },
+    { cat: 'ESPAÇO', text: 'A Estação Espacial Internacional viaja a cerca de 28 mil km/h e dá uma volta na Terra a cada 90 minutos.' },
+    { cat: 'ESPAÇO', text: 'A Lua está se afastando da Terra cerca de 3,8 centímetros por ano.' },
+    { cat: 'ESPAÇO', text: 'Um dia em Vênus dura mais do que um ano venusiano.' },
+    { cat: 'ESPAÇO', text: 'O Sol contém 99,86% de toda a massa do Sistema Solar.' },
+    { cat: 'ESPAÇO', text: 'Os anéis de Saturno são feitos quase totalmente de gelo.' },
+    { cat: 'ESPAÇO', text: 'O primeiro satélite artificial, o Sputnik 1, pesava só 83 quilos e foi lançado em 1957.' },
+    { cat: 'ESPAÇO', text: 'O som não se propaga no espaço, porque não há ar para carregar as ondas sonoras.' },
+    { cat: 'CIÊNCIA', text: 'A Torre Eiffel cresce cerca de 15 centímetros no verão, por causa da dilatação do ferro com o calor.' },
+    { cat: 'NATUREZA', text: 'O Monte Everest cresce cerca de 4 milímetros por ano.' },
+    { cat: 'NATUREZA', text: 'O coração de uma baleia-azul é do tamanho de um carro pequeno.' },
+    { cat: 'HISTÓRIA', text: 'O Coliseu de Roma já foi inundado de propósito para encenar batalhas navais.' },
+    { cat: 'HISTÓRIA', text: 'A Grande Muralha da China foi construída com uma argamassa que levava farinha de arroz glutinoso.' },
+    { cat: 'HISTÓRIA', text: 'O alfabeto havaiano tem só 12 letras.' },
+    { cat: 'HISTÓRIA', text: 'A moeda de 1 centavo americana custa mais para fabricar do que vale.' }
+  ];
+  var FX_REFRESH_MS = 600000;
+  var FX_PHOTO = 'https://images.pexels.com/photos/10149290/pexels-photo-10149290.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1';
+  var FX_FIAT = ['EUR', 'GBP', 'JPY'];
+  var FX_SYM = { EUR: '€', GBP: '£', JPY: '¥' };
+  var FX_CRYPTO = [ ['BTC', 'bitcoin'], ['ETH', 'ethereum'], ['SOL', 'solana'], ['BNB', 'binancecoin'], ['XRP', 'ripple'], ['DOGE', 'dogecoin'] ];
+  var ROTATE_MS = 15000;
+  var REFRESH_MS = 600000;
+  var WEATHER_MS = 1800000;
+  var RETRY_MS = 30000;
+
+  var items = [];
+  var curNewsIdx = 0;
+  var curKind = 'C';
+  var current = 'A';
+  var retryPending = false;
+  var rotateTimer = null;
+  var resizeTimer = null;
+  var typeTimer = null;
+  var typing = false;
+  var weatherData = null;
+  var weatherFailed = false;
+  var fxData = null;
+  var fxFailed = false;
+  var seq = [];
+  var seqPos = 0;
+  var slides = { A: document.getElementById('slideA'), B: document.getElementById('slideB') };
+  var wxSlide = document.getElementById('slideWeather');
+  var fxSlide = document.getElementById('slideFx');
+  var clockSlide = document.getElementById('slideClock');
+  var bibleSlide = document.getElementById('slideBible');
+  var airSlide = document.getElementById('slideAir');
+  var mktSlide = document.getElementById('slideMkt');
+  var factSlide = document.getElementById('slideFact');
+  var airData = null;
+  var airPollen = null;
+  var mktData = null;
+  var factLast = '';
+  var factNext = null;
+  var factCount = 0;
+  var factBusy = false;
+  var fxChartInstance = null;
+  var transCache = {};
+  var transBusy = {};
+  var transTimer = null;
+
+  function q(sel, el) { return (el || document).querySelector(sel); }
+  function qa(sel, el) { return (el || document).querySelectorAll(sel); }
+
+  function xhrGet(url, cb) {
+    var x = new XMLHttpRequest();
+    x.open('GET', url, true);
+    x.timeout = 20000;
+    x.onreadystatechange = function () {
+      if (x.readyState === 4) {
+        cb(x.status >= 200 && x.status < 300 ? null : new Error('HTTP ' + x.status), x.responseText);
+      }
+    };
+    x.ontimeout = function () { cb(new Error('timeout')); };
+    x.onerror = function () { cb(new Error('network')); };
+    x.send();
+  }
+
+  function catLabel(c) {
+    if (c === 'brasil') return 'Brasil';
+    if (c === 'mundo') return 'Mundo';
+    if (c === 'eua') return 'EUA';
+    if (c === 'atlanta') return 'Local';
+    return 'Tecnologia';
+  }
+
+  function fmtTime(iso) {
+    if (!iso) return '';
+    try {
+      var d = new Date(iso);
+      return new Intl.DateTimeFormat('pt-BR', {
+        timeZone: 'America/New_York', day: '2-digit', month: '2-digit',
+        hour: '2-digit', minute: '2-digit'
+      }).format(d);
+    } catch (e) { return ''; }
+  }
+
+  function fmtRelative(iso) {
+    if (!iso) return '';
+    try {
+      var d = new Date(iso);
+      var diff = Date.now() - d.getTime();
+      if (isNaN(diff)) return fmtTime(iso);
+      var min = Math.floor(diff / 60000);
+      if (min < 1) return 'agora';
+      if (min < 60) return 'há ' + min + ' min';
+      var h = Math.floor(min / 60);
+      if (h < 24) return 'há ' + h + ' h';
+      return fmtTime(iso);
+    } catch (e) { return fmtTime(iso); }
+  }
+
+  function tickClock() {
+    try {
+      var now = new Date();
+      var time = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit', hour12: true
+      }).format(now);
+      var wd = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/New_York', weekday: 'short' }).format(now).replace(/\./g, '');
+      wd = wd.charAt(0).toUpperCase() + wd.slice(1);
+      var mo = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/New_York', month: 'long' }).format(now);
+      mo = mo.charAt(0).toUpperCase() + mo.slice(1);
+      var dy = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/New_York', day: 'numeric' }).format(now);
+      var yr = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/New_York', year: 'numeric' }).format(now);
+      var date = wd + ', ' + dy + ' ' + mo + ' ' + yr;
+      var clocks = qa('.clock');
+      var dates = qa('.date');
+      for (var i = 0; i < clocks.length; i++) { clocks[i].textContent = time; }
+      for (var j = 0; j < dates.length; j++) { dates[j].textContent = date; }
+    } catch (e) {}
+  }
+
+  function weatherLabel(code) {
+    if (code === 0) return 'Céu limpo';
+    if (code === 1) return 'Sol com poucas nuvens';
+    if (code === 2) return 'Parcialmente nublado';
+    if (code === 3) return 'Nublado';
+    if (code === 45 || code === 48) return 'Nevoeiro';
+    if (code === 51 || code === 53 || code === 55) return 'Garoa';
+    if (code === 56 || code === 57) return 'Garoa congelante';
+    if (code === 61 || code === 63 || code === 65) return 'Chuva';
+    if (code === 66 || code === 67) return 'Chuva congelante';
+    if (code === 71 || code === 73 || code === 75) return 'Neve';
+    if (code === 77) return 'Grãos de neve';
+    if (code === 80 || code === 81 || code === 82) return 'Pancadas de chuva';
+    if (code === 85 || code === 86) return 'Pancadas de neve';
+    if (code === 95) return 'Trovoada';
+    if (code === 96 || code === 99) return 'Trovoada com granizo';
+    return '';
+  }
+
+  function iconSVG(code) {
+    var open = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">';
+    var sun = '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"/>';
+    var cloud = '<path d="M17.5 18H6.5a4.5 4.5 0 0 1-.7-8.9A6 6 0 0 1 17.6 10.5 4.2 4.2 0 0 1 17.5 18z"/>';
+    var partly = '<circle cx="8" cy="8" r="3"/><path d="M8 2v1.5M8 12.5V14M2 8h1.5M12.5 8H14M4 4l1 1M11 11l1 1M12 4l-1 1M5 11l-1 1M17.5 18H9a4 4 0 0 1-.6-7.9A5.5 5.5 0 0 1 18.6 11 3.8 3.8 0 0 1 17.5 18z"/>';
+    var fog = '<path d="M17.5 16H6.5a4 4 0 0 1-.6-7.9A5.5 5.5 0 0 1 16.6 9 3.8 3.8 0 0 1 17.5 16z"/><path d="M8 19h8M10 22h4"/>';
+    var drizzle = '<path d="M17.5 16H6.5a4 4 0 0 1-.6-7.9A5.5 5.5 0 0 1 16.6 9 3.8 3.8 0 0 1 17.5 16z"/><path d="M8 19l-1 2M12 19l-1 2M16 19l-1 2"/>';
+    var rain = '<path d="M17.5 16H6.5a4 4 0 0 1-.6-7.9A5.5 5.5 0 0 1 16.6 9 3.8 3.8 0 0 1 17.5 16z"/><path d="M8 19l-1.5 2.5M12 19l-1.5 2.5M16 19l-1.5 2.5"/>';
+    var snow = '<path d="M17.5 16H6.5a4 4 0 0 1-.6-7.9A5.5 5.5 0 0 1 16.6 9 3.8 3.8 0 0 1 17.5 16z"/><circle cx="8" cy="20.5" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="20.5" r="1" fill="currentColor" stroke="none"/><circle cx="16" cy="20.5" r="1" fill="currentColor" stroke="none"/>';
+    var storm = '<path d="M17.5 16H6.5a4 4 0 0 1-.6-7.9A5.5 5.5 0 0 1 16.6 9 3.8 3.8 0 0 1 17.5 16z"/><path d="M13 12l-4 6h3l-2 5 5-6h-3z" fill="currentColor" stroke="none"/>';
+    var body = cloud;
+    if (code === 0 || code === 1) body = sun;
+    else if (code === 2) body = partly;
+    else if (code === 45 || code === 48) body = fog;
+    else if (code === 51 || code === 53 || code === 55 || code === 56 || code === 57) body = drizzle;
+    else if (code === 61 || code === 63 || code === 65 || code === 66 || code === 67 || code === 80 || code === 81 || code === 82) body = rain;
+    else if (code === 71 || code === 73 || code === 75 || code === 77 || code === 85 || code === 86) body = snow;
+    else if (code === 95 || code === 96 || code === 99) body = storm;
+    return open + body + '</svg>';
+  }
+
+  function loadWeather() {
+    xhrGet(WEATHER_URL, function (err, txt) {
+      if (err) { weatherFailed = true; renderWeatherSlide(); return; }
+      try {
+        var j = JSON.parse(txt);
+        var c = j.current;
+        weatherData = { current: c, daily: j.daily };
+        weatherFailed = false;
+        var temp = Math.round(c.temperature_2m);
+        var html = '<span class="top"><span class="wic">' + iconSVG(c.weather_code) + '</span><span class="temp">' + temp + '°C</span></span><span class="cond">' + weatherLabel(c.weather_code) + '</span>';
+        var els = qa('.weather');
+        for (var i = 0; i < els.length; i++) { els[i].innerHTML = html; }
+        renderWeatherSlide();
+      } catch (e) { weatherFailed = true; renderWeatherSlide(); }
+    });
+  }
+
+  function loadAlerts() {
+    var badge = document.getElementById('nwsAlert');
+    if (!badge) return;
+    xhrGet('/api/alerts', function (err, txt) {
+      var evt = q('.alertevt', badge);
+      if (err || !evt) { badge.style.display = 'none'; return; }
+      try {
+        var d = JSON.parse(txt);
+        if (d && d.alert && d.alert.event) {
+          evt.textContent = d.alert.event;
+          badge.style.display = '';
+        } else {
+          badge.style.display = 'none';
+        }
+      } catch (e) { badge.style.display = 'none'; }
+    });
+  }
+
+  function loadTransCache() {
+    try { transCache = JSON.parse(localStorage.getItem('portalNewsTrans') || '{}') || {}; } catch (e) { transCache = {}; }
+  }
+  function saveTransCache() {
+    try {
+      var keys = Object.keys(transCache);
+      while (keys.length > 300) { delete transCache[keys.shift()]; keys = Object.keys(transCache); }
+      localStorage.setItem('portalNewsTrans', JSON.stringify(transCache));
+    } catch (e) {}
+  }
+  function isTranslatable(it) { return it && (it.category === 'eua' || it.category === 'atlanta'); }
+  function applyTranslation(it, translated) {
+    transCache[it.title] = translated;
+    saveTransCache();
+    it.titlePT = translated;
+    if (curKind === 'news' && items[curNewsIdx] === it) {
+      var el = slides[current];
+      if (el) {
+        var wasTyping = typing;
+        if (typeTimer) { clearInterval(typeTimer); typeTimer = null; }
+        typing = false;
+        el._fullTitle = translated;
+        var h = q('.headline', el);
+        if (h) {
+          if (wasTyping) { startTyping(); }
+          else { h.textContent = translated; fitHeadline(); }
+        }
+      }
+    }
+  }
+  function translateTitle(it) {
+    if (!isTranslatable(it) || !it.title) return;
+    if (transCache[it.title]) { it.titlePT = transCache[it.title]; return; }
+    if (transBusy[it.title]) return;
+    transBusy[it.title] = true;
+    var query = it.title.slice(0, 450);
+    xhrGet('https://api.mymemory.translated.net/get?q=' + encodeURIComponent(query) + '&langpair=en%7Cpt-BR', function (err, txt) {
+      transBusy[it.title] = false;
+      if (err) return;
+      try {
+        var d = JSON.parse(txt);
+        var t = d && d.responseData && d.responseData.translatedText;
+        if (!t) return;
+        if (t.indexOf('MYMEMORY WARNING') === 0 || t.indexOf('QUERY LENGTH LIMIT') === 0) return;
+        if (d.responseStatus && String(d.responseStatus) !== '200') return;
+        applyTranslation(it, t);
+      } catch (e) {}
+    });
+  }
+  function translateText(text, cb) {
+    var query = text.slice(0, 450);
+    if (transCache[query]) { cb(transCache[query]); return; }
+    if (transBusy[query]) { cb(null); return; }
+    transBusy[query] = true;
+    xhrGet('https://api.mymemory.translated.net/get?q=' + encodeURIComponent(query) + '&langpair=en%7Cpt-BR', function (err, txt) {
+      transBusy[query] = false;
+      if (err) { cb(null); return; }
+      try {
+        var d = JSON.parse(txt);
+        var t = d && d.responseData && d.responseData.translatedText;
+        if (!t) { cb(null); return; }
+        if (t.indexOf('MYMEMORY WARNING') === 0 || t.indexOf('QUERY LENGTH LIMIT') === 0) { cb(null); return; }
+        if (d.responseStatus && String(d.responseStatus) !== '200') { cb(null); return; }
+        transCache[query] = t;
+        saveTransCache();
+        cb(t);
+      } catch (e) { cb(null); }
+    });
+  }
+  function prefetchTranslations() {
+    if (!items.length) return;
+    var queue = [];
+    items.forEach(function (it) {
+      if (isTranslatable(it) && !transCache[it.title] && !transBusy[it.title]) queue.push(it);
+    });
+    if (!queue.length) return;
+    if (transTimer) { clearTimeout(transTimer); transTimer = null; }
+    (function next() {
+      var it = queue.shift();
+      if (!it) return;
+      translateTitle(it);
+      if (queue.length) transTimer = setTimeout(next, 350);
+    })();
+  }
+  function renderSlide(el, it, pos, total) {
+    var photo = q('.photo', el);
+    var blur = q('.photo-blur', el);
+    var img = q('.photo-img', el);
+    if (it.image) {
+      blur.style.backgroundImage = 'url("' + it.image + '")';
+      img.style.display = '';
+      el.className = el.className.replace(/\blow-res\b/g, '').replace(/\s+/g, ' ');
+      img.onload = function () {
+        if (img.naturalWidth && img.naturalWidth < 1000) {
+          if (el.className.indexOf('low-res') === -1) { el.className += ' low-res'; }
+        }
+      };
+      img.onerror = function () {
+        if (el.className.indexOf('no-photo') === -1) { el.className += ' no-photo'; }
+      };
+      img.src = it.image;
+      el.className = el.className.replace(/\bno-photo\b/g, '').replace(/\s+/g, ' ');
+    } else {
+      blur.style.backgroundImage = 'none';
+      el.className = el.className.replace(/\blow-res\b/g, '').replace(/\s+/g, ' ');
+      img.removeAttribute('src');
+      if (el.className.indexOf('no-photo') === -1) { el.className += ' no-photo'; }
+    }
+    var logo = q('.srclogo', el);
+    logo.style.display = '';
+    logo.onerror = function () { logo.style.display = 'none'; };
+    try {
+      var a = document.createElement('a');
+      a.href = it.link;
+      logo.src = 'https://www.google.com/s2/favicons?domain=' + a.hostname + '&sz=64';
+    } catch (e) { logo.style.display = 'none'; }
+    q('.src', el).textContent = it.source.toUpperCase() + ' · ' + catLabel(it.category).toUpperCase();
+    var dispTitle = it.titlePT || transCache[it.title] || it.title;
+    if (!it.titlePT && !transCache[it.title]) translateTitle(it);
+    q('.headline', el).textContent = dispTitle;
+    el._fullTitle = dispTitle;
+    q('.meta', el).textContent = fmtRelative(it.published_at);
+    var fr = q('.fresh', el);
+    if (fr) {
+      var isFresh = false;
+      try { isFresh = !!it.published_at && (Date.now() - new Date(it.published_at).getTime()) < 30 * 60000; } catch (e) {}
+      fr.textContent = 'AGORA';
+      fr.style.display = isFresh ? '' : 'none';
+    }
+    q('.counter', el).textContent = (pos + 1) + ' / ' + total;
+  }
+
+  function fitHeadline() {
+    if (typing) return;
+    var el = slides[current];
+    var h = q('.headline', el);
+    if (!h) return;
+    h.style.fontSize = '';
+    h.style.maxHeight = '';
+    var min = Math.max(48, Math.floor(window.innerWidth * 0.048));
+    var size = 0;
+    try { size = parseFloat(getComputedStyle(h).fontSize) || 0; } catch (e) {}
+    var guard = 0;
+    while (size > min && h.scrollHeight > h.clientHeight && guard < 60) {
+      size -= 2;
+      h.style.fontSize = size + 'px';
+      guard++;
+    }
+    if (h.scrollHeight > h.clientHeight) { h.style.maxHeight = 'none'; }
+  }
+
+  function upgradeImage(it) {
+    if (!it || !it.link || it.ogTried) return;
+    it.ogTried = true;
+    xhrGet('/api/og?url=' + encodeURIComponent(it.link), function (err, txt) {
+      if (err) return;
+      try {
+        var d = JSON.parse(txt);
+        if (d && d.image && d.image !== it.image) {
+          it.image = d.image;
+          if (items[curNewsIdx] === it) {
+            var el = slides[current];
+            var img = q('.photo-img', el);
+            var blur = q('.photo-blur', el);
+            el.className = el.className.replace(/\bno-photo\b/g, '').replace(/\blow-res\b/g, '').replace(/\s+/g, ' ');
+            blur.style.backgroundImage = 'url("' + d.image + '")';
+            img.style.display = '';
+            img.src = d.image;
+          }
+        }
+      } catch (e) {}
+    });
+  }
+
+  function restartProgress(ms) {
+    var bar = document.getElementById('bar');
+    bar.style.transition = 'none';
+    bar.style.width = '0%';
+    void bar.offsetWidth;
+    bar.style.transition = 'width ' + ms + 'ms linear';
+    bar.style.width = '100%';
+  }
+
+  function resetRotate(ms) {
+    if (rotateTimer) clearTimeout(rotateTimer);
+    rotateTimer = setTimeout(function () {
+      nextSeq();
+    }, ms);
+  }
+
+  function preloadNext() {
+    if (!items.length) return;
+    var next = items[(curNewsIdx + 1) % items.length];
+    if (next && next.image) {
+      var img = new Image();
+      img.onerror = function () { next.image = ''; };
+      img.src = next.image;
+    }
+    upgradeImage(next);
+  }
+
+  function restoreHeadlines() {
+    if (typeTimer) { clearInterval(typeTimer); typeTimer = null; }
+    typing = false;
+    for (var k in slides) {
+      var s = slides[k];
+      if (s._fullTitle) {
+        var hh = q('.headline', s);
+        if (hh) hh.textContent = s._fullTitle;
+      }
+    }
+  }
+
+  function startTyping() {
+    var el = slides[current];
+    var h = q('.headline', el);
+    if (!h) return;
+    var full = el._fullTitle || h.textContent;
+    if (!full) return;
+    typing = true;
+    var caret = document.createElement('span');
+    caret.className = 'caret';
+    var txt = document.createTextNode('');
+    h.textContent = '';
+    h.appendChild(txt);
+    h.appendChild(caret);
+    var n = 0;
+    var step = Math.max(12, Math.min(28, Math.floor(1800 / full.length)));
+    typeTimer = setInterval(function () {
+      n++;
+      txt.nodeValue = full.slice(0, n);
+      if (n >= full.length) {
+        if (typeTimer) { clearInterval(typeTimer); typeTimer = null; }
+        typing = false;
+        h.textContent = full;
+        fitHeadline();
+      }
+    }, step);
+  }
+
+  function kbOn(img) {
+    if (!img) return;
+    img.className = img.className.replace(/\bkb\S*/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '');
+    img.className += ' kb-start';
+    void img.offsetWidth;
+    img.className = img.className.replace(/\bkb-start\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '') + ' kb';
+  }
+  function applyKenBurns(el) { kbOn(q('.photo-img', el)); }
+
+  var WX_PHOTOS = {
+    sunny: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/74/Sunny_day_in_Jerusalem.jpg/1920px-Sunny_day_in_Jerusalem.jpg',
+    sunclouds: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/1/11/Sun_Behind_Clouds_Canada_%28Unsplash%29.jpg/1920px-Sun_Behind_Clouds_Canada_%28Unsplash%29.jpg',
+    night: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8f/Milky_Way_and_starry_night_sky_%2826972689115%29.jpg/1920px-Milky_Way_and_starry_night_sky_%2826972689115%29.jpg',
+    partly: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b5/Partly_cloudy_sky_at_Rambla_de_Playa_Honda_in_Montevideo_in_2023.jpg/1920px-Partly_cloudy_sky_at_Rambla_de_Playa_Honda_in_Montevideo_in_2023.jpg',
+    overcast: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3e/Stormy_Sky_%28140025141%29.jpeg/1920px-Stormy_Sky_%28140025141%29.jpeg',
+    fog: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Misty_and_foggy_viewpoint.jpg/1920px-Misty_and_foggy_viewpoint.jpg',
+    rain: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cc/Free_photo_of_Amsterdam_picture_of_the_Plantage_Middenlaan_with_light_rain%2C_in_Fall%27%2C_The_Netherlands_%2831160452445%29.png/1920px-Free_photo_of_Amsterdam_picture_of_the_Plantage_Middenlaan_with_light_rain%2C_in_Fall%27%2C_The_Netherlands_%2831160452445%29.png',
+    storm: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/8/82/Lightning_Pritzerbe_01_%28MK%29.jpg/1920px-Lightning_Pritzerbe_01_%28MK%29.jpg',
+    snow: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4e/Winter_in_Tatry_Mountains_-_Poland.jpg/1920px-Winter_in_Tatry_Mountains_-_Poland.jpg'
+  };
+  var WX_GRAD = { sunny: 'wx-sunny', sunclouds: 'wx-sunny', night: 'wx-night', partly: 'wx-cloudy', overcast: 'wx-cloudy', fog: 'wx-fog', rain: 'wx-rain', storm: 'wx-storm', snow: 'wx-snow' };
+  function wxTheme(code, isDay) {
+    if (code === 0) return isDay ? 'sunny' : 'night';
+    if (code === 1) return isDay ? 'sunclouds' : 'night';
+    if (code === 2) return 'partly';
+    if (code === 3) return 'overcast';
+    if (code === 45 || code === 48) return 'fog';
+    if ((code >= 51 && code <= 57) || (code >= 61 && code <= 67) || (code >= 80 && code <= 82)) return 'rain';
+    if ((code >= 71 && code <= 77) || (code >= 85 && code <= 86)) return 'snow';
+    if (code >= 95) return 'storm';
+    return 'partly';
+  }
+  function fmtHour(iso) {
+    if (!iso) return '';
+    try {
+      return new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit' }).format(new Date(iso));
+    } catch (e) { return ''; }
+  }
+  function dayName(iso, idx) {
+    if (idx === 0) return 'HOJE';
+    try {
+      var p = iso.split('-');
+      var dt = new Date(Date.UTC(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10), 12, 0, 0));
+      return new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/New_York', weekday: 'short' }).format(dt).replace(/\./g, '').toUpperCase();
+    } catch (e) { return ''; }
+  }
+  function renderWeatherSlide() {
+    var el = wxSlide;
+    if (!el) return;
+    var cond = q('.wx-cond', el);
+    var tempEl = q('.wx-temp', el);
+    var wic = q('.wx-big .wic', el);
+    var det = q('.wx-details', el);
+    var days = q('.wx-days', el);
+    var img = q('.wx-photo', el);
+    if (!weatherData) {
+      cond.textContent = weatherFailed ? 'Clima indisponível no momento' : 'Carregando previsão…';
+      tempEl.textContent = '';
+      wic.innerHTML = '';
+      det.textContent = '';
+      days.innerHTML = '';
+      return;
+    }
+    var c = weatherData.current;
+    var d = weatherData.daily;
+    var theme = wxTheme(c.weather_code, c.is_day !== 0);
+    el.className = el.className.replace(/\bwx-(sunny|night|cloudy|rain|storm|snow|fog)\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '') + ' ' + WX_GRAD[theme];
+    var url = WX_PHOTOS[theme];
+    if (img) {
+      img.style.display = '';
+      img.onerror = function () { img.style.display = 'none'; };
+      if (img.getAttribute('data-src') !== url) { img.src = url; img.setAttribute('data-src', url); }
+    }
+    wic.innerHTML = iconSVG(c.weather_code);
+    tempEl.textContent = Math.round(c.temperature_2m) + '°';
+    cond.textContent = weatherLabel(c.weather_code);
+    var parts = [];
+    if (c.apparent_temperature !== undefined && c.apparent_temperature !== null) parts.push('Sensação ' + Math.round(c.apparent_temperature) + '°');
+    if (c.relative_humidity_2m !== undefined && c.relative_humidity_2m !== null) parts.push('Umidade ' + Math.round(c.relative_humidity_2m) + '%');
+    if (c.wind_speed_10m !== undefined && c.wind_speed_10m !== null) parts.push('Vento ' + Math.round(c.wind_speed_10m) + ' mph');
+    if (d && d.sunrise && d.sunrise[0]) parts.push('Nascer do sol ' + fmtHour(d.sunrise[0]));
+    if (d && d.sunset && d.sunset[0]) parts.push('Pôr do sol ' + fmtHour(d.sunset[0]));
+    det.textContent = parts.join(' · ');
+    var html = '';
+    if (d && d.time) {
+      var n = Math.min(7, d.time.length);
+      for (var i = 0; i < n; i++) {
+        var code = d.weather_code ? d.weather_code[i] : 0;
+        var pop = (d.precipitation_probability_max && d.precipitation_probability_max[i] !== null && d.precipitation_probability_max[i] !== undefined) ? d.precipitation_probability_max[i] : null;
+        html += '<div class="wx-day" style="animation-delay:' + (i * 0.08) + 's"><div class="dname">' + dayName(d.time[i], i) + '</div><div class="dic">' + iconSVG(code) + '</div><div class="dmax">' + Math.round(d.temperature_2m_max[i]) + '°</div><div class="dmin">' + Math.round(d.temperature_2m_min[i]) + '°</div>' + (pop !== null ? '<div class="dpop">' + Math.round(pop) + '% chuva</div>' : '') + '</div>';
+      }
+    }
+    days.innerHTML = html;
+  }
+  function buildSeq() {
+    var specials = ['C', 'W', 'K', 'B', 'A', 'M', 'F'];
+    seq = specials.slice();
+    var si = 0;
+    for (var i = 0; i < items.length; i++) {
+      seq.push(i);
+      if ((i + 1) % 4 === 0) { seq.push(specials[si % specials.length]); si++; }
+    }
+  }
+  function showSeq(p) {
+    if (!seq.length) return;
+    seqPos = ((p % seq.length) + seq.length) % seq.length;
+    var s = seq[seqPos];
+    if (s === 'W') { showWeatherSlide(); }
+    else if (s === 'C') { showFxSlide(); }
+    else if (s === 'K') { showClockSlide(); }
+    else if (s === 'B') { showBibleSlide(); }
+    else if (s === 'A') { showAirSlide(); }
+    else if (s === 'M') { showMktSlide(); }
+    else if (s === 'F') { showFactSlide(); }
+    else { curNewsIdx = s; curKind = 'news'; showSlide(s); }
+  }
+  function nextSeq() {
+    if (!seq.length) return;
+    showSeq(seqPos + 1);
+  }
+  function prevSeq() {
+    if (!seq.length) return;
+    showSeq(seqPos - 1);
+  }
+  function deactivateAll() {
+    var all = [slides.A, slides.B, wxSlide, fxSlide, clockSlide, bibleSlide, airSlide, mktSlide, factSlide];
+    for (var i = 0; i < all.length; i++) {
+      if (all[i]) all[i].className = all[i].className.replace(/\bactive\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '');
+    }
+  }
+  function showWeatherSlide() {
+    restoreHeadlines();
+    curKind = 'W';
+    var el = wxSlide;
+    renderWeatherSlide();
+    kbOn(q('.wx-photo', el));
+    deactivateAll();
+    el.className = el.className.replace(/\bactive\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '') + ' active';
+    var tw = document.querySelector('.topbar .weather');
+    if (tw) tw.style.visibility = 'hidden';
+    restartProgress(WX_MS);
+    resetRotate(WX_MS);
+  }
+  function pad2(n) { return (n < 10 ? '0' : '') + n; }
+  function isoDay(d) { return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
+  function fmtDayBR(iso) { var p = iso.split('-'); return p[2] + '/' + p[1]; }
+  function fmtNum(v, dec) {
+    try { return v.toLocaleString('pt-BR', { minimumFractionDigits: dec, maximumFractionDigits: dec }); }
+    catch (e) { return String(v); }
+  }
+  function fxChangeSpan(ch) {
+    if (ch === null || ch === undefined || isNaN(ch)) return '';
+    var cls = ch >= 0 ? 'up' : 'down';
+    var arrow = ch >= 0 ? '▲ ' : '▼ ';
+    return '<div class="fchange ' + cls + '">' + arrow + fmtNum(Math.abs(ch), 1) + '%</div>';
+  }
+  function loadFx() {
+    var parts = { fiat: null, crypto: null, n: 0 };
+    function done() {
+      parts.n++;
+      if (parts.n < 2) return;
+      if (!parts.fiat && !parts.crypto) { fxFailed = true; }
+      else { fxData = { fiat: parts.fiat, crypto: parts.crypto }; fxFailed = false; }
+      renderFxSlide();
+    }
+    var today = new Date();
+    var start = new Date(today.getTime() - 9 * 24 * 3600 * 1000);
+    var tsUrl = 'https://api.frankfurter.dev/v1/' + isoDay(start) + '..' + isoDay(today) + '?base=USD&symbols=BRL,EUR,GBP,JPY';
+    xhrGet(tsUrl, function (err, txt) {
+      if (!err) {
+        try {
+          var j = JSON.parse(txt);
+          var dates = Object.keys(j.rates).sort();
+          if (dates.length) {
+            var last = j.rates[dates[dates.length - 1]];
+            var prev = dates.length > 1 ? j.rates[dates[dates.length - 2]] : null;
+            var series = dates.slice(-7).map(function (d) { return { date: d, brl: j.rates[d].BRL }; });
+            parts.fiat = { date: dates[dates.length - 1], rates: last, prev: prev, series: series };
+            done(); return;
+          }
+        } catch (e) {}
+      }
+      xhrGet('https://open.er-api.com/v6/latest/USD', function (err2, txt2) {
+        if (!err2) {
+          try {
+            var j2 = JSON.parse(txt2);
+            if (j2 && j2.result === 'success' && j2.rates) {
+              parts.fiat = { date: null, rates: { BRL: j2.rates.BRL, EUR: j2.rates.EUR, GBP: j2.rates.GBP, JPY: j2.rates.JPY }, prev: null };
+              done(); return;
+            }
+          } catch (e) {}
+        }
+        parts.fiat = null; done();
+      });
+    });
+    var ids = FX_CRYPTO.map(function (c) { return c[1]; }).join(',');
+    xhrGet('https://api.coingecko.com/api/v3/simple/price?ids=' + ids + '&vs_currencies=usd&include_24hr_change=true', function (err, txt) {
+      if (!err) {
+        try {
+          var j = JSON.parse(txt);
+          var out = {};
+          var ok = false;
+          FX_CRYPTO.forEach(function (c) {
+            if (j[c[1]] && j[c[1]].usd !== undefined) { out[c[0]] = { price: j[c[1]].usd, change: j[c[1]].usd_24h_change }; ok = true; }
+          });
+          if (ok) { parts.crypto = out; done(); return; }
+        } catch (e) {}
+      }
+      var syms = FX_CRYPTO.map(function (c) { return c[0] + 'USDT'; });
+      xhrGet('https://api.binance.us/api/v3/ticker/24hr?symbols=' + encodeURIComponent(JSON.stringify(syms)), function (err2, txt2) {
+        if (!err2) {
+          try {
+            var arr = JSON.parse(txt2);
+            var out = {};
+            var ok = false;
+            arr.forEach(function (t) {
+              var code = t.symbol.replace('USDT', '');
+              out[code] = { price: parseFloat(t.lastPrice), change: parseFloat(t.priceChangePercent) };
+              ok = true;
+            });
+            if (ok) { parts.crypto = out; done(); return; }
+          } catch (e) {}
+        }
+        parts.crypto = null; done();
+      });
+    });
+  }
+  function renderFxChart(fiat) {
+    var chartEl = q('.fx-chart', fxSlide);
+    if (!chartEl) return;
+    if (fxChartInstance) { try { fxChartInstance.destroy(); } catch (e) {} fxChartInstance = null; }
+    if (!fiat || !fiat.series || fiat.series.length < 2) { chartEl.innerHTML = ''; chartEl.style.display = 'none'; return; }
+    var pts = fiat.series;
+    var vals = pts.map(function (p) { return p.brl; });
+    var min = Math.min.apply(null, vals);
+    var max = Math.max.apply(null, vals);
+    var labels = pts.map(function (p) { return fmtDayBR(p.date); });
+    chartEl.innerHTML = '<div class="fx-chart-title"><span>DÓLAR · ÚLTIMA SEMANA</span><span class="fx-chart-mm">máx R$ ' + fmtNum(max, 2) + ' · mín R$ ' + fmtNum(min, 2) + '</span></div><div class="fx-chart-wrap"><canvas></canvas></div>';
+    chartEl.style.display = '';
+    if (typeof Chart === 'undefined') { chartEl.style.display = 'none'; return; }
+    var ctx = q('canvas', chartEl);
+    if (!ctx) return;
+    fxChartInstance = new Chart(ctx, {
+      type: 'line',
+      data: { labels: labels, datasets: [{ data: vals, borderColor: '#f5b942', backgroundColor: 'rgba(245,185,66,0.22)', fill: true, pointBackgroundColor: '#f5b942', pointBorderColor: '#0a1f16', pointBorderWidth: 1, pointRadius: 4, pointHoverRadius: 4, borderWidth: 3, lineTension: 0.25 }] },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        legend: { display: false },
+        animation: { duration: 1600, easing: 'easeOutQuart' },
+        tooltips: { enabled: false },
+        scales: {
+          xAxes: [{ gridLines: { display: false }, ticks: { fontColor: '#c8cdd2', fontSize: 13, maxRotation: 0, autoSkip: false } }],
+          yAxes: [{ gridLines: { color: 'rgba(255,255,255,0.12)' }, ticks: { fontColor: '#c8cdd2', fontSize: 12, maxTicksLimit: 4, callback: function (v) { return 'R$ ' + fmtNum(v, 2); } } }]
+        }
+      }
+    });
+  }
+  function renderFxSlide() {
+    var el = fxSlide;
+    if (!el) return;
+    var rateEl = q('.fx-rate', el);
+    var chEl = q('.fx-change', el);
+    var det = q('.fx-details', el);
+    var rows = q('.fx-rows', el);
+    var chartEl = q('.fx-chart', el);
+    var img = q('.fx-photo', el);
+    if (img) {
+      img.style.display = '';
+      img.onerror = function () { img.style.display = 'none'; };
+      if (img.getAttribute('data-src') !== FX_PHOTO) { img.src = FX_PHOTO; img.setAttribute('data-src', FX_PHOTO); }
+    }
+    if (!fxData || (!fxData.fiat && !fxData.crypto)) {
+      rateEl.textContent = '';
+      chEl.style.display = 'none';
+      det.textContent = fxFailed ? 'Cotações indisponíveis no momento' : 'Carregando cotações…';
+      rows.innerHTML = '';
+      chartEl.innerHTML = '';
+      chartEl.style.display = 'none';
+      return;
+    }
+    var fiat = fxData.fiat;
+    var heroCh = null;
+    if (fiat && fiat.rates && fiat.rates.BRL) {
+      rateEl.textContent = 'R$ ' + fmtNum(fiat.rates.BRL, 2);
+      if (fiat.prev && fiat.prev.BRL) heroCh = (fiat.rates.BRL - fiat.prev.BRL) / fiat.prev.BRL * 100;
+    } else {
+      rateEl.textContent = '';
+    }
+    if (heroCh === null || isNaN(heroCh)) { chEl.style.display = 'none'; }
+    else {
+      chEl.style.display = '';
+      chEl.className = 'fx-change ' + (heroCh >= 0 ? 'up' : 'down');
+      chEl.textContent = (heroCh >= 0 ? '▲ ' : '▼ ') + fmtNum(Math.abs(heroCh), 1) + '%';
+    }
+    var detParts = [];
+    if (fiat && fiat.date) detParts.push('Cotações BCE de ' + fmtDayBR(fiat.date));
+    detParts.push('Criptomoedas ao vivo');
+    det.textContent = detParts.join(' · ');
+    renderFxChart(fiat);
+    var html = '';
+    if (fiat && fiat.rates) {
+      var fiatBoxes = '';
+      FX_FIAT.forEach(function (code, i) {
+        var v = fiat.rates[code];
+        if (v === undefined) return;
+        var c = (fiat.prev && fiat.prev[code]) ? (v - fiat.prev[code]) / fiat.prev[code] * 100 : null;
+        fiatBoxes += '<div class="fx-box" style="animation-delay:' + (i * 0.08) + 's"><div class="fname">' + code + '</div><div class="fprice">' + FX_SYM[code] + ' ' + fmtNum(v, v >= 100 ? 0 : 2) + '</div>' + fxChangeSpan(c) + '</div>';
+      });
+      if (fiatBoxes) html += '<div><div class="fx-rowlabel">MOEDAS · POR US$ 1</div><div class="fx-row">' + fiatBoxes + '</div></div>';
+    }
+    if (fxData.crypto) {
+      var cryptoBoxes = '';
+      FX_CRYPTO.forEach(function (c, i) {
+        var d = fxData.crypto[c[0]];
+        if (!d) return;
+        cryptoBoxes += '<div class="fx-box" style="animation-delay:' + (i * 0.08) + 's"><div class="fname">' + c[0] + '</div><div class="fprice">US$ ' + fmtNum(d.price, d.price >= 100 ? 0 : (d.price >= 1 ? 2 : 4)) + '</div>' + fxChangeSpan(d.change) + '</div>';
+      });
+      if (cryptoBoxes) html += '<div><div class="fx-rowlabel">CRIPTOMOEDAS · EM US$</div><div class="fx-row">' + cryptoBoxes + '</div></div>';
+    }
+    rows.innerHTML = html;
+  }
+  function showFxSlide() {
+    restoreHeadlines();
+    curKind = 'C';
+    var el = fxSlide;
+    renderFxSlide();
+    kbOn(q('.fx-photo', el));
+    deactivateAll();
+    el.className = el.className.replace(/\bactive\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '') + ' active';
+    var tw = document.querySelector('.topbar .weather');
+    if (tw) tw.style.visibility = 'hidden';
+    restartProgress(FX_MS);
+    resetRotate(FX_MS);
+  }
+  function showSlide(i) {
+    restoreHeadlines();
+    curNewsIdx = i;
+    curKind = 'news';
+    var next = current === 'A' ? 'B' : 'A';
+    var el = slides[next];
+    renderSlide(el, items[i], i, items.length);
+    applyKenBurns(el);
+    deactivateAll();
+    el.className = el.className.replace(/\bactive\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '') + ' active';
+    current = next;
+    var tw = document.querySelector('.topbar .weather');
+    if (tw) tw.style.visibility = '';
+    restartProgress(ROTATE_MS);
+    preloadNext();
+    resetRotate(ROTATE_MS);
+    fitHeadline();
+    startTyping();
+    upgradeImage(items[i]);
+  }
+
+  function buildClockFaces() {
+    var row = q('.clock-row', clockSlide);
+    if (!row || row.children.length) return;
+    var html = '';
+    CLOCK_CITIES.forEach(function (c, i) {
+      var ticks = '';
+      for (var t = 0; t < 12; t++) {
+        ticks += '<div class="tick" style="transform: rotate(' + (t * 30) + 'deg) translateY(-580%)"></div>';
+      }
+      html += '<div class="clock-card" style="animation-delay:' + (i * 0.12) + 's">' +
+        '<div class="clock-face">' + ticks +
+        '<div class="cnum" style="top:12%;left:50%">12</div><div class="cnum" style="top:50%;left:88%">3</div><div class="cnum" style="top:88%;left:50%">6</div><div class="cnum" style="top:50%;left:12%">9</div>' +
+        '<div class="hand hour"></div><div class="hand min"></div><div class="hand sec"></div><div class="cap"></div></div>' +
+        '<div class="city">' + c.name + '</div><div class="dig"></div><div class="cdate"></div></div>';
+    });
+    row.innerHTML = html;
+  }
+  function zoneParts(tz, off) {
+    try {
+      var s = new Date().toLocaleString('en-GB', { timeZone: tz, hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      var p = s.split(':');
+      var h = parseInt(p[0], 10); if (h === 24) h = 0;
+      return { h: h, m: parseInt(p[1], 10), s: parseInt(p[2], 10) };
+    } catch (e) {
+      var d = new Date(Date.now() + off * 3600000);
+      return { h: d.getUTCHours(), m: d.getUTCMinutes(), s: d.getUTCSeconds() };
+    }
+  }
+  function zoneDate(tz, off) {
+    try {
+      return new Date().toLocaleString('pt-BR', { timeZone: tz, weekday: 'short', day: '2-digit', month: '2-digit' });
+    } catch (e) {
+      var WD = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
+      var d = new Date(Date.now() + off * 3600000);
+      return WD[d.getUTCDay()] + ', ' + pad2(d.getUTCDate()) + '/' + pad2(d.getUTCMonth() + 1);
+    }
+  }
+  function updateClocks() {
+    var row = q('.clock-row', clockSlide);
+    if (!row) return;
+    var cards = row.children;
+    for (var i = 0; i < CLOCK_CITIES.length && i < cards.length; i++) {
+      var c = CLOCK_CITIES[i];
+      var p = zoneParts(c.tz, c.off);
+      var card = cards[i];
+      var hour = q('.hand.hour', card);
+      var min = q('.hand.min', card);
+      var sec = q('.hand.sec', card);
+      if (hour) hour.style.transform = 'rotate(' + ((p.h % 12) * 30 + p.m * 0.5) + 'deg)';
+      if (min) min.style.transform = 'rotate(' + (p.m * 6 + p.s * 0.1) + 'deg)';
+      if (sec) {
+        sec.style.transition = (p.s === 0) ? 'none' : '';
+        sec.style.transform = 'rotate(' + (p.s * 6) + 'deg)';
+      }
+      var dig = q('.dig', card);
+      if (dig) { var h12 = (p.h % 12) || 12; dig.textContent = h12 + ':' + pad2(p.m) + ' ' + (p.h < 12 ? 'AM' : 'PM'); }
+      var dt = q('.cdate', card);
+      if (dt) dt.textContent = zoneDate(c.tz, c.off);
+    }
+  }
+  function renderClockSlide() {
+    var el = clockSlide;
+    if (!el) return;
+    var img = q('.clock-photo', el);
+    if (img) {
+      img.style.display = '';
+      img.onerror = function () { img.style.display = 'none'; };
+      if (img.getAttribute('data-src') !== CLOCK_PHOTO) { img.src = CLOCK_PHOTO; img.setAttribute('data-src', CLOCK_PHOTO); }
+    }
+    buildClockFaces();
+    updateClocks();
+  }
+  function showClockSlide() {
+    restoreHeadlines();
+    curKind = 'K';
+    var el = clockSlide;
+    renderClockSlide();
+    kbOn(q('.clock-photo', el));
+    deactivateAll();
+    el.className = el.className.replace(/\bactive\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '') + ' active';
+    var tw = document.querySelector('.topbar .weather');
+    if (tw) tw.style.visibility = 'hidden';
+    restartProgress(CLOCK_MS);
+    resetRotate(CLOCK_MS);
+  }
+  function loadBibleLast() {
+    try { bibleLastRef = localStorage.getItem('portalNewsBibleLast') || ''; } catch (e) { bibleLastRef = ''; }
+  }
+  function pickBibleRef() {
+    var pool = [];
+    for (var i = 0; i < BIBLE_REFS.length; i++) {
+      if (BIBLE_REFS[i].toLowerCase() !== bibleLastRef.toLowerCase()) pool.push(BIBLE_REFS[i]);
+    }
+    if (!pool.length) pool = BIBLE_REFS;
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+  function fetchBibleVerse(ref, cb) {
+    xhrGet('https://bible-api.com/' + encodeURIComponent(ref) + '?translation=almeida', function (err, txt) {
+      if (err) { cb(null); return; }
+      try {
+        var d = JSON.parse(txt);
+        if (d && d.text) { cb({ ref: d.reference, text: d.text.replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, ''), trans: 'ALMEIDA' }); return; }
+      } catch (e) {}
+      cb(null);
+    });
+  }
+  function prefetchBible() {
+    if (bibleNext) return;
+    var ref = pickBibleRef();
+    fetchBibleVerse(ref, function (v) { if (v) bibleNext = v; });
+  }
+  function renderBibleSlide() {
+    var el = bibleSlide;
+    if (!el) return;
+    var img = q('.bible-photo', el);
+    if (img) {
+      img.style.display = '';
+      img.onerror = function () {
+        if (img.getAttribute('data-src') !== BIBLE_PHOTO_FALLBACK) { img.src = BIBLE_PHOTO_FALLBACK; img.setAttribute('data-src', BIBLE_PHOTO_FALLBACK); }
+        else { img.style.display = 'none'; }
+      };
+      if (img.getAttribute('data-src') !== BIBLE_PHOTO) { img.src = BIBLE_PHOTO; img.setAttribute('data-src', BIBLE_PHOTO); }
+    }
+    var v = bibleNext;
+    if (v) {
+      bibleNext = null;
+      bibleLastRef = v.ref;
+      try { localStorage.setItem('portalNewsBibleLast', v.ref); } catch (e) {}
+    } else {
+      var pool = [];
+      for (var i = 0; i < BIBLE_VERSES.length; i++) {
+        if (BIBLE_VERSES[i].ref.toLowerCase() !== bibleLastRef.toLowerCase()) pool.push(BIBLE_VERSES[i]);
+      }
+      if (!pool.length) pool = BIBLE_VERSES;
+      var fv = pool[Math.floor(Math.random() * pool.length)];
+      v = { ref: fv.ref, text: fv.text, trans: 'NVI' };
+    }
+    var t = q('.bible-text', el);
+    var r = q('.bible-ref', el);
+    if (t) { t.textContent = v.text; }
+    if (r) { r.textContent = v.ref.toUpperCase() + ' · ' + v.trans; }
+    prefetchBible();
+  }
+  function showBibleSlide() {
+    restoreHeadlines();
+    curKind = 'B';
+    var el = bibleSlide;
+    renderBibleSlide();
+    kbOn(q('.bible-photo', el));
+    deactivateAll();
+    el.className = el.className.replace(/\bactive\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '') + ' active';
+    var tw = document.querySelector('.topbar .weather');
+    if (tw) tw.style.visibility = '';
+    restartProgress(BIBLE_MS);
+    resetRotate(BIBLE_MS);
+  }
+  function aqiCat(a) {
+    if (a <= 50) return { label: 'BOM', color: '#2ea043' };
+    if (a <= 100) return { label: 'MODERADO', color: '#d7b500' };
+    if (a <= 150) return { label: 'GRUPOS SENSÍVEIS', color: '#e67e22' };
+    if (a <= 200) return { label: 'NÃO SAUDÁVEL', color: '#da3633' };
+    if (a <= 300) return { label: 'MUITO NÃO SAUDÁVEL', color: '#8957e5' };
+    return { label: 'PERIGOSO', color: '#7a1f1f' };
+  }
+  function pollenLevel(idx) {
+    if (idx === null || idx === undefined) return null;
+    if (idx < 2.5) return { label: 'BAIXO', color: '#7ee787' };
+    if (idx < 4.9) return { label: 'MODERADO', color: '#d7b500' };
+    if (idx < 7.3) return { label: 'ALTO', color: '#e67e22' };
+    return { label: 'MUITO ALTO', color: '#da3633' };
+  }
+  var ICONS = {
+    wind: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.59 4.59A2 2 0 1 1 11 8H2"/><path d="M12.59 19.41A2 2 0 1 0 14 16H2"/><path d="M17.73 7.73A2.5 2.5 0 1 1 19.5 12H2"/></svg>',
+    dust: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="2.4"/><circle cx="6.5" cy="8" r="1.6"/><circle cx="17.5" cy="8.5" r="1.6"/><circle cx="7" cy="17" r="1.6"/><circle cx="17" cy="17.5" r="1.6"/></svg>',
+    sun: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
+    car: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16V11l1.5-4A2 2 0 0 1 7.4 5.5h9.2a2 2 0 0 1 1.9 1.5L20 11v5"/><path d="M4 16h2.5M15.5 16H20"/><circle cx="7.5" cy="16" r="1.8"/><circle cx="16.5" cy="16" r="1.8"/></svg>',
+    cloud: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>',
+    factory: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20"/><path d="M4 20V10l6 5V10l6 5V5h4v15"/></svg>',
+    flower: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/><circle cx="12" cy="6.5" r="2.5"/><circle cx="12" cy="17.5" r="2.5"/><circle cx="6.5" cy="12" r="2.5"/><circle cx="17.5" cy="12" r="2.5"/></svg>'
+  };
+  function aqiRec(a) {
+    if (a <= 50) return 'Ar bom. Aproveite as atividades ao ar livre sem preocupação.';
+    if (a <= 100) return 'Ar aceitável. Quem tem sensibilidade respiratória deve ficar atento a sintomas.';
+    if (a <= 150) return 'Grupos sensíveis devem reduzir esforço prolongado ao ar livre.';
+    if (a <= 200) return 'Todos podem sentir efeitos. Evite esforço prolongado ao ar livre.';
+    if (a <= 300) return 'Alerta de saúde: evite atividades ao ar livre.';
+    return 'Emergência: permaneça em ambientes fechados.';
+  }
+  function renderAirChart(el) {
+    var box = q('.air-chart', el);
+    if (!box) return;
+    var day = airData && airData.day ? airData.day : [];
+    if (day.length < 2) { box.style.display = 'none'; return; }
+    box.style.display = '';
+    var vals = [];
+    for (var i = 0; i < day.length; i++) vals.push(day[i].v);
+    var min = Math.min.apply(null, vals), max = Math.max.apply(null, vals);
+    if (max === min) max = min + 1;
+    var w = 100, h = 36, pad = 2;
+    var pts = [];
+    for (var j = 0; j < day.length; j++) {
+      var x = (day[j].h / 23) * w;
+      var y = h - pad - ((day[j].v - min) / (max - min)) * (h - pad * 2);
+      pts.push(x.toFixed(1) + ',' + y.toFixed(1));
+    }
+    var area = pts.join(' ') + ' ' + w + ',' + h + ' 0,' + h;
+    var svg = '<svg viewBox="0 0 100 36" preserveAspectRatio="none"><polygon points="' + area + '" fill="rgba(245,185,66,0.25)"/><polyline points="' + pts.join(' ') + '" fill="none" stroke="#f5b942" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>';
+    if (airData.hour >= 0) {
+      var cur = null;
+      for (var k = 0; k < day.length; k++) { if (day[k].h === airData.hour) cur = day[k]; }
+      if (cur) {
+        var cx = (cur.h / 23) * w;
+        var cy = h - pad - ((cur.v - min) / (max - min)) * (h - pad * 2);
+        svg += '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="2.6" fill="#fff" stroke="#f5b942" stroke-width="1.2"/>';
+      }
+    }
+    svg += '</svg>';
+    var svgBox = q('.air-chart-svg', el);
+    if (svgBox) svgBox.innerHTML = svg;
+    var hours = q('.air-chart-hours', el);
+    if (hours) hours.innerHTML = '<span>0h</span><span>6h</span><span>12h</span><span>18h</span><span>23h</span>';
+  }
+  function renderAirSlide() {
+    var el = airSlide;
+    if (!el) return;
+    var img = q('.air-photo', el);
+    if (img && img.getAttribute('data-src') !== AIR_PHOTO) { img.src = AIR_PHOTO; img.setAttribute('data-src', AIR_PHOTO); }
+    var aicon = q('.air-aqi-icon', el);
+    if (aicon && !aicon.innerHTML) aicon.innerHTML = ICONS.wind;
+    if (!airData) return;
+    var num = q('.air-aqi-num', el);
+    var cat = q('.air-aqi-cat', el);
+    if (num) num.textContent = Math.round(airData.aqi);
+    if (cat) {
+      var c = aqiCat(airData.aqi);
+      cat.textContent = c.label;
+      cat.style.background = c.color;
+    }
+    var rec = q('.air-rec', el);
+    if (rec) rec.textContent = aqiRec(airData.aqi);
+    var det = q('.air-details', el);
+    if (det) {
+      var boxes = [
+        ['PM2.5', airData.pm25, 'µg/m³', ICONS.dust],
+        ['PM10', airData.pm10, 'µg/m³', ICONS.dust],
+        ['OZÔNIO', airData.ozone, 'µg/m³', ICONS.sun],
+        ['NO₂', airData.no2, 'µg/m³', ICONS.car],
+        ['CO', airData.co, 'µg/m³', ICONS.cloud],
+        ['SO₂', airData.so2, 'µg/m³', ICONS.factory]
+      ];
+      var html = '';
+      for (var r = 0; r < 2; r++) {
+        html += '<div class="air-row">';
+        for (var i = 0; i < 3; i++) {
+          var b = boxes[r * 3 + i];
+          var bv = (b[1] !== null && b[1] !== undefined) ? (b[1] >= 100 ? Math.round(b[1]) : b[1]) : '—';
+          html += '<div class="air-box" style="animation-delay:' + ((r * 3 + i) * 0.08) + 's"><div class="aicon">' + b[3] + '</div><div class="aname">' + b[0] + '</div><div class="aval">' + bv + '</div><div class="aunit">' + b[2] + '</div></div>';
+        }
+        html += '</div>';
+      }
+      det.innerHTML = html;
+    }
+    renderAirChart(el);
+    var plabel = q('.air-pollen-label', el);
+    var prow = q('.air-pollen', el);
+    if (airPollen && airPollen.ok) {
+      var types = [['ÁRVORES', airPollen.tree], ['GRAMA', airPollen.grass], ['ERVAS', airPollen.weed]];
+      var phtml = '';
+      for (var j = 0; j < types.length; j++) {
+        var lv = pollenLevel(types[j][1]);
+        phtml += '<div class="air-box" style="animation-delay:' + (j * 0.08) + 's"><div class="aicon">' + ICONS.flower + '</div><div class="aname">' + types[j][0] + '</div>' +
+          (lv ? '<div class="alevel" style="color:' + lv.color + '">' + lv.label + '</div><div class="aunit">índice ' + types[j][1] + '</div>' : '<div class="alevel">—</div>') + '</div>';
+      }
+      if (prow) prow.innerHTML = phtml;
+      if (plabel) plabel.style.display = '';
+      if (prow) prow.style.display = '';
+    } else {
+      if (plabel) plabel.style.display = 'none';
+      if (prow) prow.style.display = 'none';
+    }
+    var src = q('.air-source', el);
+    if (src) src.textContent = airPollen && airPollen.ok ? 'Fontes: Open-Meteo · Pollen.com' : 'Fonte: Open-Meteo (AQI EUA)';
+  }
+  function loadAir() {
+    xhrGet(AIR_URL, function (err, txt) {
+      if (err) return;
+      try {
+        var d = JSON.parse(txt);
+        if (d && d.current) {
+          var day = [];
+          if (d.hourly && d.hourly.time && d.hourly.us_aqi) {
+            var today = d.current.time ? d.current.time.slice(0, 10) : '';
+            for (var i = 0; i < d.hourly.time.length; i++) {
+              if (today && d.hourly.time[i].slice(0, 10) !== today) continue;
+              if (d.hourly.us_aqi[i] === null || d.hourly.us_aqi[i] === undefined) continue;
+              day.push({ h: parseInt(d.hourly.time[i].slice(11, 13), 10), v: d.hourly.us_aqi[i] });
+            }
+          }
+          airData = { aqi: d.current.us_aqi, pm25: d.current.pm2_5, pm10: d.current.pm10, ozone: d.current.ozone, no2: d.current.nitrogen_dioxide, so2: d.current.sulphur_dioxide, co: d.current.carbon_monoxide, day: day, hour: d.current.time ? parseInt(d.current.time.slice(11, 13), 10) : -1 };
+          renderAirSlide();
+        }
+      } catch (e) {}
+    });
+    xhrGet('/api/pollen', function (err, txt) {
+      if (err) return;
+      try {
+        var d = JSON.parse(txt);
+        if (d) { airPollen = d; renderAirSlide(); }
+      } catch (e) {}
+    });
+  }
+  function showAirSlide() {
+    restoreHeadlines();
+    curKind = 'A';
+    var el = airSlide;
+    renderAirSlide();
+    kbOn(q('.air-photo', el));
+    deactivateAll();
+    el.className = el.className.replace(/\bactive\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '') + ' active';
+    var tw = document.querySelector('.topbar .weather');
+    if (tw) tw.style.visibility = 'hidden';
+    restartProgress(AIR_MS);
+    resetRotate(AIR_MS);
+  }
+  function sparkSVG(vals, up) {
+    if (!vals || vals.length < 2) return '';
+    var w = 100, h = 32, min = Math.min.apply(null, vals), max = Math.max.apply(null, vals);
+    if (max === min) max = min + 1;
+    var pts = [];
+    for (var i = 0; i < vals.length; i++) {
+      var x = (i / (vals.length - 1)) * w;
+      var y = h - 2 - ((vals[i] - min) / (max - min)) * (h - 4);
+      pts.push(x.toFixed(1) + ',' + y.toFixed(1));
+    }
+    var color = up ? '#7ee787' : '#ff7b72';
+    return '<svg viewBox="0 0 100 32" preserveAspectRatio="none"><polyline points="' + pts.join(' ') + '" fill="none" stroke="' + color + '" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>';
+  }
+  function fmtNum(v) {
+    return v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  function renderMktSlide() {
+    var el = mktSlide;
+    if (!el) return;
+    var img = q('.mkt-photo', el);
+    if (img && img.getAttribute('data-src') !== MKT_PHOTO) { img.src = MKT_PHOTO; img.setAttribute('data-src', MKT_PHOTO); }
+    var grid = q('.mkt-grid', el);
+    var src = q('.mkt-source', el);
+    if (!mktData || !mktData.indices || !mktData.indices.length) {
+      if (grid) grid.innerHTML = '<div style="font-size:2.4vw;font-weight:700">Mercados indisponíveis no momento — tentando novamente…</div>';
+      if (src) src.textContent = 'Fonte: Yahoo Finance';
+      return;
+    }
+    var html = '';
+    for (var i = 0; i < mktData.indices.length; i++) {
+      var it = mktData.indices[i];
+      var up = it.changePct >= 0;
+      var sign = up ? '+' : '';
+      html += '<div class="mkt-card" style="animation-delay:' + (i * 0.06) + 's">' +
+        '<div class="mkt-region">' + it.region + '</div><div class="mkt-name">' + it.name + '</div>' +
+        '<div class="mkt-val">' + fmtNum(it.price) + '</div>' +
+        '<div class="mkt-change ' + (up ? 'up' : 'down') + '">' + sign + it.changePct.toFixed(2).replace('.', ',') + '% hoje</div>' +
+        '<div class="mkt-spark">' + sparkSVG(it.spark, up) + '</div></div>';
+    }
+    if (grid) grid.innerHTML = html;
+    if (src) {
+      var t = '';
+      if (mktData.time) {
+        try {
+          var d = new Date(mktData.time);
+          t = ' · atualizado ' + ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
+        } catch (e) {}
+      }
+      src.textContent = 'Fonte: Yahoo Finance (último mês)' + t;
+    }
+  }
+  function loadMkt() {
+    xhrGet('/api/markets', function (err, txt) {
+      if (err) return;
+      try {
+        var d = JSON.parse(txt);
+        if (d && d.ok && d.indices && d.indices.length) {
+          mktData = d;
+          try { localStorage.setItem('portalNewsMarkets', txt); } catch (e) {}
+          renderMktSlide();
+        }
+      } catch (e) {}
+    });
+  }
+  function loadMktCache() {
+    try {
+      var c = localStorage.getItem('portalNewsMarkets');
+      if (c) { var d = JSON.parse(c); if (d && d.indices) mktData = d; }
+    } catch (e) {}
+  }
+  function showMktSlide() {
+    restoreHeadlines();
+    curKind = 'M';
+    var el = mktSlide;
+    renderMktSlide();
+    kbOn(q('.mkt-photo', el));
+    deactivateAll();
+    el.className = el.className.replace(/\bactive\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '') + ' active';
+    var tw = document.querySelector('.topbar .weather');
+    if (tw) tw.style.visibility = 'hidden';
+    restartProgress(MKT_MS);
+    resetRotate(MKT_MS);
+  }
+  function loadFactLast() {
+    try { factLast = localStorage.getItem('portalNewsFactLast') || ''; } catch (e) { factLast = ''; }
+  }
+  function cleanFactText(s) {
+    return s.replace(/\(imagem\)/gi, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '');
+  }
+  function wikiThumb(pages) {
+    try {
+      if (pages && pages.length) {
+        for (var i = 0; i < pages.length; i++) {
+          var o = pages[i].originalimage && pages[i].originalimage.source;
+          if (o && o.split('?')[0].slice(-4).toLowerCase() !== '.svg') return o;
+        }
+        var t = pages[0].thumbnail && pages[0].thumbnail.source;
+        if (t) return t;
+      }
+    } catch (e) {}
+    return null;
+  }
+  function pickFactEvent(list) {
+    var pool = [];
+    for (var i = 0; i < list.length; i++) {
+      var txt = cleanFactText(list[i].text || '');
+      if (txt.length < 40 || txt.length > 260) continue;
+      if (txt === factLast) continue;
+      pool.push({ text: txt, tag: 'NESTE DIA · ' + list[i].year, photo: wikiThumb(list[i].pages) });
+    }
+    if (!pool.length) return null;
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+  function fetchFactFrom(url, cb) {
+    xhrGet(url, function (err, txt) {
+      if (err) { cb(null); return; }
+      try {
+        var d = JSON.parse(txt);
+        var list = d.events || d.selected || [];
+        cb(pickFactEvent(list));
+      } catch (e) { cb(null); }
+    });
+  }
+  function factDatePath() {
+    try {
+      var s = new Date().toLocaleString('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit' });
+      var p = s.split('-');
+      return p[1] + '/' + p[2];
+    } catch (e) {
+      var d = new Date();
+      return ('0' + (d.getMonth() + 1)).slice(-2) + '/' + ('0' + d.getDate()).slice(-2);
+    }
+  }
+  function triviaTag(cat) {
+    if (TRIVIA_CATS[cat]) return TRIVIA_CATS[cat];
+    var c = cat || '';
+    var ix = c.indexOf(':');
+    if (ix !== -1) c = c.slice(ix + 1);
+    c = c.replace(/^\s+|\s+$/g, '').toUpperCase();
+    return c || 'CURIOSIDADE';
+  }
+  function prefetchTrivia() {
+    xhrGet('https://opentdb.com/api.php?amount=5&type=multiple', function (err, txt) {
+      if (err) { prefetchWikiFact(); return; }
+      try {
+        var d = JSON.parse(txt);
+        var list = (d && d.results) || [];
+        var picked = null;
+        for (var i = 0; i < list.length; i++) {
+          var qq = decodeEntities(list[i].question || '');
+          var aa = decodeEntities(list[i].correct_answer || '');
+          if (!qq || !aa) continue;
+          if (qq.length > 200 || aa.length > 80) continue;
+          picked = { q: qq, a: aa, cat: decodeEntities(list[i].category || '') };
+          break;
+        }
+        if (!picked) { prefetchWikiFact(); return; }
+        translateText(picked.q, function (tq) {
+          if (!tq) { prefetchWikiFact(); return; }
+          translateText(picked.a, function (ta) {
+            if (!ta) { prefetchWikiFact(); return; }
+            factNext = { text: tq, tag: triviaTag(picked.cat), quiz: true, answer: ta, photo: TRIVIA_PHOTOS[picked.cat] || null };
+            factBusy = false;
+          });
+        });
+      } catch (e) { prefetchWikiFact(); }
+    });
+  }
+  function prefetchWikiFact() {
+    var base = 'https://pt.wikipedia.org/api/rest_v1/feed/onthisday/';
+    var md = factDatePath();
+    fetchFactFrom(base + 'events/' + md, function (f) {
+      if (f) { factNext = f; factBusy = false; return; }
+      fetchFactFrom(base + 'selected/' + md, function (f2) {
+        if (f2) { factNext = f2; factBusy = false; return; }
+        xhrGet('https://pt.wikipedia.org/api/rest_v1/page/random/summary', function (err, txt) {
+          if (!err) {
+            try {
+              var d = JSON.parse(txt);
+              if (d && d.type !== 'disambiguation' && d.extract) {
+                var first = d.extract.split('. ')[0];
+                if (first && first.length > 40) {
+                  if (first.length > 260) first = first.slice(0, 257).replace(/\s+\S*$/, '') + '…';
+                  if (first.slice(-1) !== '.') first += '.';
+                  factNext = { text: first, tag: (d.title || 'WIKIPÉDIA').toUpperCase().slice(0, 40), photo: wikiThumb([d]) };
+                }
+              }
+            } catch (e) {}
+          }
+          factBusy = false;
+        });
+      });
+    });
+  }
+  function prefetchFact() {
+    if (factNext || factBusy) return;
+    factBusy = true;
+    if (factCount % 3 === 2) { prefetchTrivia(); return; }
+    prefetchWikiFact();
+  }
+  function renderFactSlide() {
+    var el = factSlide;
+    if (!el) return;
+    var f = factNext;
+    if (f) {
+      factNext = null;
+      factLast = f.text;
+      try { localStorage.setItem('portalNewsFactLast', f.text); } catch (e) {}
+    } else {
+      var pool = [];
+      for (var i = 0; i < FACTS.length; i++) {
+        if (FACTS[i].text !== factLast) pool.push(FACTS[i]);
+      }
+      if (!pool.length) pool = FACTS;
+      var hf = pool[Math.floor(Math.random() * pool.length)];
+      f = { text: hf.text, tag: hf.cat };
+    }
+    factCount++;
+    var photo = f.photo || FACT_PHOTO;
+    var img = q('.fact-photo', el);
+    if (img) {
+      img.onerror = function () {
+        if (img.getAttribute('data-src') !== FACT_PHOTO) { img.src = FACT_PHOTO; img.setAttribute('data-src', FACT_PHOTO); }
+      };
+      if (img.getAttribute('data-src') !== photo) { img.src = photo; img.setAttribute('data-src', photo); }
+    }
+    var t = q('.fact-text', el);
+    var g = q('.fact-tag', el);
+    var a = q('.fact-answer', el);
+    var l = q('.fact-label', el);
+    if (t) { t.textContent = f.text; }
+    if (g) { g.textContent = f.tag; }
+    if (a) {
+      if (f.quiz) { a.textContent = 'Resposta: ' + f.answer; a.style.display = ''; }
+      else { a.textContent = ''; a.style.display = 'none'; }
+    }
+    if (l) { l.textContent = f.quiz ? 'QUIZ' : 'VOCÊ SABIA?'; }
+    prefetchFact();
+  }
+  function showFactSlide() {
+    restoreHeadlines();
+    curKind = 'F';
+    var el = factSlide;
+    renderFactSlide();
+    kbOn(q('.fact-photo', el));
+    deactivateAll();
+    el.className = el.className.replace(/\bactive\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '') + ' active';
+    var tw = document.querySelector('.topbar .weather');
+    if (tw) tw.style.visibility = 'hidden';
+    restartProgress(FACT_MS);
+    resetRotate(FACT_MS);
+  }
+  function showOffline() {
+    document.body.className = 'offline';
+  }
+
+  function hideOffline() {
+    document.body.className = document.body.className.replace(/\boffline\b/g, '').replace(/\s+/g, ' ');
+  }
+
+  function decodeEntities(str) {
+    if (!str || str.indexOf('&') === -1) return str;
+    try {
+      var ta = document.createElement('textarea');
+      ta.innerHTML = str;
+      return ta.value;
+    } catch (e) { return str; }
+  }
+  function loadFromCache() {
+    try {
+      var cached = JSON.parse(localStorage.getItem('portalNewsCache') || 'null');
+      if (cached && cached.items && cached.items.length) {
+        items = cached.items;
+        items.forEach(function (it) { if (it.title) it.title = decodeEntities(it.title); });
+        curNewsIdx = 0;
+        buildSeq();
+        showSeq(0);
+        prefetchTranslations();
+        hideOffline();
+        return true;
+      }
+    } catch (e) {}
+    return false;
+  }
+
+  function scheduleRetry() {
+    if (retryPending) return;
+    retryPending = true;
+    setTimeout(function () { retryPending = false; loadNews(); }, RETRY_MS);
+  }
+
+  function loadNews() {
+    xhrGet(NEWS_URL + '?v=' + Math.floor(Date.now() / REFRESH_MS), function (err, txt) {
+      if (!err) {
+        try {
+          var data = JSON.parse(txt);
+          if (data.items && data.items.length) {
+            var changed = !items.length || items[0].title !== data.items[0].title;
+            items = data.items;
+            items.forEach(function (it) { if (it.title) it.title = decodeEntities(it.title); });
+            if (curNewsIdx >= items.length) curNewsIdx = 0;
+            try { localStorage.setItem('portalNewsCache', JSON.stringify({ saved_at: Date.now(), items: items })); } catch (e) {}
+            hideOffline();
+            prefetchTranslations();
+            if (changed) {
+              buildSeq();
+              if (curKind === 'news') {
+                var pn = seq.indexOf(curNewsIdx);
+                showSeq(pn === -1 ? 0 : pn);
+              } else {
+                var ps = seq.indexOf(curKind);
+                showSeq(ps === -1 ? 0 : ps);
+              }
+            }
+            return;
+          }
+        } catch (e) {}
+      }
+      if (!items.length && !loadFromCache()) {
+        showOffline();
+        scheduleRetry();
+      }
+    });
+  }
+
+  document.getElementById('tapNext').onclick = nextSeq;
+  document.getElementById('tapPrev').onclick = prevSeq;
+  document.onkeydown = function (e) {
+    if (e.keyCode === 39) nextSeq();
+    if (e.keyCode === 37) prevSeq();
+  };
+  window.onresize = function () {
+    if (resizeTimer) clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(fitHeadline, 200);
+  };
+
+  tickClock();
+  setInterval(tickClock, 1000);
+  loadTransCache();
+  loadBibleLast();
+  prefetchBible();
+  loadFactLast();
+  prefetchFact();
+  loadMktCache();
+  loadAir();
+  setInterval(loadAir, AIR_REFRESH_MS);
+  loadMkt();
+  setInterval(loadMkt, MKT_REFRESH_MS);
+  buildClockFaces();
+  updateClocks();
+  setInterval(updateClocks, 1000);
+  loadWeather();
+  setInterval(loadWeather, WEATHER_MS);
+  loadAlerts();
+  setInterval(loadAlerts, REFRESH_MS);
+  loadFx();
+  setInterval(loadFx, FX_REFRESH_MS);
+  loadNews();
+  setInterval(loadNews, REFRESH_MS);
+})();
+</script>
+</body>
+</html>
