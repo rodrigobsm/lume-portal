@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-KGXSLWW669"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-KGXSLWW669');
+</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Portal News</title>
@@ -503,6 +512,147 @@
   function lumeClock24() { return !!(lumeCfg && lumeCfg.clockFormat === '24h'); }
   function lumeTempF() { return !!(lumeCfg && lumeCfg.tempUnit === 'F'); }
   function lumeNoTranslate() { return !!(lumeCfg && lumeCfg.language === 'en-US'); }
+
+  function isEN() { return !!(lumeCfg && lumeCfg.language === 'en-US'); }
+  function loc() { return isEN() ? 'en-US' : 'pt-BR'; }
+  var I18N = {
+    'pt-BR': {
+      today: 'HOJE', now: 'agora', minAgo: 'há {n} min', hAgo: 'há {n} h', nowPill: 'AGORA',
+      wxLoading: 'Carregando previsão…', wxFailed: 'Clima indisponível no momento',
+      feelsLike: 'Sensação', humidity: 'Umidade', wind: 'Vento', sunrise: 'Nascer do sol', sunset: 'Pôr do sol', rainChance: '% chuva',
+      wxLabel: 'PREVISÃO DO TEMPO', fxLabel: 'CÂMBIO', fxLoading: 'Carregando cotações…', fxFailed: 'Cotações indisponíveis no momento',
+      fxEcbPrefix: 'Cotações BCE de ', fxCryptoLive: 'Criptomoedas ao vivo', fxCurrencies: 'MOEDAS · POR US$ 1', fxCrypto: 'CRIPTOMOEDAS · EM US$',
+      fxChartTitle: 'DÓLAR · ÚLTIMA SEMANA', fxMax: 'máx R$ ', fxMin: 'mín R$ ',
+      clockLabel: 'HORÁRIO MUNDIAL', bibleLabel: 'PALAVRA DO DIA', mktLabel: 'MERCADOS DO MUNDO',
+      mktFailed: 'Mercados indisponíveis no momento — tentando novamente…', mktSource: 'Fonte: Yahoo Finance', mktSourceMonth: 'Fonte: Yahoo Finance (último mês)', mktUpdatedPrefix: ' · atualizado ', todayWord: 'hoje',
+      factLabel: 'VOCÊ SABIA?', answerPrefix: 'Resposta: ',
+      airLabel: 'QUALIDADE DO AR', airSub: 'ÍNDICE EUA (AQI)', airChartTitle: 'AQI AO LONGO DO DIA', airPollenLabel: 'PÓLEN · HOJE',
+      airSourcePollen: 'Fontes: Open-Meteo · Pollen.com', airSource: 'Fonte: Open-Meteo (AQI EUA)', ozone: 'OZÔNIO',
+      pollenTree: 'ÁRVORES', pollenGrass: 'GRAMA', pollenWeed: 'ERVAS', pollenIndex: 'índice ',
+      offlineMsg: 'Sem conexão com as notícias no momento — tentando novamente…',
+      aqiGood: 'BOM', aqiModerate: 'MODERADO', aqiSensitive: 'GRUPOS SENSÍVEIS', aqiUnhealthy: 'NÃO SAUDÁVEL', aqiVeryUnhealthy: 'MUITO NÃO SAUDÁVEL', aqiHazardous: 'PERIGOSO',
+      aqiRecGood: 'Ar bom. Aproveite as atividades ao ar livre sem preocupação.',
+      aqiRecModerate: 'Ar aceitável. Quem tem sensibilidade respiratória deve ficar atento a sintomas.',
+      aqiRecSensitive: 'Grupos sensíveis devem reduzir esforço prolongado ao ar livre.',
+      aqiRecUnhealthy: 'Todos podem sentir efeitos. Evite esforço prolongado ao ar livre.',
+      aqiRecVeryUnhealthy: 'Alerta de saúde: evite atividades ao ar livre.',
+      aqiRecHazardous: 'Emergência: permaneça em ambientes fechados.',
+      polLow: 'BAIXO', polModerate: 'MODERADO', polHigh: 'ALTO', polVeryHigh: 'MUITO ALTO',
+      catBrasil: 'Brasil', catMundo: 'Mundo', catEua: 'EUA', catAtlanta: 'Local', catTech: 'Tecnologia'
+    },
+    'en-US': {
+      today: 'TODAY', now: 'now', minAgo: '{n} min ago', hAgo: '{n} h ago', nowPill: 'NOW',
+      wxLoading: 'Loading forecast…', wxFailed: 'Weather unavailable right now',
+      feelsLike: 'Feels like', humidity: 'Humidity', wind: 'Wind', sunrise: 'Sunrise', sunset: 'Sunset', rainChance: '% rain',
+      wxLabel: 'WEATHER FORECAST', fxLabel: 'CURRENCY', fxLoading: 'Loading quotes…', fxFailed: 'Quotes unavailable right now',
+      fxEcbPrefix: 'ECB rates from ', fxCryptoLive: 'Live crypto', fxCurrencies: 'CURRENCIES · PER US$ 1', fxCrypto: 'CRYPTO · IN US$',
+      fxChartTitle: 'DOLLAR · LAST WEEK', fxMax: 'max R$ ', fxMin: 'min R$ ',
+      clockLabel: 'WORLD CLOCK', bibleLabel: 'WORD OF THE DAY', mktLabel: 'WORLD MARKETS',
+      mktFailed: 'Markets unavailable right now — trying again…', mktSource: 'Source: Yahoo Finance', mktSourceMonth: 'Source: Yahoo Finance (last month)', mktUpdatedPrefix: ' · updated ', todayWord: 'today',
+      factLabel: 'DID YOU KNOW?', answerPrefix: 'Answer: ',
+      airLabel: 'AIR QUALITY', airSub: 'US INDEX (AQI)', airChartTitle: 'AQI THROUGH THE DAY', airPollenLabel: 'POLLEN · TODAY',
+      airSourcePollen: 'Sources: Open-Meteo · Pollen.com', airSource: 'Source: Open-Meteo (US AQI)', ozone: 'OZONE',
+      pollenTree: 'TREES', pollenGrass: 'GRASS', pollenWeed: 'WEEDS', pollenIndex: 'index ',
+      offlineMsg: 'No connection to the news right now — trying again…',
+      aqiGood: 'Good', aqiModerate: 'Moderate', aqiSensitive: 'Unhealthy for Sensitive Groups', aqiUnhealthy: 'Unhealthy', aqiVeryUnhealthy: 'Very Unhealthy', aqiHazardous: 'Hazardous',
+      aqiRecGood: 'Good air. Enjoy outdoor activities without worry.',
+      aqiRecModerate: 'Acceptable air. People with respiratory sensitivity should watch for symptoms.',
+      aqiRecSensitive: 'Sensitive groups should reduce prolonged outdoor exertion.',
+      aqiRecUnhealthy: 'Everyone may feel effects. Avoid prolonged outdoor exertion.',
+      aqiRecVeryUnhealthy: 'Health alert: avoid outdoor activities.',
+      aqiRecHazardous: 'Emergency: stay indoors.',
+      polLow: 'LOW', polModerate: 'MODERATE', polHigh: 'HIGH', polVeryHigh: 'VERY HIGH',
+      catBrasil: 'Brazil', catMundo: 'World', catEua: 'USA', catAtlanta: 'Atlanta', catTech: 'Tech'
+    }
+  };
+  function t(k) {
+    var lang = isEN() ? 'en-US' : 'pt-BR';
+    var d = I18N[lang];
+    if (d && d[k] !== undefined) return d[k];
+    var p = I18N['pt-BR'];
+    return (p && p[k] !== undefined) ? p[k] : k;
+  }
+  function tr(k, n) { return t(k).replace('{n}', n); }
+  function fmtClockTime(d) {
+    if (isEN() && !lumeClock24()) {
+      try { return new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).format(d); } catch (e) {}
+    }
+    return pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+  }
+  var WX_LABEL_PT = { 0: 'Céu limpo', 1: 'Sol com poucas nuvens', 2: 'Parcialmente nublado', 3: 'Nublado', 45: 'Nevoeiro', 48: 'Nevoeiro', 51: 'Garoa', 53: 'Garoa', 55: 'Garoa', 56: 'Garoa congelante', 57: 'Garoa congelante', 61: 'Chuva', 63: 'Chuva', 65: 'Chuva', 66: 'Chuva congelante', 67: 'Chuva congelante', 71: 'Neve', 73: 'Neve', 75: 'Neve', 77: 'Grãos de neve', 80: 'Pancadas de chuva', 81: 'Pancadas de chuva', 82: 'Pancadas de chuva', 85: 'Pancadas de neve', 86: 'Pancadas de neve', 95: 'Trovoada', 96: 'Trovoada com granizo', 99: 'Trovoada com granizo' };
+  var WX_LABEL_EN = { 0: 'Clear sky', 1: 'Mainly clear', 2: 'Partly cloudy', 3: 'Overcast', 45: 'Fog', 48: 'Fog', 51: 'Drizzle', 53: 'Drizzle', 55: 'Drizzle', 56: 'Freezing drizzle', 57: 'Freezing drizzle', 61: 'Rain', 63: 'Rain', 65: 'Rain', 66: 'Freezing rain', 67: 'Freezing rain', 71: 'Snow', 73: 'Snow', 75: 'Snow', 77: 'Snow grains', 80: 'Rain showers', 81: 'Rain showers', 82: 'Rain showers', 85: 'Snow showers', 86: 'Snow showers', 95: 'Thunderstorm', 96: 'Thunderstorm with hail', 99: 'Thunderstorm with hail' };
+  var BIBLE_BOOK_EN = { 'João': 'John', 'Salmos': 'Psalms', 'Filipenses': 'Philippians', 'Jeremias': 'Jeremiah', '1 Coríntios': '1 Corinthians', 'Mateus': 'Matthew', 'Romanos': 'Romans', 'Isaías': 'Isaiah', 'Provérbios': 'Proverbs', '1 João': '1 John', 'Hebreus': 'Hebrews', 'Tiago': 'James', 'Efésios': 'Ephesians', 'Josué': 'Joshua', 'Deuteronômio': 'Deuteronomy', 'Lucas': 'Luke', 'Apocalipse': 'Revelation', '1 Pedro': '1 Peter' };
+  function bibleRefEN(ref) {
+    var m = ref.match(/^(.*?)\s+(\d+:\d+)$/);
+    if (!m) return ref;
+    var en = BIBLE_BOOK_EN[m[1]];
+    return en ? (en + ' ' + m[2]) : ref;
+  }
+  var BIBLE_VERSES_EN = [
+    { ref: 'John 3:16', text: 'For God so loved the world, that he gave his one and only Son, that whoever believes in him should not perish, but have eternal life.' },
+    { ref: 'Psalms 23:1', text: 'Yahweh is my shepherd; I shall lack nothing.' },
+    { ref: 'Philippians 4:13', text: 'I can do all things through Christ, who strengthens me.' },
+    { ref: 'Jeremiah 29:11', text: 'For I know the thoughts that I think toward you, says Yahweh, thoughts of peace, and not of evil, to give you hope and a future.' },
+    { ref: '1 Corinthians 13:4', text: 'Love is patient and is kind. Love does not envy. Love does not brag, is not proud.' },
+    { ref: 'Matthew 11:28', text: 'Come to me, all you who labor and are heavily burdened, and I will give you rest.' },
+    { ref: 'Romans 8:28', text: 'We know that all things work together for good for those who love God, for those who are called according to his purpose.' },
+    { ref: 'Isaiah 41:10', text: 'Do not be afraid, for I am with you. Do not be dismayed, for I am your God. I will strengthen you. Yes, I will help you. Yes, I will uphold you with the right hand of my righteousness.' }
+  ];
+  var FACTS_EN = [
+    { cat: 'TECHNOLOGY', text: 'The first computer mouse in history was made of wood. It was created in 1964 by Douglas Engelbart.' },
+    { cat: 'TECHNOLOGY', text: 'Google was almost called Backrub, because it analyzed the links pointing to each page.' },
+    { cat: 'TECHNOLOGY', text: 'The first webcam in the world was created to watch a coffee machine at the University of Cambridge.' },
+    { cat: 'TECHNOLOGY', text: 'The first real computer bug was a moth found inside the Harvard Mark II, in 1947.' },
+    { cat: 'TECHNOLOGY', text: 'The Nokia 1100 is the best-selling cell phone in history, with over 250 million units.' },
+    { cat: 'TECHNOLOGY', text: 'The first .com domain ever registered was Symbolics.com, in 1985.' },
+    { cat: 'TECHNOLOGY', text: 'The QR code was invented in 1994 in Japan to track car parts in a factory.' },
+    { cat: 'TECHNOLOGY', text: 'The word robot comes from the Czech robota, meaning forced labor, and appeared in a play in 1920.' },
+    { cat: 'TECHNOLOGY', text: 'The first programmer in history was Ada Lovelace, in the 19th century, before computers even existed.' },
+    { cat: 'TECHNOLOGY', text: 'The first commercial cell phone, the Motorola DynaTAC, weighed almost 1.1 kg and cost about 4,000 dollars in 1983.' },
+    { cat: 'TECHNOLOGY', text: 'YouTube started in 2005 as a dating site, with the slogan Tune In, Hook Up.' },
+    { cat: 'TECHNOLOGY', text: 'Amazon started in 1994 selling books from Jeff Bezos garage.' },
+    { cat: 'TECHNOLOGY', text: 'GPS only works accurately because of Einstein Theory of Relativity.' },
+    { cat: 'TECHNOLOGY', text: 'The first iPhone, from 2007, had no App Store, no copy and paste, and no 3G.' },
+    { cat: 'SCIENCE', text: 'Lightning is about five times hotter than the surface of the Sun.' },
+    { cat: 'SCIENCE', text: 'Most of the oxygen we breathe comes from the ocean, not from forests.' },
+    { cat: 'SCIENCE', text: 'Honey never spoils: 3,000-year-old pots of honey found in Egyptian tombs were still good to eat.' },
+    { cat: 'SCIENCE', text: 'Octopuses have three hearts and blue blood.' },
+    { cat: 'SCIENCE', text: 'The Turritopsis jellyfish is biologically immortal: it can revert to its polyp stage.' },
+    { cat: 'SCIENCE', text: 'Bees can recognize human faces.' },
+    { cat: 'SPACE', text: 'The International Space Station travels at about 28,000 km/h and orbits Earth every 90 minutes.' },
+    { cat: 'SPACE', text: 'The Moon is drifting away from Earth by about 3.8 centimeters per year.' },
+    { cat: 'SPACE', text: 'A day on Venus lasts longer than a Venusian year.' },
+    { cat: 'SPACE', text: 'The Sun holds 99.86% of all the mass in the Solar System.' },
+    { cat: 'SPACE', text: 'Saturn rings are made almost entirely of ice.' },
+    { cat: 'SPACE', text: 'The first artificial satellite, Sputnik 1, weighed only 83 kg and was launched in 1957.' },
+    { cat: 'SPACE', text: 'Sound cannot travel in space, because there is no air to carry it.' },
+    { cat: 'SCIENCE', text: 'The Eiffel Tower grows about 15 centimeters in summer, as the iron expands.' },
+    { cat: 'NATURE', text: 'Mount Everest grows about 4 millimeters per year.' },
+    { cat: 'NATURE', text: 'A blue whale heart is the size of a small car.' },
+    { cat: 'HISTORY', text: 'The Colosseum in Rome was once flooded on purpose to stage naval battles.' },
+    { cat: 'HISTORY', text: 'The Great Wall of China was built with a mortar containing sticky rice flour.' },
+    { cat: 'HISTORY', text: 'The Hawaiian alphabet has only 12 letters.' },
+    { cat: 'HISTORY', text: 'The American 1-cent coin costs more to make than it is worth.' }
+  ];
+  var MKT_REGION_EN = { 'EUA': 'USA', 'BRASIL': 'BRAZIL', 'EUROPA': 'EUROPE', 'ÁSIA': 'ASIA' };
+  function airLabelText() {
+    var city = (lumeCfg && lumeCfg.city && lumeCfg.city.name) ? lumeCfg.city.name : 'Acworth, GA';
+    return t('airLabel') + ' · ' + city.toUpperCase();
+  }
+  function applyLang() {
+    try { document.documentElement.lang = 'en-US'; } catch (e) {}
+    var set = function (sel, txt) { var el = document.querySelector(sel); if (el) el.textContent = txt; };
+    set('.wx-label', t('wxLabel'));
+    set('.fx-label', t('fxLabel'));
+    set('.clock-label', t('clockLabel'));
+    set('.bible-label', t('bibleLabel'));
+    set('.air-label', airLabelText());
+    set('.air-aqi-sub', t('airSub'));
+    set('.air-chart-title', t('airChartTitle'));
+    set('.air-pollen-label', t('airPollenLabel'));
+    set('.mkt-label', t('mktLabel'));
+    set('#offline .msg', t('offlineMsg'));
+  }
   function slideMs() {
     if (lumeCfg && [5, 10, 15, 20, 25, 30, 60].indexOf(lumeCfg.slideDuration) !== -1) return lumeCfg.slideDuration * 1000;
     return ROTATE_MS;
@@ -513,6 +663,7 @@
   function lumeApply(cfg) {
     if (!cfg || typeof cfg !== 'object') return;
     lumeCfg = cfg;
+    if (isEN()) applyLang();
     document.documentElement.style.setProperty('--slide-kb', slideMs() + 'ms');
     if (cfg.city && typeof cfg.city.lat === 'number' && typeof cfg.city.lon === 'number') {
       wxLat = cfg.city.lat;
@@ -582,11 +733,11 @@
   var BIBLE_PHOTO = 'https://commons.wikimedia.org/wiki/Special:FilePath/Leonardo%20da%20Vinci%20%281452-1519%29%20-%20The%20Last%20Supper%20%281495-1498%29.jpg?width=1600';
   var BIBLE_PHOTO_FALLBACK = 'https://commons.wikimedia.org/wiki/Special:FilePath/Holy%20Bible.jpg?width=1600';
   var CLOCK_CITIES = [
-    { name: 'ATLANTA', tz: 'America/New_York', off: -4 },
-    { name: 'LOS ANGELES', tz: 'America/Los_Angeles', off: -7 },
-    { name: 'BRASÍLIA', tz: 'America/Sao_Paulo', off: -3 },
-    { name: 'LONDRES', tz: 'Europe/London', off: 1 },
-    { name: 'TÓQUIO', tz: 'Asia/Tokyo', off: 9 }
+    { name: 'ATLANTA', en: 'ATLANTA', tz: 'America/New_York', off: -4 },
+    { name: 'LOS ANGELES', en: 'LOS ANGELES', tz: 'America/Los_Angeles', off: -7 },
+    { name: 'BRASÍLIA', en: 'BRASILIA', tz: 'America/Sao_Paulo', off: -3 },
+    { name: 'LONDRES', en: 'LONDON', tz: 'Europe/London', off: 1 },
+    { name: 'TÓQUIO', en: 'TOKYO', tz: 'Asia/Tokyo', off: 9 }
   ];
   var BIBLE_VERSES = [
     { ref: 'JOÃO 3:16', text: 'Porque Deus tanto amou o mundo que deu o seu Filho Unigênito, para que todo o que nele crer não pereça, mas tenha a vida eterna.' },
@@ -612,6 +763,7 @@
   ];
   var bibleNext = null;
   var bibleLastRef = '';
+  var bibleLastPick = '';
   var FACTS = [
     { cat: 'TECNOLOGIA', text: 'O primeiro mouse da história era de madeira. Foi criado em 1964 por Douglas Engelbart.' },
     { cat: 'TECNOLOGIA', text: 'O Google quase se chamou Backrub, porque analisava os links que apontavam para cada página.' },
@@ -711,6 +863,13 @@
   }
 
   function catLabel(c) {
+    if (isEN()) {
+      if (c === 'brasil') return 'Brazil';
+      if (c === 'mundo') return 'World';
+      if (c === 'eua') return 'USA';
+      if (c === 'atlanta') return 'Atlanta';
+      return 'Tech';
+    }
     if (c === 'brasil') return 'Brasil';
     if (c === 'mundo') return 'Mundo';
     if (c === 'eua') return 'EUA';
@@ -722,6 +881,14 @@
     if (!iso) return '';
     try {
       var d = new Date(iso);
+      if (isEN()) {
+        var s = new Intl.DateTimeFormat('en-US', {
+          timeZone: 'America/New_York', month: '2-digit', day: '2-digit',
+          hour: lumeClock24() ? '2-digit' : 'numeric', minute: '2-digit', hour12: !lumeClock24()
+        }).format(d);
+        if (lumeClock24()) s = s.replace(/, 24:/, ', 00:');
+        return s;
+      }
       return new Intl.DateTimeFormat('pt-BR', {
         timeZone: 'America/New_York', day: '2-digit', month: '2-digit',
         hour: '2-digit', minute: '2-digit'
@@ -736,10 +903,10 @@
       var diff = Date.now() - d.getTime();
       if (isNaN(diff)) return fmtTime(iso);
       var min = Math.floor(diff / 60000);
-      if (min < 1) return 'agora';
-      if (min < 60) return 'há ' + min + ' min';
+      if (min < 1) return t('now');
+      if (min < 60) return tr('minAgo', min);
       var h = Math.floor(min / 60);
-      if (h < 24) return 'há ' + h + ' h';
+      if (h < 24) return tr('hAgo', h);
       return fmtTime(iso);
     } catch (e) { return fmtTime(iso); }
   }
@@ -751,13 +918,20 @@
         timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit', hour12: !lumeClock24()
       }).format(now);
       if (lumeClock24()) time = time.replace(/^24:/, '00:');
-      var wd = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/New_York', weekday: 'short' }).format(now).replace(/\./g, '');
-      wd = wd.charAt(0).toUpperCase() + wd.slice(1);
-      var mo = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/New_York', month: 'long' }).format(now);
-      mo = mo.charAt(0).toUpperCase() + mo.slice(1);
-      var dy = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/New_York', day: 'numeric' }).format(now);
-      var yr = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/New_York', year: 'numeric' }).format(now);
-      var date = wd + ', ' + dy + ' ' + mo + ' ' + yr;
+      var date;
+      if (isEN()) {
+        try {
+          date = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', weekday: 'short', month: 'long', day: 'numeric', year: 'numeric' }).format(now);
+        } catch (e) { date = ''; }
+      } else {
+        var wd = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/New_York', weekday: 'short' }).format(now).replace(/\./g, '');
+        wd = wd.charAt(0).toUpperCase() + wd.slice(1);
+        var mo = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/New_York', month: 'long' }).format(now);
+        mo = mo.charAt(0).toUpperCase() + mo.slice(1);
+        var dy = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/New_York', day: 'numeric' }).format(now);
+        var yr = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/New_York', year: 'numeric' }).format(now);
+        date = wd + ', ' + dy + ' ' + mo + ' ' + yr;
+      }
       var clocks = qa('.clock');
       var dates = qa('.date');
       for (var i = 0; i < clocks.length; i++) { clocks[i].textContent = time; }
@@ -766,22 +940,8 @@
   }
 
   function weatherLabel(code) {
-    if (code === 0) return 'Céu limpo';
-    if (code === 1) return 'Sol com poucas nuvens';
-    if (code === 2) return 'Parcialmente nublado';
-    if (code === 3) return 'Nublado';
-    if (code === 45 || code === 48) return 'Nevoeiro';
-    if (code === 51 || code === 53 || code === 55) return 'Garoa';
-    if (code === 56 || code === 57) return 'Garoa congelante';
-    if (code === 61 || code === 63 || code === 65) return 'Chuva';
-    if (code === 66 || code === 67) return 'Chuva congelante';
-    if (code === 71 || code === 73 || code === 75) return 'Neve';
-    if (code === 77) return 'Grãos de neve';
-    if (code === 80 || code === 81 || code === 82) return 'Pancadas de chuva';
-    if (code === 85 || code === 86) return 'Pancadas de neve';
-    if (code === 95) return 'Trovoada';
-    if (code === 96 || code === 99) return 'Trovoada com granizo';
-    return '';
+    var m = isEN() ? WX_LABEL_EN : WX_LABEL_PT;
+    return m[code] !== undefined ? m[code] : '';
   }
 
   function iconSVG(code) {
@@ -825,7 +985,7 @@
   function loadAlerts() {
     var badge = document.getElementById('nwsAlert');
     if (!badge) return;
-    xhrGet('/api/alerts?point=' + wxLat + ',' + wxLon, function (err, txt) {
+    xhrGet('/api/alerts?point=' + wxLat + ',' + wxLon + (isEN() ? '&lang=en' : ''), function (err, txt) {
       var evt = q('.alertevt', badge);
       if (err || !evt) { badge.style.display = 'none'; return; }
       try {
@@ -966,7 +1126,7 @@
     if (fr) {
       var isFresh = false;
       try { isFresh = !!it.published_at && (Date.now() - new Date(it.published_at).getTime()) < 30 * 60000; } catch (e) {}
-      fr.textContent = 'AGORA';
+      fr.textContent = t('nowPill');
       fr.style.display = isFresh ? '' : 'none';
     }
     q('.counter', el).textContent = (pos + 1) + ' / ' + total;
@@ -1117,15 +1277,20 @@
   function fmtHour(iso) {
     if (!iso) return '';
     try {
+      if (isEN()) {
+        var s = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: lumeClock24() ? '2-digit' : 'numeric', minute: '2-digit', hour12: !lumeClock24() }).format(new Date(iso));
+        if (lumeClock24()) s = s.replace(/^24:/, '00:');
+        return s;
+      }
       return new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit' }).format(new Date(iso));
     } catch (e) { return ''; }
   }
   function dayName(iso, idx) {
-    if (idx === 0) return 'HOJE';
+    if (idx === 0) return t('today');
     try {
       var p = iso.split('-');
       var dt = new Date(Date.UTC(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10), 12, 0, 0));
-      return new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/New_York', weekday: 'short' }).format(dt).replace(/\./g, '').toUpperCase();
+      return new Intl.DateTimeFormat(loc(), { timeZone: 'America/New_York', weekday: 'short' }).format(dt).replace(/\./g, '').toUpperCase();
     } catch (e) { return ''; }
   }
   function renderWeatherSlide() {
@@ -1138,7 +1303,7 @@
     var days = q('.wx-days', el);
     var img = q('.wx-photo', el);
     if (!weatherData) {
-      cond.textContent = weatherFailed ? 'Clima indisponível no momento' : 'Carregando previsão…';
+      cond.textContent = weatherFailed ? t('wxFailed') : t('wxLoading');
       tempEl.textContent = '';
       wic.innerHTML = '';
       det.textContent = '';
@@ -1159,11 +1324,11 @@
     tempEl.textContent = tempVal(c.temperature_2m) + tempBare();
     cond.textContent = weatherLabel(c.weather_code);
     var parts = [];
-    if (c.apparent_temperature !== undefined && c.apparent_temperature !== null) parts.push('Sensação ' + tempVal(c.apparent_temperature) + tempBare());
-    if (c.relative_humidity_2m !== undefined && c.relative_humidity_2m !== null) parts.push('Umidade ' + Math.round(c.relative_humidity_2m) + '%');
-    if (c.wind_speed_10m !== undefined && c.wind_speed_10m !== null) parts.push('Vento ' + Math.round(c.wind_speed_10m) + ' mph');
-    if (d && d.sunrise && d.sunrise[0]) parts.push('Nascer do sol ' + fmtHour(d.sunrise[0]));
-    if (d && d.sunset && d.sunset[0]) parts.push('Pôr do sol ' + fmtHour(d.sunset[0]));
+    if (c.apparent_temperature !== undefined && c.apparent_temperature !== null) parts.push(t('feelsLike') + ' ' + tempVal(c.apparent_temperature) + tempBare());
+    if (c.relative_humidity_2m !== undefined && c.relative_humidity_2m !== null) parts.push(t('humidity') + ' ' + Math.round(c.relative_humidity_2m) + '%');
+    if (c.wind_speed_10m !== undefined && c.wind_speed_10m !== null) parts.push(t('wind') + ' ' + Math.round(c.wind_speed_10m) + ' mph');
+    if (d && d.sunrise && d.sunrise[0]) parts.push(t('sunrise') + ' ' + fmtHour(d.sunrise[0]));
+    if (d && d.sunset && d.sunset[0]) parts.push(t('sunset') + ' ' + fmtHour(d.sunset[0]));
     det.textContent = parts.join(' · ');
     var html = '';
     if (d && d.time) {
@@ -1171,7 +1336,7 @@
       for (var i = 0; i < n; i++) {
         var code = d.weather_code ? d.weather_code[i] : 0;
         var pop = (d.precipitation_probability_max && d.precipitation_probability_max[i] !== null && d.precipitation_probability_max[i] !== undefined) ? d.precipitation_probability_max[i] : null;
-        html += '<div class="wx-day" style="animation-delay:' + (i * 0.08) + 's"><div class="dname">' + dayName(d.time[i], i) + '</div><div class="dic">' + iconSVG(code) + '</div><div class="dmax">' + tempVal(d.temperature_2m_max[i]) + tempBare() + '</div><div class="dmin">' + tempVal(d.temperature_2m_min[i]) + tempBare() + '</div>' + (pop !== null ? '<div class="dpop">' + Math.round(pop) + '% chuva</div>' : '') + '</div>';
+        html += '<div class="wx-day" style="animation-delay:' + (i * 0.08) + 's"><div class="dname">' + dayName(d.time[i], i) + '</div><div class="dic">' + iconSVG(code) + '</div><div class="dmax">' + tempVal(d.temperature_2m_max[i]) + tempBare() + '</div><div class="dmin">' + tempVal(d.temperature_2m_min[i]) + tempBare() + '</div>' + (pop !== null ? '<div class="dpop">' + Math.round(pop) + t('rainChance') + '</div>' : '') + '</div>';
       }
     }
     days.innerHTML = html;
@@ -1232,8 +1397,10 @@
   function pad2(n) { return (n < 10 ? '0' : '') + n; }
   function isoDay(d) { return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
   function fmtDayBR(iso) { var p = iso.split('-'); return p[2] + '/' + p[1]; }
+  function fmtDayEN(iso) { var p = iso.split('-'); return p[1] + '/' + p[2]; }
+  function fmtDay(iso) { return isEN() ? fmtDayEN(iso) : fmtDayBR(iso); }
   function fmtNum(v, dec) {
-    try { return v.toLocaleString('pt-BR', { minimumFractionDigits: dec, maximumFractionDigits: dec }); }
+    try { return v.toLocaleString(loc(), { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
     catch (e) { return String(v); }
   }
   function fxChangeSpan(ch) {
@@ -1322,8 +1489,8 @@
     var vals = pts.map(function (p) { return p.brl; });
     var min = Math.min.apply(null, vals);
     var max = Math.max.apply(null, vals);
-    var labels = pts.map(function (p) { return fmtDayBR(p.date); });
-    chartEl.innerHTML = '<div class="fx-chart-title"><span>DÓLAR · ÚLTIMA SEMANA</span><span class="fx-chart-mm">máx R$ ' + fmtNum(max, 2) + ' · mín R$ ' + fmtNum(min, 2) + '</span></div><div class="fx-chart-wrap"><canvas></canvas></div>';
+    var labels = pts.map(function (p) { return fmtDay(p.date); });
+    chartEl.innerHTML = '<div class="fx-chart-title"><span>' + t('fxChartTitle') + '</span><span class="fx-chart-mm">' + t('fxMax') + fmtNum(max, 2) + ' · ' + t('fxMin') + fmtNum(min, 2) + '</span></div><div class="fx-chart-wrap"><canvas></canvas></div>';
     chartEl.style.display = '';
     if (typeof Chart === 'undefined') { chartEl.style.display = 'none'; return; }
     var ctx = q('canvas', chartEl);
@@ -1360,7 +1527,7 @@
     if (!fxData || (!fxData.fiat && !fxData.crypto)) {
       rateEl.textContent = '';
       chEl.style.display = 'none';
-      det.textContent = fxFailed ? 'Cotações indisponíveis no momento' : 'Carregando cotações…';
+      det.textContent = fxFailed ? t('fxFailed') : t('fxLoading');
       rows.innerHTML = '';
       chartEl.innerHTML = '';
       chartEl.style.display = 'none';
@@ -1381,8 +1548,8 @@
       chEl.textContent = (heroCh >= 0 ? '▲ ' : '▼ ') + fmtNum(Math.abs(heroCh), 1) + '%';
     }
     var detParts = [];
-    if (fiat && fiat.date) detParts.push('Cotações BCE de ' + fmtDayBR(fiat.date));
-    detParts.push('Criptomoedas ao vivo');
+    if (fiat && fiat.date) detParts.push(t('fxEcbPrefix') + fmtDay(fiat.date));
+    detParts.push(t('fxCryptoLive'));
     det.textContent = detParts.join(' · ');
     renderFxChart(fiat);
     var html = '';
@@ -1394,7 +1561,7 @@
         var c = (fiat.prev && fiat.prev[code]) ? (v - fiat.prev[code]) / fiat.prev[code] * 100 : null;
         fiatBoxes += '<div class="fx-box" style="animation-delay:' + (i * 0.08) + 's"><div class="fname">' + code + '</div><div class="fprice">' + FX_SYM[code] + ' ' + fmtNum(v, v >= 100 ? 0 : 2) + '</div>' + fxChangeSpan(c) + '</div>';
       });
-      if (fiatBoxes) html += '<div><div class="fx-rowlabel">MOEDAS · POR US$ 1</div><div class="fx-row">' + fiatBoxes + '</div></div>';
+      if (fiatBoxes) html += '<div><div class="fx-rowlabel">' + t('fxCurrencies') + '</div><div class="fx-row">' + fiatBoxes + '</div></div>';
     }
     if (fxData.crypto) {
       var cryptoBoxes = '';
@@ -1403,7 +1570,7 @@
         if (!d) return;
         cryptoBoxes += '<div class="fx-box" style="animation-delay:' + (i * 0.08) + 's"><div class="fname">' + c[0] + '</div><div class="fprice">US$ ' + fmtNum(d.price, d.price >= 100 ? 0 : (d.price >= 1 ? 2 : 4)) + '</div>' + fxChangeSpan(d.change) + '</div>';
       });
-      if (cryptoBoxes) html += '<div><div class="fx-rowlabel">CRIPTOMOEDAS · EM US$</div><div class="fx-row">' + cryptoBoxes + '</div></div>';
+      if (cryptoBoxes) html += '<div><div class="fx-rowlabel">' + t('fxCrypto') + '</div><div class="fx-row">' + cryptoBoxes + '</div></div>';
     }
     rows.innerHTML = html;
   }
@@ -1455,7 +1622,7 @@
         '<div class="clock-face">' + ticks +
         '<div class="cnum" style="top:12%;left:50%">12</div><div class="cnum" style="top:50%;left:88%">3</div><div class="cnum" style="top:88%;left:50%">6</div><div class="cnum" style="top:50%;left:12%">9</div>' +
         '<div class="hand hour"></div><div class="hand min"></div><div class="hand sec"></div><div class="cap"></div></div>' +
-        '<div class="city">' + c.name + '</div><div class="dig"></div><div class="cdate"></div></div>';
+        '<div class="city">' + (isEN() ? c.en : c.name) + '</div><div class="dig"></div><div class="cdate"></div></div>';
     });
     row.innerHTML = html;
   }
@@ -1472,11 +1639,14 @@
   }
   function zoneDate(tz, off) {
     try {
+      if (isEN()) {
+        return new Date().toLocaleString('en-US', { timeZone: tz, weekday: 'short', month: '2-digit', day: '2-digit' });
+      }
       return new Date().toLocaleString('pt-BR', { timeZone: tz, weekday: 'short', day: '2-digit', month: '2-digit' });
     } catch (e) {
-      var WD = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
+      var WD = isEN() ? ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'] : ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
       var d = new Date(Date.now() + off * 3600000);
-      return WD[d.getUTCDay()] + ', ' + pad2(d.getUTCDate()) + '/' + pad2(d.getUTCMonth() + 1);
+      return isEN() ? (WD[d.getUTCDay()] + ', ' + pad2(d.getUTCMonth() + 1) + '/' + pad2(d.getUTCDate())) : (WD[d.getUTCDay()] + ', ' + pad2(d.getUTCDate()) + '/' + pad2(d.getUTCMonth() + 1));
     }
   }
   function updateClocks() {
@@ -1533,17 +1703,19 @@
   function pickBibleRef() {
     var pool = [];
     for (var i = 0; i < BIBLE_REFS.length; i++) {
-      if (BIBLE_REFS[i].toLowerCase() !== bibleLastRef.toLowerCase()) pool.push(BIBLE_REFS[i]);
+      if (BIBLE_REFS[i].toLowerCase() !== bibleLastRef.toLowerCase() && BIBLE_REFS[i].toLowerCase() !== bibleLastPick.toLowerCase()) pool.push(BIBLE_REFS[i]);
     }
     if (!pool.length) pool = BIBLE_REFS;
     return pool[Math.floor(Math.random() * pool.length)];
   }
   function fetchBibleVerse(ref, cb) {
-    xhrGet('https://bible-api.com/' + encodeURIComponent(ref) + '?translation=almeida', function (err, txt) {
+    var en = isEN();
+    var qref = en ? bibleRefEN(ref) : ref;
+    xhrGet('https://bible-api.com/' + encodeURIComponent(qref) + '?translation=' + (en ? 'web' : 'almeida'), function (err, txt) {
       if (err) { cb(null); return; }
       try {
         var d = JSON.parse(txt);
-        if (d && d.text) { cb({ ref: d.reference, text: d.text.replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, ''), trans: 'ALMEIDA' }); return; }
+        if (d && d.text) { cb({ ref: d.reference, text: d.text.replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, ''), trans: en ? 'WEB' : 'ALMEIDA' }); return; }
       } catch (e) {}
       cb(null);
     });
@@ -1551,6 +1723,7 @@
   function prefetchBible() {
     if (bibleNext) return;
     var ref = pickBibleRef();
+    bibleLastPick = ref;
     fetchBibleVerse(ref, function (v) { if (v) bibleNext = v; });
   }
   function renderBibleSlide() {
@@ -1571,13 +1744,14 @@
       bibleLastRef = v.ref;
       try { localStorage.setItem('portalNewsBibleLast', v.ref); } catch (e) {}
     } else {
+      var srcVerses = isEN() ? BIBLE_VERSES_EN : BIBLE_VERSES;
       var pool = [];
-      for (var i = 0; i < BIBLE_VERSES.length; i++) {
-        if (BIBLE_VERSES[i].ref.toLowerCase() !== bibleLastRef.toLowerCase()) pool.push(BIBLE_VERSES[i]);
+      for (var i = 0; i < srcVerses.length; i++) {
+        if (srcVerses[i].ref.toLowerCase() !== bibleLastRef.toLowerCase()) pool.push(srcVerses[i]);
       }
-      if (!pool.length) pool = BIBLE_VERSES;
+      if (!pool.length) pool = srcVerses;
       var fv = pool[Math.floor(Math.random() * pool.length)];
-      v = { ref: fv.ref, text: fv.text, trans: 'NVI' };
+      v = { ref: fv.ref, text: fv.text, trans: isEN() ? 'WEB' : 'NVI' };
     }
     var t = q('.bible-text', el);
     var r = q('.bible-ref', el);
@@ -1599,19 +1773,19 @@
     resetRotate(slideMs());
   }
   function aqiCat(a) {
-    if (a <= 50) return { label: 'BOM', color: '#2ea043' };
-    if (a <= 100) return { label: 'MODERADO', color: '#d7b500' };
-    if (a <= 150) return { label: 'GRUPOS SENSÍVEIS', color: '#e67e22' };
-    if (a <= 200) return { label: 'NÃO SAUDÁVEL', color: '#da3633' };
-    if (a <= 300) return { label: 'MUITO NÃO SAUDÁVEL', color: '#8957e5' };
-    return { label: 'PERIGOSO', color: '#7a1f1f' };
+    if (a <= 50) return { label: t('aqiGood'), color: '#2ea043' };
+    if (a <= 100) return { label: t('aqiModerate'), color: '#d7b500' };
+    if (a <= 150) return { label: t('aqiSensitive'), color: '#e67e22' };
+    if (a <= 200) return { label: t('aqiUnhealthy'), color: '#da3633' };
+    if (a <= 300) return { label: t('aqiVeryUnhealthy'), color: '#8957e5' };
+    return { label: t('aqiHazardous'), color: '#7a1f1f' };
   }
   function pollenLevel(idx) {
     if (idx === null || idx === undefined) return null;
-    if (idx < 2.5) return { label: 'BAIXO', color: '#7ee787' };
-    if (idx < 4.9) return { label: 'MODERADO', color: '#d7b500' };
-    if (idx < 7.3) return { label: 'ALTO', color: '#e67e22' };
-    return { label: 'MUITO ALTO', color: '#da3633' };
+    if (idx < 2.5) return { label: t('polLow'), color: '#7ee787' };
+    if (idx < 4.9) return { label: t('polModerate'), color: '#d7b500' };
+    if (idx < 7.3) return { label: t('polHigh'), color: '#e67e22' };
+    return { label: t('polVeryHigh'), color: '#da3633' };
   }
   var ICONS = {
     wind: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.59 4.59A2 2 0 1 1 11 8H2"/><path d="M12.59 19.41A2 2 0 1 0 14 16H2"/><path d="M17.73 7.73A2.5 2.5 0 1 1 19.5 12H2"/></svg>',
@@ -1623,12 +1797,12 @@
     flower: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/><circle cx="12" cy="6.5" r="2.5"/><circle cx="12" cy="17.5" r="2.5"/><circle cx="6.5" cy="12" r="2.5"/><circle cx="17.5" cy="12" r="2.5"/></svg>'
   };
   function aqiRec(a) {
-    if (a <= 50) return 'Ar bom. Aproveite as atividades ao ar livre sem preocupação.';
-    if (a <= 100) return 'Ar aceitável. Quem tem sensibilidade respiratória deve ficar atento a sintomas.';
-    if (a <= 150) return 'Grupos sensíveis devem reduzir esforço prolongado ao ar livre.';
-    if (a <= 200) return 'Todos podem sentir efeitos. Evite esforço prolongado ao ar livre.';
-    if (a <= 300) return 'Alerta de saúde: evite atividades ao ar livre.';
-    return 'Emergência: permaneça em ambientes fechados.';
+    if (a <= 50) return t('aqiRecGood');
+    if (a <= 100) return t('aqiRecModerate');
+    if (a <= 150) return t('aqiRecSensitive');
+    if (a <= 200) return t('aqiRecUnhealthy');
+    if (a <= 300) return t('aqiRecVeryUnhealthy');
+    return t('aqiRecHazardous');
   }
   function renderAirChart(el) {
     var box = q('.air-chart', el);
@@ -1671,6 +1845,8 @@
     if (img && img.getAttribute('data-src') !== AIR_PHOTO) { img.src = AIR_PHOTO; img.setAttribute('data-src', AIR_PHOTO); }
     var aicon = q('.air-aqi-icon', el);
     if (aicon && !aicon.innerHTML) aicon.innerHTML = ICONS.wind;
+    var alab = q('.air-label', el);
+    if (alab) alab.textContent = airLabelText();
     if (!airData) return;
     var num = q('.air-aqi-num', el);
     var cat = q('.air-aqi-cat', el);
@@ -1687,7 +1863,7 @@
       var boxes = [
         ['PM2.5', airData.pm25, 'µg/m³', ICONS.dust],
         ['PM10', airData.pm10, 'µg/m³', ICONS.dust],
-        ['OZÔNIO', airData.ozone, 'µg/m³', ICONS.sun],
+        [t('ozone'), airData.ozone, 'µg/m³', ICONS.sun],
         ['NO₂', airData.no2, 'µg/m³', ICONS.car],
         ['CO', airData.co, 'µg/m³', ICONS.cloud],
         ['SO₂', airData.so2, 'µg/m³', ICONS.factory]
@@ -1708,12 +1884,12 @@
     var plabel = q('.air-pollen-label', el);
     var prow = q('.air-pollen', el);
     if (airPollen && airPollen.ok) {
-      var types = [['ÁRVORES', airPollen.tree], ['GRAMA', airPollen.grass], ['ERVAS', airPollen.weed]];
+      var types = [[t('pollenTree'), airPollen.tree], [t('pollenGrass'), airPollen.grass], [t('pollenWeed'), airPollen.weed]];
       var phtml = '';
       for (var j = 0; j < types.length; j++) {
         var lv = pollenLevel(types[j][1]);
         phtml += '<div class="air-box" style="animation-delay:' + (j * 0.08) + 's"><div class="aicon">' + ICONS.flower + '</div><div class="aname">' + types[j][0] + '</div>' +
-          (lv ? '<div class="alevel" style="color:' + lv.color + '">' + lv.label + '</div><div class="aunit">índice ' + types[j][1] + '</div>' : '<div class="alevel">—</div>') + '</div>';
+          (lv ? '<div class="alevel" style="color:' + lv.color + '">' + lv.label + '</div><div class="aunit">' + t('pollenIndex') + types[j][1] + '</div>' : '<div class="alevel">—</div>') + '</div>';
       }
       if (prow) prow.innerHTML = phtml;
       if (plabel) plabel.style.display = '';
@@ -1723,7 +1899,7 @@
       if (prow) prow.style.display = 'none';
     }
     var src = q('.air-source', el);
-    if (src) src.textContent = airPollen && airPollen.ok ? 'Fontes: Open-Meteo · Pollen.com' : 'Fonte: Open-Meteo (AQI EUA)';
+    if (src) src.textContent = airPollen && airPollen.ok ? t('airSourcePollen') : t('airSource');
   }
   function loadAir() {
     xhrGet(airUrl(), function (err, txt) {
@@ -1779,9 +1955,7 @@
     var color = up ? '#7ee787' : '#ff7b72';
     return '<svg viewBox="0 0 100 32" preserveAspectRatio="none"><polyline points="' + pts.join(' ') + '" fill="none" stroke="' + color + '" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>';
   }
-  function fmtNum(v) {
-    return v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  }
+
   function renderMktSlide() {
     var el = mktSlide;
     if (!el) return;
@@ -1790,8 +1964,8 @@
     var grid = q('.mkt-grid', el);
     var src = q('.mkt-source', el);
     if (!mktData || !mktData.indices || !mktData.indices.length) {
-      if (grid) grid.innerHTML = '<div style="font-size:2.4vw;font-weight:700">Mercados indisponíveis no momento — tentando novamente…</div>';
-      if (src) src.textContent = 'Fonte: Yahoo Finance';
+      if (grid) grid.innerHTML = '<div style="font-size:2.4vw;font-weight:700">' + t('mktFailed') + '</div>';
+      if (src) src.textContent = t('mktSource');
       return;
     }
     var html = '';
@@ -1800,21 +1974,21 @@
       var up = it.changePct >= 0;
       var sign = up ? '+' : '';
       html += '<div class="mkt-card" style="animation-delay:' + (i * 0.06) + 's">' +
-        '<div class="mkt-region">' + it.region + '</div><div class="mkt-name">' + it.name + '</div>' +
+        '<div class="mkt-region">' + (isEN() ? (MKT_REGION_EN[it.region] || it.region) : it.region) + '</div><div class="mkt-name">' + it.name + '</div>' +
         '<div class="mkt-val">' + fmtNum(it.price) + '</div>' +
-        '<div class="mkt-change ' + (up ? 'up' : 'down') + '">' + sign + it.changePct.toFixed(2).replace('.', ',') + '% hoje</div>' +
+        '<div class="mkt-change ' + (up ? 'up' : 'down') + '">' + sign + (isEN() ? it.changePct.toFixed(2) : it.changePct.toFixed(2).replace('.', ',')) + '% ' + t('todayWord') + '</div>' +
         '<div class="mkt-spark">' + sparkSVG(it.spark, up) + '</div></div>';
     }
     if (grid) grid.innerHTML = html;
     if (src) {
-      var t = '';
+      var upd = '';
       if (mktData.time) {
         try {
           var d = new Date(mktData.time);
-          t = ' · atualizado ' + ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
+          upd = t('mktUpdatedPrefix') + fmtClockTime(d);
         } catch (e) {}
       }
-      src.textContent = 'Fonte: Yahoo Finance (último mês)' + t;
+      src.textContent = t('mktSourceMonth') + upd;
     }
   }
   function loadMkt() {
@@ -1874,7 +2048,7 @@
       var txt = cleanFactText(list[i].text || '');
       if (txt.length < 40 || txt.length > 260) continue;
       if (txt === factLast) continue;
-      pool.push({ text: txt, tag: 'NESTE DIA · ' + list[i].year, photo: wikiThumb(list[i].pages) });
+      pool.push({ text: txt, tag: (isEN() ? 'ON THIS DAY · ' : 'NESTE DIA · ') + list[i].year, photo: wikiThumb(list[i].pages) });
     }
     if (!pool.length) return null;
     return pool[Math.floor(Math.random() * pool.length)];
@@ -1924,7 +2098,7 @@
         }
         if (!picked) { prefetchWikiFact(); return; }
         if (lumeNoTranslate()) {
-          factNext = { text: picked.q, tag: triviaTag(picked.cat), quiz: true, answer: picked.a, photo: TRIVIA_PHOTOS[picked.cat] || null };
+          factNext = { text: picked.q, tag: picked.cat, quiz: true, answer: picked.a, photo: TRIVIA_PHOTOS[picked.cat] || null };
           factBusy = false;
           return;
         }
@@ -1940,13 +2114,13 @@
     });
   }
   function prefetchWikiFact() {
-    var base = 'https://pt.wikipedia.org/api/rest_v1/feed/onthisday/';
+    var base = isEN() ? 'https://en.wikipedia.org/api/rest_v1/feed/onthisday/' : 'https://pt.wikipedia.org/api/rest_v1/feed/onthisday/';
     var md = factDatePath();
     fetchFactFrom(base + 'events/' + md, function (f) {
       if (f) { factNext = f; factBusy = false; return; }
       fetchFactFrom(base + 'selected/' + md, function (f2) {
         if (f2) { factNext = f2; factBusy = false; return; }
-        xhrGet('https://pt.wikipedia.org/api/rest_v1/page/random/summary', function (err, txt) {
+        xhrGet((isEN() ? 'https://en.wikipedia.org/api/rest_v1/page/random/summary' : 'https://pt.wikipedia.org/api/rest_v1/page/random/summary'), function (err, txt) {
           if (!err) {
             try {
               var d = JSON.parse(txt);
@@ -1955,7 +2129,7 @@
                 if (first && first.length > 40) {
                   if (first.length > 260) first = first.slice(0, 257).replace(/\s+\S*$/, '') + '…';
                   if (first.slice(-1) !== '.') first += '.';
-                  factNext = { text: first, tag: (d.title || 'WIKIPÉDIA').toUpperCase().slice(0, 40), photo: wikiThumb([d]) };
+                  factNext = { text: first, tag: (d.title || (isEN() ? 'WIKIPEDIA' : 'WIKIPÉDIA')).toUpperCase().slice(0, 40), photo: wikiThumb([d]) };
                 }
               }
             } catch (e) {}
@@ -1980,11 +2154,12 @@
       factLast = f.text;
       try { localStorage.setItem('portalNewsFactLast', f.text); } catch (e) {}
     } else {
+      var srcFacts = isEN() ? FACTS_EN : FACTS;
       var pool = [];
-      for (var i = 0; i < FACTS.length; i++) {
-        if (FACTS[i].text !== factLast) pool.push(FACTS[i]);
+      for (var i = 0; i < srcFacts.length; i++) {
+        if (srcFacts[i].text !== factLast) pool.push(srcFacts[i]);
       }
-      if (!pool.length) pool = FACTS;
+      if (!pool.length) pool = srcFacts;
       var hf = pool[Math.floor(Math.random() * pool.length)];
       f = { text: hf.text, tag: hf.cat };
     }
@@ -1997,17 +2172,17 @@
       };
       if (img.getAttribute('data-src') !== photo) { img.src = photo; img.setAttribute('data-src', photo); }
     }
-    var t = q('.fact-text', el);
+    var ftext = q('.fact-text', el);
     var g = q('.fact-tag', el);
     var a = q('.fact-answer', el);
     var l = q('.fact-label', el);
-    if (t) { t.textContent = f.text; }
+    if (ftext) { ftext.textContent = f.text; }
     if (g) { g.textContent = f.tag; }
     if (a) {
-      if (f.quiz) { a.textContent = 'Resposta: ' + f.answer; a.style.display = ''; }
+      if (f.quiz) { a.textContent = t('answerPrefix') + f.answer; a.style.display = ''; }
       else { a.textContent = ''; a.style.display = 'none'; }
     }
-    if (l) { l.textContent = f.quiz ? 'QUIZ' : 'VOCÊ SABIA?'; }
+    if (l) { l.textContent = f.quiz ? 'QUIZ' : t('factLabel'); }
     prefetchFact();
   }
   function showFactSlide() {

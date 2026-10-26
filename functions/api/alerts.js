@@ -1,10 +1,12 @@
-// Cloudflare Pages Function: GET /api/alerts[?point=lat,lon]
+// Cloudflare Pages Function: GET /api/alerts[?point=lat,lon][&lang=en]
 // Alertas meteorológicos do NWS (Serviço Nacional de Meteorologia dos EUA)
 // para o ponto de Acworth, GA por padrão. Só retorna avisos severos (Extreme/Severe),
 // para o selo não aparecer por qualquer comunicado de rotina. Se o NWS
 // falhar, devolve alert:null e o selo fica escondido — nunca quebra a página.
 // Lume Portal passa ?point= com a cidade da config; ponto inválido ou
 // ausente cai para Acworth, o comportamento de sempre.
+// ?lang=en devolve o nome do evento em inglês cru do weather.gov; sem ele,
+// o nome é traduzido pelo mapa PT abaixo (comportamento de sempre).
 
 var DEFAULT_POINT = '34.0658,-84.6769';
 var UA = 'PortalNews/1.0 (contact@travustech.com)';
@@ -56,7 +58,9 @@ export async function onRequest(context) {
     var alert = null;
     if (feats.length) {
       var p = feats[0].properties;
-      alert = { event: PT[p.event] || p.event, severity: p.severity };
+      var langEn = false;
+      try { langEn = new URL(context.request.url).searchParams.get('lang') === 'en'; } catch (e) {}
+      alert = { event: langEn ? p.event : (PT[p.event] || p.event), severity: p.severity };
     }
     return new Response(JSON.stringify({ alert: alert }), {
       headers: {
