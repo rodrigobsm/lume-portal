@@ -455,6 +455,18 @@
   }
   $('code').addEventListener('input', cleanCode);
 
+  // ---- Portal code cookie: remember the code so the page auto-fills
+  // it on later visits (1 year, site-wide, Lax). ?code= always wins
+  // and refreshes the cookie.
+  var CODE_COOKIE = 'lumePairCode';
+  function readCodeCookie() {
+    var mm = new RegExp('(?:^|; )' + CODE_COOKIE + '=([^;]*)').exec(document.cookie);
+    return mm ? decodeURIComponent(mm[1]) : '';
+  }
+  function writeCodeCookie(code) {
+    try { document.cookie = CODE_COOKIE + '=' + encodeURIComponent(code) + '; max-age=31536000; path=/; SameSite=Lax'; } catch (e) {}
+  }
+
   // ---- Load / save ----
   function applyConfig(cfg) {
     if (!cfg) return;
@@ -530,6 +542,7 @@
   function loadConfig() {
     var code = cleanCode();
     if (code.length !== 6) { setMsg($('codeMsg'), 'Enter the full 6-character code from your Portal.', false); return; }
+    writeCodeCookie(code);
     setMsg($('codeMsg'), 'Loading…', true);
     fetch('/api/lume/config?code=' + encodeURIComponent(code)).then(function (r) { return r.json(); }).then(function (d) {
       if (d.paired && d.config) {
@@ -548,6 +561,7 @@
   $('saveBtn').addEventListener('click', function () {
     var code = cleanCode();
     if (code.length !== 6) { setMsg($('saveMsg'), 'Enter the full 6-character code from your Portal first.', false); return; }
+    writeCodeCookie(code);
     var btn = $('saveBtn');
     btn.disabled = true;
     setMsg($('saveMsg'), 'Saving…', true);
@@ -570,10 +584,18 @@
 
   // Support ?code=XXXXXX links (e.g. QR codes from the app's pairing
   // screen): prefill the code AND auto-load it, exactly like Load.
+  // Without ?code=, fall back to the code saved in a cookie, so the
+  // page auto-fills (and auto-loads) on later visits — no retyping.
   var m = /[?&]code=([A-Za-z0-9]+)/.exec(location.search);
   if (m) {
     $('code').value = m[1].toUpperCase();
-    if (cleanCode().length === 6) loadConfig();
+    if (cleanCode().length === 6) { writeCodeCookie(cleanCode()); loadConfig(); }
+  } else {
+    var savedCode = readCodeCookie();
+    if (savedCode) {
+      $('code').value = savedCode.toUpperCase();
+      if (cleanCode().length === 6) loadConfig();
+    }
   }
 })();
 </script>
