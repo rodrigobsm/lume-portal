@@ -32,8 +32,8 @@
     object-fit: cover; transform-origin: center center;
   }
   .photo-img.kb-start { transform: scale(1); }
-  /* news zoom = --news-kb (default 15s = ROTATE_MS): dura o slide inteiro, até passar para o próximo */
-  .photo-img.kb { transform: scale(1.25); transition: transform var(--news-kb, 15s) linear; }
+  /* slide zoom = --slide-kb (default 15s = ROTATE_MS): dura o slide inteiro, até passar para o próximo */
+  .photo-img.kb { transform: scale(1.25); transition: transform var(--slide-kb, 15s) linear; }
   .wxslide { background: #101820; }
   .wx-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
   .wx-sunny .wx-bg { background: linear-gradient(160deg, #1e6fb8 0%, #4aa3e0 45%, #f5b942 130%); }
@@ -45,7 +45,7 @@
   .wx-fog .wx-bg { background: linear-gradient(160deg, #6a7378 0%, #9aa3a6 60%, #c9cdcc 130%); }
   .wx-photo { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transform-origin: center center; }
   .wx-photo.kb-start { transform: scale(1); }
-  .wx-photo.kb { transform: scale(1.12); transition: transform 20s linear; }
+  .wx-photo.kb { transform: scale(1.12); transition: transform var(--slide-kb, 15s) linear; }
   .wx-shade { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.45) 45%, rgba(0,0,0,0.35) 100%); }
   .wx-content { position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 2; display: flex; flex-direction: column; justify-content: space-between; padding: 15vh 3vw 3vw 3vw; }
   .wx-label { font-size: 1.8vw; font-weight: 700; letter-spacing: 0.25em; color: #f5b942; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
@@ -69,7 +69,7 @@
   .fx-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(160deg, #0a1f16 0%, #123524 55%, #1d4a2f 130%); }
   .fx-photo { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transform-origin: center center; }
   .fx-photo.kb-start { transform: scale(1); }
-  .fx-photo.kb { transform: scale(1.12); transition: transform 20s linear; }
+  .fx-photo.kb { transform: scale(1.12); transition: transform var(--slide-kb, 15s) linear; }
   .fx-shade { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.62) 45%, rgba(0,0,0,0.55) 100%); }
   .fx-content { position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 2; display: flex; flex-direction: column; justify-content: flex-start; gap: 1.6vh; padding: 16vh 3vw 2.5vw 3vw; }
   .fx-top { display: flex; gap: 2vw; align-items: stretch; }
@@ -99,7 +99,7 @@
   .clock-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(160deg, #0b1e3a 0%, #050914 60%, #0a1a33 130%); }
   .clock-photo { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 94%; transform-origin: center center; }
   .clock-photo.kb-start { transform: scale(1); }
-  .clock-photo.kb { transform: scale(1.12); transition: transform 20s linear; }
+  .clock-photo.kb { transform: scale(1.12); transition: transform var(--slide-kb, 15s) linear; }
   .clock-shade { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.45) 100%); }
   .clock-content { position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 2; display: flex; flex-direction: column; justify-content: flex-start; gap: 3vh; padding: 13vh 3vw 3vw 3vw; }
   .clock-label { font-size: 1.8vw; font-weight: 700; letter-spacing: 0.25em; color: #f5b942; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
@@ -119,7 +119,7 @@
   .bible-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(160deg, #1a1206 0%, #2c1e0a 55%, #0a0803 130%); }
   .bible-photo { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transform-origin: center center; }
   .bible-photo.kb-start { transform: scale(1); }
-  .bible-photo.kb { transform: scale(1.12); transition: transform 20s linear; }
+  .bible-photo.kb { transform: scale(1.12); transition: transform var(--slide-kb, 15s) linear; }
   .bible-shade { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.45) 100%); }
   .bible-content { position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 12vh 6vw 6vw 6vw; }
   .bible-label { font-size: 1.8vw; font-weight: 700; letter-spacing: 0.25em; color: #f5b942; text-shadow: 0 1px 8px rgba(0,0,0,0.6); margin-bottom: 3vh; }
@@ -129,7 +129,7 @@
   .air-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(160deg, #0a1f16 0%, #123524 55%, #1d4a2f 130%); }
   .air-photo { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transform-origin: center center; }
   .air-photo.kb-start { transform: scale(1); }
-  .air-photo.kb { transform: scale(1.12); transition: transform 20s linear; }
+  .air-photo.kb { transform: scale(1.12); transition: transform var(--slide-kb, 15s) linear; }
   .air-shade { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.65) 45%, rgba(0,0,0,0.55) 100%); }
   .air-content { position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 2; display: flex; flex-direction: column; justify-content: space-evenly; gap: 1.5vh; padding: 12vh 3vw 2.5vw 3vw; }
   .air-label { font-size: 1.8vw; font-weight: 700; letter-spacing: 0.25em; color: #f5b942; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
@@ -158,7 +158,7 @@
   .mkt-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(160deg, #0b0f16 0%, #131c2e 55%, #0a0e1a 130%); }
   .mkt-photo { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transform-origin: center center; }
   .mkt-photo.kb-start { transform: scale(1); }
-  .mkt-photo.kb { transform: scale(1.12); transition: transform 20s linear; }
+  .mkt-photo.kb { transform: scale(1.12); transition: transform var(--slide-kb, 15s) linear; }
   .mkt-shade { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.65) 45%, rgba(0,0,0,0.55) 100%); }
   .mkt-content { position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 2; display: flex; flex-direction: column; justify-content: flex-start; gap: 2vh; padding: 13vh 3vw 3vw 3vw; }
   .mkt-label { font-size: 2.4vw; font-weight: 700; letter-spacing: 0.25em; color: #f5b942; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
@@ -177,7 +177,7 @@
   .fact-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(160deg, #0a0a14 0%, #1a1430 55%, #050510 130%); }
   .fact-photo { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transform-origin: center center; }
   .fact-photo.kb-start { transform: scale(1); }
-  .fact-photo.kb { transform: scale(1.12); transition: transform 20s linear; }
+  .fact-photo.kb { transform: scale(1.12); transition: transform var(--slide-kb, 15s) linear; }
   .fact-shade { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.45) 100%); }
   .fact-content { position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 12vh 6vw 6vw 6vw; }
   .fact-label { font-size: 1.8vw; font-weight: 700; letter-spacing: 0.25em; color: #f5b942; text-shadow: 0 1px 8px rgba(0,0,0,0.6); margin-bottom: 3vh; }
@@ -503,7 +503,7 @@
   function lumeClock24() { return !!(lumeCfg && lumeCfg.clockFormat === '24h'); }
   function lumeTempF() { return !!(lumeCfg && lumeCfg.tempUnit === 'F'); }
   function lumeNoTranslate() { return !!(lumeCfg && lumeCfg.language === 'en-US'); }
-  function lumeNewsMs() {
+  function slideMs() {
     if (lumeCfg && [5, 10, 15, 20, 25, 30, 60].indexOf(lumeCfg.slideDuration) !== -1) return lumeCfg.slideDuration * 1000;
     return ROTATE_MS;
   }
@@ -513,7 +513,7 @@
   function lumeApply(cfg) {
     if (!cfg || typeof cfg !== 'object') return;
     lumeCfg = cfg;
-    document.documentElement.style.setProperty('--news-kb', lumeNewsMs() + 'ms');
+    document.documentElement.style.setProperty('--slide-kb', slideMs() + 'ms');
     if (cfg.city && typeof cfg.city.lat === 'number' && typeof cfg.city.lon === 'number') {
       wxLat = cfg.city.lat;
       wxLon = cfg.city.lon;
@@ -524,13 +524,6 @@
     if (lumeCode) u += '&code=' + lumeCode;
     return u;
   }
-  var WX_MS = 20000;
-  var FX_MS = 20000;
-  var CLOCK_MS = 20000;
-  var BIBLE_MS = 20000;
-  var AIR_MS = 20000;
-  var MKT_MS = 20000;
-  var FACT_MS = 20000;
   var AIR_PHOTO = 'https://images.pexels.com/photos/16603821/pexels-photo-16603821.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=1260&h=750&dpr=1';
   var MKT_PHOTO = 'https://images.pexels.com/photos/35118250/pexels-photo-35118250.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1';
   var FACT_PHOTO = 'https://images.pexels.com/photos/22491158/pexels-photo-22491158.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1';
@@ -1233,8 +1226,8 @@
     el.className = el.className.replace(/\bactive\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '') + ' active';
     var tw = document.querySelector('.topbar .weather');
     if (tw) tw.style.visibility = 'hidden';
-    restartProgress(WX_MS);
-    resetRotate(WX_MS);
+    restartProgress(slideMs());
+    resetRotate(slideMs());
   }
   function pad2(n) { return (n < 10 ? '0' : '') + n; }
   function isoDay(d) { return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
@@ -1424,8 +1417,8 @@
     el.className = el.className.replace(/\bactive\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '') + ' active';
     var tw = document.querySelector('.topbar .weather');
     if (tw) tw.style.visibility = 'hidden';
-    restartProgress(FX_MS);
-    resetRotate(FX_MS);
+    restartProgress(slideMs());
+    resetRotate(slideMs());
   }
   function showSlide(i) {
     restoreHeadlines();
@@ -1440,7 +1433,7 @@
     current = next;
     var tw = document.querySelector('.topbar .weather');
     if (tw) tw.style.visibility = '';
-    var newsMs = lumeNewsMs();
+    var newsMs = slideMs();
     restartProgress(newsMs);
     preloadNext();
     resetRotate(newsMs);
@@ -1531,8 +1524,8 @@
     el.className = el.className.replace(/\bactive\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '') + ' active';
     var tw = document.querySelector('.topbar .weather');
     if (tw) tw.style.visibility = 'hidden';
-    restartProgress(CLOCK_MS);
-    resetRotate(CLOCK_MS);
+    restartProgress(slideMs());
+    resetRotate(slideMs());
   }
   function loadBibleLast() {
     try { bibleLastRef = localStorage.getItem('portalNewsBibleLast') || ''; } catch (e) { bibleLastRef = ''; }
@@ -1602,8 +1595,8 @@
     el.className = el.className.replace(/\bactive\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '') + ' active';
     var tw = document.querySelector('.topbar .weather');
     if (tw) tw.style.visibility = '';
-    restartProgress(BIBLE_MS);
-    resetRotate(BIBLE_MS);
+    restartProgress(slideMs());
+    resetRotate(slideMs());
   }
   function aqiCat(a) {
     if (a <= 50) return { label: 'BOM', color: '#2ea043' };
@@ -1770,8 +1763,8 @@
     el.className = el.className.replace(/\bactive\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '') + ' active';
     var tw = document.querySelector('.topbar .weather');
     if (tw) tw.style.visibility = 'hidden';
-    restartProgress(AIR_MS);
-    resetRotate(AIR_MS);
+    restartProgress(slideMs());
+    resetRotate(slideMs());
   }
   function sparkSVG(vals, up) {
     if (!vals || vals.length < 2) return '';
@@ -1853,8 +1846,8 @@
     el.className = el.className.replace(/\bactive\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '') + ' active';
     var tw = document.querySelector('.topbar .weather');
     if (tw) tw.style.visibility = 'hidden';
-    restartProgress(MKT_MS);
-    resetRotate(MKT_MS);
+    restartProgress(slideMs());
+    resetRotate(slideMs());
   }
   function loadFactLast() {
     try { factLast = localStorage.getItem('portalNewsFactLast') || ''; } catch (e) { factLast = ''; }
@@ -2027,8 +2020,8 @@
     el.className = el.className.replace(/\bactive\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '') + ' active';
     var tw = document.querySelector('.topbar .weather');
     if (tw) tw.style.visibility = 'hidden';
-    restartProgress(FACT_MS);
-    resetRotate(FACT_MS);
+    restartProgress(slideMs());
+    resetRotate(slideMs());
   }
   function showOffline() {
     var ld = document.getElementById('loading');
