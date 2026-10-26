@@ -1,93 +1,221 @@
-# Portal News — Smart News Screensaver
+# Lume Portal
 
-Dashboard de notícias em português para Meta Portal (10,1", horizontal) via Immortal.
+Dashboard de notícias e informações para o **Meta Portal de 1ª geração** (10,1",
+horizontal), que a Meta descontinuou em 2022 — o app quiosque **Lume Portal**
+ressuscita o aparelho como tela de informações sempre ligada, configurável por
+aparelho, em português ou inglês.
+
+> O código do app Android vive num repositório local separado (não publicado
+> aqui). Este repositório contém toda a parte web: o painel, o site público,
+> a página de configuração e o backend de pareamento (Cloudflare Pages +
+> Workers KV). O APK é hospedado aqui em `public/downloads/`.
+
+## URLs de produção
+
+| O quê | URL |
+|---|---|
+| Site público (inglês) | https://lumeportal.travustech.ai/ |
+| Painel (dashboard) | https://lumeportal.travustech.ai/preview/ |
+| Configuração por aparelho | https://lumeportal.travustech.ai/pair/ |
+| Download do APK (sempre a última versão) | https://lumeportal.travustech.ai/downloads/lume-portal.apk |
+| Domínio reserva (mesmo projeto) | https://portal-news-6t7.pages.dev/ |
+
+Aparelhos já pareados continuam funcionando: `/?code=XXXXXX` redireciona (302)
+para `/preview/?code=XXXXXX`. **O Immortal (ou qualquer visualizador) deve
+apontar para `/preview/`** — a raiz virou o site público.
+
+## O painel
+
+Um único arquivo (`public/preview/index.html`, JS ES5, Chart.js via CDN),
+feito para leitura a ~3 m do sofá: foto em tela cheia com zoom lento contínuo
+(Ken Burns), manchete digitada (typewriter), barra de progresso e topo fixo
+(clima à esquerda, alerta NWS no centro, relógio + data à direita).
+
+**Notícias** — 11 fontes RSS, agregadas no servidor (`functions/api/news.js`):
+G1 Brasil, CNN Brasil, Agência Brasil, G1 Mundo, BBC Brasil, Canaltech, Olhar
+Digital, Tecnoblog, G1 Tecnologia, Fox News (EUA) e Fox 5 Atlanta (local).
+Mix por categoria, sem repetir a mesma fonte em sequência, preferência por
+itens das últimas 48 h com imagem. Catálogo recarregado a cada 10 min, com
+cache em `localStorage` e tela de "sem conexão" (nunca fica em branco).
+
+**Telas especiais** — sequência `C, W, K, B, A, M, F`: o bloco de abertura
+mostra as 7 em sequência; depois, uma a cada 4 notícias.
+
+- **C — Câmbio**: US$ 1 = R$ X em destaque, EUR/GBP/JPY por US$ 1,
+  BTC/ETH/SOL/BNB/XRP/DOGE em US$ com variação de 24 h; fontes BCE (fiat) e
+  CoinGecko (cripto); gráfico do dólar na última semana.
+- **W — Clima**: temperatura gigante, sensação térmica, umidade, vento,
+  nascer/pôr do sol e previsão de 7 dias (Open-Meteo).
+- **K — Relógio mundial**: 5 relógios analógicos (Atlanta, Los Angeles,
+  Brasília, Londres, Tóquio) com ponteiro de segundos dourado, hora digital e
+  data.
+- **B — Bíblia**: versículo aleatório de 40 passagens conhecidas, via
+  bible-api.com (Almeida em PT, WEB em EN), sem repetir o anterior; fallback
+  com 8 versos fixos.
+- **A — Qualidade do ar**: AQI (EPA) com número gigante, categoria,
+  recomendação de saúde, 6 poluentes (PM2.5, PM10, ozônio, NO₂, CO, SO₂) e
+  gráfico do AQI ao longo do dia (Open-Meteo).
+- **M — Mercados**: 8 índices (EUA, Brasil, Europa, Ásia) via Yahoo Finance
+  (`functions/api/markets.js`), com mini-gráficos do último mês.
+- **F — Você sabia?**: padrão [Wikipedia, Wikipedia, Quiz] — fatos "neste
+  dia" em PT (ou EN) com foto do artigo; a cada 3º, quiz do Open Trivia DB
+  (traduzido via MyMemory em PT; em EN, no original).
+
+**Duração dos slides** — única para todas as telas (notícias + especiais),
+configurável por aparelho (5/10/15/20/25/30/60 s, padrão 15 s).
+
+**Idiomas (i18n)** — o painel é todo traduzido: `pt-BR` (padrão) e `en-US`,
+via dicionário `I18N` + `t()`. Em PT, manchetes em inglês (EUA/Local) são
+traduzidas no navegador via MyMemory (grátis, sem chave), com cache local; se
+a API falhar, mostra o original. Em EN, as manchetes em inglês aparecem no
+original. Uma nova língua = um novo objeto no dicionário.
+
+**Alertas NWS** — `api.weather.gov/alerts/active`, severidade Extreme/Severe;
+em PT, nomes de eventos traduzidos por mapa; em EN, nome cru do weather.gov
+(`functions/api/alerts.js?lang=en`).
+
+## O app Android (Lume Portal)
+
+App quiosque nativo (WebView em tela cheia) para o Portal. Pacote
+`com.travustech.lumeportal`, minSdk 28, targetSdk 29, **só permissão
+INTERNET**. Não usa MAC real (inacessível a app sideloaded no Android 9/10)
+nem é screensaver do sistema (o Portal não oferece essa opção a terceiros):
+é um app em primeiro plano, com opção de virar home via ADB.
+
+- **Pareamento**: o app gera um código de 6 caracteres (alfabeto
+  `ABCDEFGHJKMNPQRSTUVWXYZ23456789` — sem 0/O/1/I/L), digitado em `/pair/`.
+- **Long-press** em qualquer ponto do WebView reexibe a tela de pairing
+  (código, status, URL, botão de voltar que recarrega o painel).
+- **Instalação** (o APK instala por cima das versões anteriores, sem perder
+  o pareamento — mesma chave de debug em todas as versões):
+
+```bash
+curl -L -o lume-portal.apk https://lumeportal.travustech.ai/downloads/lume-portal.apk \
+  && adb install -r lume-portal.apk \
+  && adb shell am start -n com.travustech.lumeportal/.MainActivity
+```
+
+Pré-requisitos: `platform-tools` (adb) no PATH, Portal com ADB ativado
+(Settings > Debug > ADB Enabled), conexão USB-C, `adb devices` reconhecendo
+o aparelho.
+
+**Versões** (nome do arquivo versionado a cada release — o Portal/aplicativo
+de download pode cachear o nome antigo):
+
+| Versão | O que mudou |
+|---|---|
+| v1 | Primeira entrega: pairing + WebView quiosque |
+| v1.1 | Domínio `lumeportal.travustech.ai`, migração da URL antiga, long-press para o pairing, logo e ícone |
+| v1.2 | URL padrão aponta para `/preview/` |
+| v1.3 | Trava de scroll/zoom do WebView (sem barras, sem overscroll) |
+| v1.4 | Trava de arrasto no nível do gesto (arrastar não move mais o conteúdo) |
+
+Build manual (Gradle não funciona atrás do proxy da VM de build): aapt2
+compile+link → javac → d8 → zip → zipalign → apksigner, com o debug keystore
+local (fora do versionamento — sem ele, a instalação por cima perde o
+pareamento).
+
+## Pareamento e configuração por aparelho
+
+Backend em Cloudflare Pages Functions + Workers KV (namespace `lume-portal`,
+binding `LUME_KV` no projeto Pages, production + preview).
+
+- `GET /api/lume/config?code=XXXXXX` → `{paired:false}` ou
+  `{paired:true, config, dashboardUrl}` (dashboardUrl =
+  `https://lumeportal.travustech.ai/preview/?code=XXXXXX`).
+- `POST /api/lume/pair {code, config}` → valida e salva em KV como
+  `config:<CODE>`. Sem autenticação na v1 — o código é a chave.
+
+**Configuração** (validação compartilhada em `functions/_lib/lume.js`):
+
+- `language`: `en-US` | `pt-BR` (padrão `en-US` no formulário, `pt-BR` no painel
+  sem código)
+- `city`: `{name, lat, lon}` (padrão Acworth, GA — 34.0658, -84.6769)
+- `clockFormat`: `12h` | `24h`; `tempUnit`: `C` | `F`
+- `slideDuration`: 5/10/15/20/25/30/60 (qualquer outro valor normaliza para 15)
+- `screens`: `{C, W, K, B, A, M, F}` (booleanos)
+- `feeds`: `{enabled: [...ids conhecidos, máx. 30], custom: [{name, url,
+  category}]}` (custom: máx. 10; categorias `brasil|mundo|tech|eua|atlanta`)
+- Corpo limitado a 16 KB; chaves desconhecidas são removidas.
+
+**Semântica importante**: o app para de sondar a config após o pareamento e
+o painel busca a config só no carregamento (teto de 4 s; se falhar, usa o
+cache `portalNewsLume:<CODE>`). **Mudar a config no site só vale no próximo
+carregamento do painel** (reabrir o app, ou long-press → voltar ao painel).
+Sem `?code=` (ou código inválido/não pareado), o painel usa os 11 feeds
+padrão, Acworth, 12 h e °C.
+
+## Publicação (Cloudflare Pages)
+
+Conta **Travus Tech, Inc.**, projeto `portal-news`. Deploy direto via script
+(sem integração automática GitHub → Cloudflare):
+
+```bash
+python3 ~/workspace/custom-connectors/custom.cloudflare/bin/deploy-pages.py ~/workspace/portal-news
+```
+
+O script sobe `public/` + `functions/` e a propagação leva ~20–25 s. O token
+da API precisa de **Pages Edit + Account Read + Workers KV Storage Read/Edit**
+(sem a permissão de KV, a API devolve 401). Detalhe da API REST: o PATCH de
+binding do projeto usa objeto por nome
+(`{"LUME_KV": {"namespace_id": "..."}}`), não array como no wrangler.toml.
+
+## Desenvolvimento local
+
+```bash
+node server.mjs        # servidor local na porta 8901
+```
+
+Checagem de sintaxe do script inline do painel (o painel é um único HTML):
+
+```bash
+python3 -c "
+import re
+html = open('public/preview/index.html').read()
+blocks = [m for m in re.findall(r'<script>(.*?)</script>', html, re.S)]
+open('/tmp/dash.js','w').write(max(blocks, key=len))
+" && node --check /tmp/dash.js
+```
 
 ## Estrutura
 
-- `public/index.html` — frontend leve, sem dependências, compatível com navegadores
-  antigos (JS ES5, flexbox, sem build). Foto ~72% da tela, painel escuro com
-  manchete, fonte, horário, relógio, data e clima de Acworth, GA.
-  - Rotação automática a cada 15s, atualização do catálogo a cada 10 min. Toque na esquerda/direita da tela avança/volta a notícia (setas do teclado também funcionam).
- - Layout tela cheia: foto ocupa 100% da tela (cover, sem barras). Topo fixo (não gira com a notícia): clima atual à esquerda (ícone + temperatura em cima, descrição abaixo, sem cidade), relógio + data à direita, sem QR Code, tudo sobre degradê superior. Embaixo, sobre degradê preto: fonte, manchete grande (~90px) para leitura a ~3m com auto-fit (diminui sozinha se não couber, mas nunca abaixo do tamanho do relógio, ~61px; em último caso o bloco cresce para cima, nada cortado), horário relativo (há X min, com selo AGORA nas notícias com menos de 30 min) e contador maior na mesma linha. Sem previsão semanal no topo — a previsão de 7 dias vive num slide próprio de clima em tela cheia, um dos 4 slides especiais: com foto de fundo conforme o clima atual (sol, nuvens, chuva, tempestade, neve, neblina, noite), temperatura atual grande, sensação térmica, umidade, vento, nascer/pôr do sol e 7 colunas de previsão (dia, ícone, máxima/mínima, chance de chuva); dura 20s e nesse slide o mini-clima do topo some, ficando só o relógio. Os 4 slides especiais (câmbio, clima, relógio mundial, bíblia) abrem primeiro, em sequência, e depois um especial entra a cada 4 notícias, rodando entre eles na mesma ordem. Slide de câmbio em tela cheia: dólar/real em destaque (US$ 1 = R$ X, com variação), euro, libra e iene por US$ 1, e BTC, ETH, SOL, BNB, XRP e DOGE em US$ com variação de 24h; fontes BCE (fiat) e CoinGecko (cripto), foto de notas de dólar ao fundo (mais escura), e gráfico da flutuação do dólar na última semana em Chart.js ao lado do destaque. Relógio mundial: 5 relógios analógicos (Atlanta, Los Angeles, Brasília, Londres, Tóquio) com hora digital + data embaixo de cada um, foto da Terra vista da Apollo 17 com zoom. Tela bíblica: 8 versículos NVI rotativos sobre a Santa Ceia; a posição fica salva no navegador, então muda a cada aparição mesmo após recarregar. Manchetes em inglês (EUA/Local) são traduzidas para PT-BR no navegador via MyMemory (grátis, sem chave), com cache local; sem tradução, mostra o original em inglês. Alerta meteorológico do NWS no topo quando houver aviso severo em Acworth (o selo só aparece com alerta ativo). Efeitos: manchete digitada (typewriter com cursor dourado, ~1,8s por slide) e foto com zoom lento contínuo em direção ao centro (Ken Burns, 1.0 → 1.25 durante os 15s do slide, em todos os slides). Todas as fontes ampliadas para leitura do sofá.
- - Ordem aleatória: o catálogo é embaralhado a cada atualização sem deixar o mesmo site em sequência.
- - Foto em alta: o agregador tenta subir a miniatura do RSS (WordPress, BBC ichef, parâmetro w=) e o frontend busca a og:image da matéria via /api/og, trocando para a foto original quando disponível; se falhar, mantém a do RSS com o overlay de pontinhos para baixa resolução.
- - Painel: logo da fonte + nome, clima atual em °C com ícone e descrição (sem QR Code, sem previsão semanal).
-  - Cache em localStorage + tela de "sem conexão" (nunca fica em branco).
-- `functions/api/news.js` — Cloudflare Pages Function: agrega os RSS no servidor,
-  devolve JSON e guarda em cache por 10 minutos (serve o cache se as fontes falharem).
-- `functions/_lib/aggregate.js` — agregador sem dependências (RSS → JSON):
-  dedupe, filtro de recentes, mistura 30% Brasil / 20% Mundo / 20% Tech /
-  20% EUA / 10% Atlanta,
-  prioriza itens com imagem.
+- `public/index.html` — site público (inglês) com demo ao vivo em iframe
+- `public/preview/index.html` — **o painel**
+- `public/pair/index.html` — página de configuração por aparelho (inglês)
+- `public/downloads/` — APK estável (`lume-portal.apk`) + cópias versionadas
+- `public/assets/` — logos Lume e TravusTech
+- `functions/api/news.js` — agregador RSS (cache 10 min)
+- `functions/api/og.js`, `alerts.js`, `markets.js`, `pollen.js` — APIs de apoio
+- `functions/api/lume/config.js`, `pair.js` — pareamento e config
+- `functions/_lib/aggregate.js`, `lume.js` — agregação e validação
+- `functions/index.js` — redirect 302 `/?code=` → `/preview/?code=`
 
-## Fontes RSS
+## Analytics
 
-- Brasil: G1, CNN Brasil, Agência Brasil
-- Mundo: G1 Mundo, BBC Brasil
-- Tecnologia: Canaltech, Olhar Digital, Tecnoblog, G1 Tecnologia
-- EUA: Fox News
-- Atlanta (local): Fox 5 Atlanta
+Google Analytics (`G-KGXSLWW669`) no `<head>` das três páginas (site, painel
+e config). O painel dentro do iframe da demo e nos Portais também gera
+pageviews — são loads reais; para separar tráfego de marketing de tráfego
+dos aparelhos, filtrar por caminho/host no GA.
 
-## Clima
+## Limitações conhecidas
 
-Open-Meteo (gratuito, sem chave): Acworth, GA (34.0658, -84.6769), °C.
+- **RSS do G1 Brasil** servia itens de 2018–2023 (filtro de 48 h o exclui do
+  catálogo atual) — problema pré-existente do feed, a acompanhar.
+- **Pólen**: Open-Meteo CAMS retorna nulo para Acworth e pollen.com bloqueia
+  scraping; a seção do painel já existe e aparece sozinha quando
+  `/api/pollen` responder — falta uma fonte com chave (ex.: Tomorrow.io).
+- **Fuso do Open-Meteo fixo em America/New_York** (nascer/pôr do sol de
+  outras cidades saem em horário de NY); NWS cobre só EUA; vento sempre em
+  mph.
+- **NWS em EN com alerta real ainda não observado** (sem alerta ativo nos
+  testes); o caminho de código está deployado.
+- Fontes sem RSS público ou bloqueadas (não re-adicionar sem verificar):
+  TecMundo (HTTP 204), CNN americana (feeds congelados desde 2023), 11Alive
+  (0 itens em produção), AJC/WSB (sem RSS público).
 
-## Publicação (Cloudflare Pages, gratuito)
+## Em andamento
 
-```bash
-npx wrangler login            # uma vez: autoriza a conta Cloudflare no navegador
-npx wrangler pages deploy public --project-name portal-news
-```
-
-A URL pública é `https://lumeportal.travustech.ai` (o domínio padrão
-`https://portal-news-6t7.pages.dev` continua funcionando como fallback).
-A raiz do site é a página de divulgação do Lume Portal; o painel em si
-vive em `https://lumeportal.travustech.ai/preview/` (quem já pareou um
-aparelho continua funcionando: `/?code=XXXXXX` redireciona para
-`/preview/?code=XXXXXX`). A configuração por aparelho está em
-`https://lumeportal.travustech.ai/pair/` e o APK em
-`https://lumeportal.travustech.ai/downloads/lume-portal.apk`.
-
-## Immortal (Meta Portal)
-
-No app Immortal, adicione a URL pública como página/screensaver e deixe o
-Portal em orientação horizontal. A página inicia sozinha, sem cliques ou login.
-
-## Novas telas (2026-10-25)
-
-Sequência de especiais passou de 4 para 7: câmbio (C), clima (W), relógio
-mundial (K), bíblia (B), qualidade do ar (A), mercados (M) e você sabia? (F).
-O bloco de abertura mostra os 7 em sequência; depois, um especial entra a
-cada 4 notícias, rodando na mesma ordem. Todas duram 20s e escondem o
-mini-clima do topo.
-
-- Ar (A): AQI dos EUA, PM2.5, PM10, ozônio, NO₂, CO e SO₂ de Acworth via
-  Open-Meteo Air Quality (sem chave). Layout: número gigante do AQI com
-  selo de categoria colorido e recomendação de saúde, 6 caixas de poluentes
-  com ícones, e gráfico do AQI ao longo do dia (horas de hoje, com marcador
-  da hora atual). A seção de pólen (árvores/grama/ervas, índice Pollen.com
-  via /api/pollen) fica oculta quando a fonte não responde — o Pollen.com
-  bloqueia tráfego automatizado (testado em 2026-10-25, inclusive a partir
-  da rede da Cloudflare). Para ter pólen, será preciso uma fonte com chave
-  (ex.: Tomorrow.io).
-- Mercados (M): 8 índices via Yahoo Finance através de /api/markets (sem
-  chave, cache de 5 min): S&P 500, Dow Jones e Nasdaq (EUA), Ibovespa
-  (Brasil), FTSE 100 e DAX (Europa), Nikkei 225 e Hang Seng (Ásia). Cada
-  cartão mostra valor, variação do dia e mini-gráfico SVG com os closes do
-  último mês. Se a API falhar, usa o último dado salvo no navegador.
-- Você sabia? (F): roda em padrão [Wikipédia, Wikipédia, Quiz]. Os
-  fatos da Wikipédia em português ("neste dia") trazem um evento
-  histórico do dia de hoje, sorteado sem repetir o anterior, com a tag
-  "NESTE DIA · ano" em dourado e a foto do artigo relacionado ao fundo
-  (imagem original do artigo, preferindo foto a bandeira SVG; se a foto
-  falhar, cai para a lâmpada). A cada terceiro fato, um quiz do Open
-  Trivia DB: pergunta e resposta traduzidas para PT-BR via MyMemory (o
-  mesmo sistema das manchetes, com o mesmo cache); o quiz só aparece se
-  pergunta E resposta traduzirem, senão cai para um fato da Wikipédia.
-  O quiz mostra o rótulo "QUIZ", a pergunta, a tag da categoria em
-  português e a linha dourada "Resposta: ...", com foto do Pexels por
-  categoria (ciência, computadores, história, geografia, animais,
-  esportes, arte, mitologia, conhecimentos gerais, entretenimento).
-  Pré-carregado antes de aparecer. Se a Wikipédia falhar, tenta um
-  artigo aleatório; em último caso, usa uma das 34 curiosidades curadas
-  guardadas no código.
+- Tradução reversa das manchetes (PT→EN quando o aparelho está em inglês).
+- Nova página de config: abas por tipo, ordem dos slides com drag-and-drop,
+  cidades do relógio mundial, autocomplete de cidade (Open-Meteo Geocoding)
+  e feeds RSS customizados sem limite fixo de linhas.
