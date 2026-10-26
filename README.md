@@ -41,6 +41,12 @@ npx wrangler pages deploy public --project-name portal-news
 
 A URL pública é `https://lumeportal.travustech.ai` (o domínio padrão
 `https://portal-news-6t7.pages.dev` continua funcionando como fallback).
+A raiz do site é a página de divulgação do Lume Portal; o painel em si
+vive em `https://lumeportal.travustech.ai/preview/` (quem já pareou um
+aparelho continua funcionando: `/?code=XXXXXX` redireciona para
+`/preview/?code=XXXXXX`). A configuração por aparelho está em
+`https://lumeportal.travustech.ai/pair/` e o APK em
+`https://lumeportal.travustech.ai/downloads/lume-portal.apk`.
 
 ## Immortal (Meta Portal)
 

@@ -18,6 +18,6 @@ export async function onRequest(context) {
   return jsonResponse({
     paired: true,
     config: cfg,
-    dashboardUrl: 'https://lumeportal.travustech.ai/?code=' + code
+    dashboardUrl: 'https://lumeportal.travustech.ai/preview/?code=' + code
   });
 }
