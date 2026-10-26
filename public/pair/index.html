@@ -4,12 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Lume Portal — Set up your display</title>
+<link rel="icon" href="/assets/lume-icon.png">
 <style>
   * { box-sizing: border-box; }
   body { margin: 0; background: #0b0f16; color: #e6edf3; font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; line-height: 1.5; }
   .wrap { max-width: 720px; margin: 0 auto; padding: 32px 20px 64px; }
   h1 { color: #f5b942; margin: 0 0 4px; font-size: 32px; }
-  .logo { width: 180px; display: block; margin: 0 0 16px; }
+  .hero-logo { width: 100%; max-width: 320px; display: block; margin: 0 auto 16px; }
+  .footer { text-align: center; margin-top: 32px; }
+  .footer img { width: 120px; opacity: 0.85; }
   .sub { color: #8b949e; margin: 0 0 28px; }
   .card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
   h2 { font-size: 18px; margin: 0 0 14px; color: #f5b942; }
@@ -31,7 +34,7 @@
 </head>
 <body>
 <div class="wrap">
-  <img class="logo" src="/assets/travustech-logo.svg" alt="TravusTech">
+  <img class="hero-logo" src="/assets/lume-logo.png" alt="Lume Portal">
   <h1>Lume Portal</h1>
   <p class="sub">Set up your display. Enter the 6-character code shown on your Portal, adjust the settings, and save — your Portal picks them up within seconds.</p>
 
@@ -112,6 +115,8 @@
 
   <button id="saveBtn" type="button">Save setup</button>
   <div class="msg" id="saveMsg"></div>
+
+  <div class="footer"><img src="/assets/travustech-logo.svg" alt="TravusTech"></div>
 </div>
 
 <script>
