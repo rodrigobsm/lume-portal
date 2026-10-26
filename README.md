@@ -150,7 +150,8 @@ clock, Feeds), busca de cidade com autocomplete (Open-Meteo Geocoding, sem
 chave), ordem dos slides com drag-and-drop (ou setas, no celular) e feeds
 RSS customizados sem limite fixo de linhas. Ela aceita `?code=XXXXXX` na
 URL: abre a config pronta para editar — é o fluxo do QR code exibido na
-tela de pairing do app.
+tela de pairing do app. O código fica salvo no cookie `lumePairCode` (1
+ano): sem `?code=`, a página abre já preenchida e carrega a config sozinha.
 
 **Semântica importante**: o app para de sondar a config após o pareamento e
 o painel busca a config só no carregamento (teto de 4 s; se falhar, usa o
