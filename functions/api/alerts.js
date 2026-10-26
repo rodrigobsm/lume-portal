@@ -1,10 +1,12 @@
-// Cloudflare Pages Function: GET /api/alerts
+// Cloudflare Pages Function: GET /api/alerts[?point=lat,lon]
 // Alertas meteorológicos do NWS (Serviço Nacional de Meteorologia dos EUA)
-// para o ponto de Acworth, GA. Só retorna avisos severos (Extreme/Severe),
+// para o ponto de Acworth, GA por padrão. Só retorna avisos severos (Extreme/Severe),
 // para o selo não aparecer por qualquer comunicado de rotina. Se o NWS
 // falhar, devolve alert:null e o selo fica escondido — nunca quebra a página.
+// Lume Portal passa ?point= com a cidade da config; ponto inválido ou
+// ausente cai para Acworth, o comportamento de sempre.
 
-var NWS_URL = 'https://api.weather.gov/alerts/active?point=34.0658,-84.6769';
+var DEFAULT_POINT = '34.0658,-84.6769';
 var UA = 'PortalNews/1.0 (contact@travustech.com)';
 
 var PT = {
@@ -23,9 +25,21 @@ var PT = {
   'Red Flag Warning': 'Risco de Incêndio'
 };
 
+function pointFrom(requestUrl) {
+  try {
+    var p = new URL(requestUrl).searchParams.get('point') || '';
+    var m = p.match(/^(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)$/);
+    if (!m) return DEFAULT_POINT;
+    var lat = parseFloat(m[1]);
+    var lon = parseFloat(m[2]);
+    if (lat < -90 || lat > 90 || lon < -180 || lon > 180) return DEFAULT_POINT;
+    return lat + ',' + lon;
+  } catch (e) { return DEFAULT_POINT; }
+}
+
 export async function onRequest(context) {
   try {
-    var res = await fetch(NWS_URL, {
+    var res = await fetch('https://api.weather.gov/alerts/active?point=' + pointFrom(context.request.url), {
       headers: { 'User-Agent': UA, 'Accept': 'application/geo+json' }
     });
     if (!res.ok) throw new Error('HTTP ' + res.status);

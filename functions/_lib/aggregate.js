@@ -4,18 +4,42 @@
 // título, fonte, data, URL e foto vêm direto do feed de cada veículo.
 
 export var FEEDS = [
-  { name: 'G1', url: 'https://g1.globo.com/rss/g1/brasil/', category: 'brasil' },
-  { name: 'CNN Brasil', url: 'https://www.cnnbrasil.com.br/feed/', category: 'brasil' },
-  { name: 'Agência Brasil', url: 'https://agenciabrasil.ebc.com.br/rss/ultimasnoticias/feed.xml', category: 'brasil' },
-  { name: 'G1', url: 'https://g1.globo.com/rss/g1/mundo/', category: 'mundo' },
-  { name: 'BBC Brasil', url: 'https://feeds.bbci.co.uk/portuguese/rss.xml', category: 'mundo' },
-  { name: 'Fox News', url: 'https://moxie.foxnews.com/google-publisher/latest.xml', category: 'eua' },
-  { name: 'Fox 5 Atlanta', url: 'https://www.fox5atlanta.com/rss/category/local-news', category: 'atlanta' },
-  { name: 'Canaltech', url: 'https://canaltech.com.br/rss/', category: 'tech' },
-  { name: 'Olhar Digital', url: 'https://olhardigital.com.br/feed/', category: 'tech' },
-  { name: 'Tecnoblog', url: 'https://tecnoblog.net/feed/', category: 'tech' },
-  { name: 'G1', url: 'https://g1.globo.com/rss/g1/tecnologia/', category: 'tech' }
+  { id: 'g1-brasil', name: 'G1', url: 'https://g1.globo.com/rss/g1/brasil/', category: 'brasil' },
+  { id: 'cnn-brasil', name: 'CNN Brasil', url: 'https://www.cnnbrasil.com.br/feed/', category: 'brasil' },
+  { id: 'agencia-brasil', name: 'Agência Brasil', url: 'https://agenciabrasil.ebc.com.br/rss/ultimasnoticias/feed.xml', category: 'brasil' },
+  { id: 'g1-mundo', name: 'G1', url: 'https://g1.globo.com/rss/g1/mundo/', category: 'mundo' },
+  { id: 'bbc-brasil', name: 'BBC Brasil', url: 'https://feeds.bbci.co.uk/portuguese/rss.xml', category: 'mundo' },
+  { id: 'fox-news', name: 'Fox News', url: 'https://moxie.foxnews.com/google-publisher/latest.xml', category: 'eua' },
+  { id: 'fox5-atlanta', name: 'Fox 5 Atlanta', url: 'https://www.fox5atlanta.com/rss/category/local-news', category: 'atlanta' },
+  { id: 'canaltech', name: 'Canaltech', url: 'https://canaltech.com.br/rss/', category: 'tech' },
+  { id: 'olhar-digital', name: 'Olhar Digital', url: 'https://olhardigital.com.br/feed/', category: 'tech' },
+  { id: 'tecnoblog', name: 'Tecnoblog', url: 'https://tecnoblog.net/feed/', category: 'tech' },
+  { id: 'g1-tecnologia', name: 'G1', url: 'https://g1.globo.com/rss/g1/tecnologia/', category: 'tech' }
 ];
+
+// Lume Portal per-device feeds: { enabled: [known feed ids], custom: [{name,url,category}] }.
+// Stored configs are already normalized by /api/lume/pair, but this validates
+// again so a raw override can never inject a bad feed. Absent override => all 11.
+function resolveFeeds(override) {
+  if (!override || typeof override !== 'object') return FEEDS;
+  var list = [];
+  if (Array.isArray(override.enabled)) {
+    FEEDS.forEach(function (f) { if (override.enabled.indexOf(f.id) !== -1) list.push(f); });
+  } else {
+    list = FEEDS.slice();
+  }
+  if (Array.isArray(override.custom)) {
+    override.custom.slice(0, 10).forEach(function (c) {
+      if (!c || typeof c !== 'object') return;
+      var name = typeof c.name === 'string' ? c.name.trim() : '';
+      var url = typeof c.url === 'string' ? c.url.trim() : '';
+      var cat = ['brasil', 'mundo', 'tech', 'eua', 'atlanta'].indexOf(c.category) !== -1 ? c.category : 'brasil';
+      if (!name || !/^https?:\/\//i.test(url) || url.length > 500) return;
+      list.push({ name: name, url: url, category: cat });
+    });
+  }
+  return list;
+}
 
 var UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36';
 
@@ -170,9 +194,10 @@ function fetchWithTimeout(fetchImpl, url, ms) {
   }).then(function (res) { clearTimeout(timer); return res; }, function (err) { clearTimeout(timer); throw err; });
 }
 
-export async function aggregate(fetchImpl) {
+export async function aggregate(fetchImpl, feedsOverride) {
   var doFetch = fetchImpl || fetch;
-  var results = await Promise.all(FEEDS.map(async function (f) {
+  var feeds = resolveFeeds(feedsOverride);
+  var results = await Promise.all(feeds.map(async function (f) {
     try {
       var res = await fetchWithTimeout(doFetch, f.url, 8000);
       if (!res.ok) return { feed: f, items: [], error: 'HTTP ' + res.status };

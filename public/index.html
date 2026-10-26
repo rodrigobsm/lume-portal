@@ -477,7 +477,39 @@
 <script>
 (function () {
   var NEWS_URL = '/api/news';
-  var WEATHER_URL = 'https://api.open-meteo.com/v1/forecast?latitude=34.0658&longitude=-84.6769&current=temperature_2m,weather_code,apparent_temperature,relative_humidity_2m,wind_speed_10m,is_day&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max,sunrise,sunset&timezone=America%2FNew_York&temperature_unit=celsius&wind_speed_unit=mph';
+  var wxLat = 34.0658;
+  var wxLon = -84.6769;
+  function weatherUrl() { return 'https://api.open-meteo.com/v1/forecast?latitude=' + wxLat + '&longitude=' + wxLon + '&current=temperature_2m,weather_code,apparent_temperature,relative_humidity_2m,wind_speed_10m,is_day&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max,sunrise,sunset&timezone=America%2FNew_York&temperature_unit=celsius&wind_speed_unit=mph'; }
+  // Lume Portal: config por aparelho (?code=XXXXXX). Sem código ou com
+  // código inválido, nada abaixo existe: o painel usa os padrões de sempre.
+  var lumeCode = (function () {
+    try {
+      var mm = window.location.search.match(/(?:^|[?&])code=([^&]*)/);
+      if (!mm) return '';
+      var c = decodeURIComponent(mm[1]).toUpperCase();
+      return /^[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{6}$/.test(c) ? c : '';
+    } catch (e) { return ''; }
+  })();
+  var lumeCfg = null;
+  function lumeClock24() { return !!(lumeCfg && lumeCfg.clockFormat === '24h'); }
+  function lumeTempF() { return !!(lumeCfg && lumeCfg.tempUnit === 'F'); }
+  function lumeNoTranslate() { return !!(lumeCfg && lumeCfg.language === 'en-US'); }
+  function tempVal(v) { return Math.round(lumeTempF() ? v * 9 / 5 + 32 : v); }
+  function tempSuffix() { return lumeTempF() ? '°F' : '°C'; }
+  function tempBare() { return lumeTempF() ? '°F' : '°'; }
+  function lumeApply(cfg) {
+    if (!cfg || typeof cfg !== 'object') return;
+    lumeCfg = cfg;
+    if (cfg.city && typeof cfg.city.lat === 'number' && typeof cfg.city.lon === 'number') {
+      wxLat = cfg.city.lat;
+      wxLon = cfg.city.lon;
+    }
+  }
+  function newsUrl() {
+    var u = NEWS_URL + '?v=' + Math.floor(Date.now() / REFRESH_MS);
+    if (lumeCode) u += '&code=' + lumeCode;
+    return u;
+  }
   var WX_MS = 20000;
   var FX_MS = 20000;
   var CLOCK_MS = 20000;
@@ -536,7 +568,7 @@
     'Politics': 'POLÍTICA',
     'Vehicles': 'VEÍCULOS'
   };
-  var AIR_URL = 'https://air-quality-api.open-meteo.com/v1/air-quality?latitude=34.0658&longitude=-84.6769&current=us_aqi,pm2_5,pm10,ozone,nitrogen_dioxide,sulphur_dioxide,carbon_monoxide&hourly=us_aqi&timezone=America%2FNew_York';
+  function airUrl() { return 'https://air-quality-api.open-meteo.com/v1/air-quality?latitude=' + wxLat + '&longitude=' + wxLon + '&current=us_aqi,pm2_5,pm10,ozone,nitrogen_dioxide,sulphur_dioxide,carbon_monoxide&hourly=us_aqi&timezone=America%2FNew_York'; }
   var AIR_REFRESH_MS = 1800000;
   var MKT_REFRESH_MS = 900000;
   var CLOCK_PHOTO = 'https://commons.wikimedia.org/wiki/Special:FilePath/ISS-34%20Earth%27s%20atmosphere.jpg?width=1600';
@@ -709,8 +741,9 @@
     try {
       var now = new Date();
       var time = new Intl.DateTimeFormat('en-US', {
-        timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit', hour12: true
+        timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit', hour12: !lumeClock24()
       }).format(now);
+      if (lumeClock24()) time = time.replace(/^24:/, '00:');
       var wd = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/New_York', weekday: 'short' }).format(now).replace(/\./g, '');
       wd = wd.charAt(0).toUpperCase() + wd.slice(1);
       var mo = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/New_York', month: 'long' }).format(now);
@@ -766,15 +799,15 @@
   }
 
   function loadWeather() {
-    xhrGet(WEATHER_URL, function (err, txt) {
+    xhrGet(weatherUrl(), function (err, txt) {
       if (err) { weatherFailed = true; renderWeatherSlide(); return; }
       try {
         var j = JSON.parse(txt);
         var c = j.current;
         weatherData = { current: c, daily: j.daily };
         weatherFailed = false;
-        var temp = Math.round(c.temperature_2m);
-        var html = '<span class="top"><span class="wic">' + iconSVG(c.weather_code) + '</span><span class="temp">' + temp + '°C</span></span><span class="cond">' + weatherLabel(c.weather_code) + '</span>';
+        var temp = tempVal(c.temperature_2m);
+        var html = '<span class="top"><span class="wic">' + iconSVG(c.weather_code) + '</span><span class="temp">' + temp + tempSuffix() + '</span></span><span class="cond">' + weatherLabel(c.weather_code) + '</span>';
         var els = qa('.weather');
         for (var i = 0; i < els.length; i++) { els[i].innerHTML = html; }
         renderWeatherSlide();
@@ -785,7 +818,7 @@
   function loadAlerts() {
     var badge = document.getElementById('nwsAlert');
     if (!badge) return;
-    xhrGet('/api/alerts', function (err, txt) {
+    xhrGet('/api/alerts?point=' + wxLat + ',' + wxLon, function (err, txt) {
       var evt = q('.alertevt', badge);
       if (err || !evt) { badge.style.display = 'none'; return; }
       try {
@@ -810,7 +843,7 @@
       localStorage.setItem('portalNewsTrans', JSON.stringify(transCache));
     } catch (e) {}
   }
-  function isTranslatable(it) { return it && (it.category === 'eua' || it.category === 'atlanta'); }
+  function isTranslatable(it) { return !lumeNoTranslate() && it && (it.category === 'eua' || it.category === 'atlanta'); }
   function applyTranslation(it, translated) {
     transCache[it.title] = translated;
     saveTransCache();
@@ -1114,10 +1147,10 @@
       if (img.getAttribute('data-src') !== url) { img.src = url; img.setAttribute('data-src', url); }
     }
     wic.innerHTML = iconSVG(c.weather_code);
-    tempEl.textContent = Math.round(c.temperature_2m) + '°';
+    tempEl.textContent = tempVal(c.temperature_2m) + tempBare();
     cond.textContent = weatherLabel(c.weather_code);
     var parts = [];
-    if (c.apparent_temperature !== undefined && c.apparent_temperature !== null) parts.push('Sensação ' + Math.round(c.apparent_temperature) + '°');
+    if (c.apparent_temperature !== undefined && c.apparent_temperature !== null) parts.push('Sensação ' + tempVal(c.apparent_temperature) + tempBare());
     if (c.relative_humidity_2m !== undefined && c.relative_humidity_2m !== null) parts.push('Umidade ' + Math.round(c.relative_humidity_2m) + '%');
     if (c.wind_speed_10m !== undefined && c.wind_speed_10m !== null) parts.push('Vento ' + Math.round(c.wind_speed_10m) + ' mph');
     if (d && d.sunrise && d.sunrise[0]) parts.push('Nascer do sol ' + fmtHour(d.sunrise[0]));
@@ -1129,18 +1162,22 @@
       for (var i = 0; i < n; i++) {
         var code = d.weather_code ? d.weather_code[i] : 0;
         var pop = (d.precipitation_probability_max && d.precipitation_probability_max[i] !== null && d.precipitation_probability_max[i] !== undefined) ? d.precipitation_probability_max[i] : null;
-        html += '<div class="wx-day" style="animation-delay:' + (i * 0.08) + 's"><div class="dname">' + dayName(d.time[i], i) + '</div><div class="dic">' + iconSVG(code) + '</div><div class="dmax">' + Math.round(d.temperature_2m_max[i]) + '°</div><div class="dmin">' + Math.round(d.temperature_2m_min[i]) + '°</div>' + (pop !== null ? '<div class="dpop">' + Math.round(pop) + '% chuva</div>' : '') + '</div>';
+        html += '<div class="wx-day" style="animation-delay:' + (i * 0.08) + 's"><div class="dname">' + dayName(d.time[i], i) + '</div><div class="dic">' + iconSVG(code) + '</div><div class="dmax">' + tempVal(d.temperature_2m_max[i]) + tempBare() + '</div><div class="dmin">' + tempVal(d.temperature_2m_min[i]) + tempBare() + '</div>' + (pop !== null ? '<div class="dpop">' + Math.round(pop) + '% chuva</div>' : '') + '</div>';
       }
     }
     days.innerHTML = html;
   }
   function buildSeq() {
-    var specials = ['C', 'W', 'K', 'B', 'A', 'M', 'F'];
+    var all = ['C', 'W', 'K', 'B', 'A', 'M', 'F'];
+    var specials = all;
+    if (lumeCfg && lumeCfg.screens) {
+      specials = all.filter(function (k) { return lumeCfg.screens[k] !== false; });
+    }
     seq = specials.slice();
     var si = 0;
     for (var i = 0; i < items.length; i++) {
       seq.push(i);
-      if ((i + 1) % 4 === 0) { seq.push(specials[si % specials.length]); si++; }
+      if ((i + 1) % 4 === 0 && specials.length) { seq.push(specials[si % specials.length]); si++; }
     }
   }
   function showSeq(p) {
@@ -1450,7 +1487,7 @@
         sec.style.transform = 'rotate(' + (p.s * 6) + 'deg)';
       }
       var dig = q('.dig', card);
-      if (dig) { var h12 = (p.h % 12) || 12; dig.textContent = h12 + ':' + pad2(p.m) + ' ' + (p.h < 12 ? 'AM' : 'PM'); }
+      if (dig) { var h12 = (p.h % 12) || 12; dig.textContent = lumeClock24() ? (pad2(p.h) + ':' + pad2(p.m)) : (h12 + ':' + pad2(p.m) + ' ' + (p.h < 12 ? 'AM' : 'PM')); }
       var dt = q('.cdate', card);
       if (dt) dt.textContent = zoneDate(c.tz, c.off);
     }
@@ -1679,7 +1716,7 @@
     if (src) src.textContent = airPollen && airPollen.ok ? 'Fontes: Open-Meteo · Pollen.com' : 'Fonte: Open-Meteo (AQI EUA)';
   }
   function loadAir() {
-    xhrGet(AIR_URL, function (err, txt) {
+    xhrGet(airUrl(), function (err, txt) {
       if (err) return;
       try {
         var d = JSON.parse(txt);
@@ -1876,6 +1913,11 @@
           break;
         }
         if (!picked) { prefetchWikiFact(); return; }
+        if (lumeNoTranslate()) {
+          factNext = { text: picked.q, tag: triviaTag(picked.cat), quiz: true, answer: picked.a, photo: TRIVIA_PHOTOS[picked.cat] || null };
+          factBusy = false;
+          return;
+        }
         translateText(picked.q, function (tq) {
           if (!tq) { prefetchWikiFact(); return; }
           translateText(picked.a, function (ta) {
@@ -2011,7 +2053,7 @@
   }
 
   function loadNews() {
-    xhrGet(NEWS_URL + '?v=' + Math.floor(Date.now() / REFRESH_MS), function (err, txt) {
+    xhrGet(newsUrl(), function (err, txt) {
       if (!err) {
         try {
           var data = JSON.parse(txt);
@@ -2055,6 +2097,7 @@
     resizeTimer = setTimeout(fitHeadline, 200);
   };
 
+  function boot() {
   tickClock();
   setInterval(tickClock, 1000);
   loadTransCache();
@@ -2078,6 +2121,38 @@
   setInterval(loadFx, FX_REFRESH_MS);
   loadNews();
   setInterval(loadNews, REFRESH_MS);
+  }
+
+  // Com ?code= válido, busca a config antes de iniciar: se pareada, aplica
+  // (cidade, telas, língua, relógio, unidade, feeds). Sem pareamento, usa
+  // os padrões. Se a busca falhar, usa a config em cache desse código,
+  // se houver, senão os padrões. Sem código, boot imediato, como sempre.
+  // O teto de 4s garante que uma rede lenta nunca trave a abertura.
+  function start() {
+    if (!lumeCode) { boot(); return; }
+    var done = false;
+    function go() { if (done) return; done = true; boot(); }
+    setTimeout(go, 4000);
+    xhrGet('/api/lume/config?code=' + lumeCode, function (err, txt) {
+      if (!done && !err) {
+        try {
+          var d = JSON.parse(txt);
+          if (d && d.paired && d.config) {
+            lumeApply(d.config);
+            try { localStorage.setItem('portalNewsLume:' + lumeCode, JSON.stringify(d.config)); } catch (e) {}
+          }
+        } catch (e) {}
+      }
+      if (!done && err) {
+        try {
+          var c = JSON.parse(localStorage.getItem('portalNewsLume:' + lumeCode) || 'null');
+          if (c) lumeApply(c);
+        } catch (e) {}
+      }
+      go();
+    });
+  }
+  start();
 })();
 </script>
 </body>
