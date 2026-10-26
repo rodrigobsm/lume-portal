@@ -1053,6 +1053,24 @@
       }
     }
   }
+  // Fallback nao-oficial do Google Translate (sem chave, sem cadastro).
+  // Usado so quando o MyMemory falha (ex.: 429). Resposta: d[0] = lista
+  // de segmentos; d[0][i][0] = traducao de cada segmento.
+  function fallbackTitle(it, entry, query) {
+    var langs = entry.dir.split('|');
+    var sl = langs[0] === 'pt-BR' ? 'pt' : langs[0];
+    var tl = langs[1] === 'pt-BR' ? 'pt' : langs[1];
+    xhrGet('https://translate.googleapis.com/translate_a/single?client=gtx&sl=' + sl + '&tl=' + tl + '&dt=t&q=' + encodeURIComponent(query), function (err, txt) {
+      if (err) return;
+      try {
+        var d = JSON.parse(txt);
+        var parts = [];
+        if (d && d[0]) for (var i = 0; i < d[0].length; i++) if (d[0][i] && d[0][i][0]) parts.push(d[0][i][0]);
+        var t = parts.join('');
+        if (t) applyTranslation(it, t, entry);
+      } catch (e) {}
+    });
+  }
   function translateTitle(it) {
     var entry = transEntry(it);
     if (!entry) return;
@@ -1063,15 +1081,15 @@
     var query = it.title.slice(0, 450);
     xhrGet('https://api.mymemory.translated.net/get?q=' + encodeURIComponent(query) + '&langpair=' + entry.pair, function (err, txt) {
       transBusy[key] = false;
-      if (err) return;
+      if (err) { fallbackTitle(it, entry, query); return; }
       try {
         var d = JSON.parse(txt);
         var t = d && d.responseData && d.responseData.translatedText;
-        if (!t) return;
-        if (t.indexOf('MYMEMORY WARNING') === 0 || t.indexOf('QUERY LENGTH LIMIT') === 0) return;
-        if (d.responseStatus && String(d.responseStatus) !== '200') return;
+        if (!t) { fallbackTitle(it, entry, query); return; }
+        if (t.indexOf('MYMEMORY WARNING') === 0 || t.indexOf('QUERY LENGTH LIMIT') === 0) { fallbackTitle(it, entry, query); return; }
+        if (d.responseStatus && String(d.responseStatus) !== '200') { fallbackTitle(it, entry, query); return; }
         applyTranslation(it, t, entry);
-      } catch (e) {}
+      } catch (e) { fallbackTitle(it, entry, query); }
     });
   }
   function translateText(text, cb) {
