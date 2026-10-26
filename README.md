@@ -39,8 +39,8 @@ npx wrangler login            # uma vez: autoriza a conta Cloudflare no navegado
 npx wrangler pages deploy public --project-name portal-news
 ```
 
-A URL pública é `https://portal-news-6t7.pages.dev` (ou domínio customizado,
-se configurado no dashboard).
+A URL pública é `https://lumeportal.travustech.ai` (o domínio padrão
+`https://portal-news-6t7.pages.dev` continua funcionando como fallback).
 
 ## Immortal (Meta Portal)
 
