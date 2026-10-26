@@ -36,6 +36,8 @@ export function normalizeConfig(input) {
   cfg.city = { name: str(city.name, 80) || 'Acworth, GA', lat: lat, lon: lon };
   cfg.clockFormat = (src.clockFormat === '24h') ? '24h' : '12h';
   cfg.tempUnit = (src.tempUnit === 'F') ? 'F' : 'C';
+  var DURATIONS = [5, 10, 15, 20, 25, 30, 60];
+  cfg.slideDuration = DURATIONS.indexOf(src.slideDuration) !== -1 ? src.slideDuration : 15;
   var screens = {};
   var ssrc = (src.screens && typeof src.screens === 'object') ? src.screens : {};
   SCREEN_KEYS.forEach(function (k) { screens[k] = ssrc[k] !== false; });

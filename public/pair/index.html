@@ -87,6 +87,16 @@
       <option value="C">Celsius (°C)</option>
       <option value="F">Fahrenheit (°F)</option>
     </select>
+    <label for="slideDuration">Slide duration (news)</label>
+    <select id="slideDuration">
+      <option value="5">5 seconds</option>
+      <option value="10">10 seconds</option>
+      <option value="15" selected>15 seconds</option>
+      <option value="20">20 seconds</option>
+      <option value="25">25 seconds</option>
+      <option value="30">30 seconds</option>
+      <option value="60">60 seconds</option>
+    </select>
   </div>
 
   <div class="card">
@@ -184,6 +194,7 @@
     $('language').value = cfg.language || 'en-US';
     $('clockFormat').value = cfg.clockFormat || '12h';
     $('tempUnit').value = cfg.tempUnit || 'C';
+    $('slideDuration').value = [5, 10, 15, 20, 25, 30, 60].indexOf(cfg.slideDuration) !== -1 ? cfg.slideDuration : 15;
     if (cfg.city) {
       $('lat').value = cfg.city.lat;
       $('lon').value = cfg.city.lon;
@@ -233,6 +244,7 @@
       city: { name: cityName, lat: parseFloat($('lat').value), lon: parseFloat($('lon').value) },
       clockFormat: $('clockFormat').value,
       tempUnit: $('tempUnit').value,
+      slideDuration: parseInt($('slideDuration').value, 10),
       screens: screens,
       feeds: { enabled: enabled, custom: custom }
     };

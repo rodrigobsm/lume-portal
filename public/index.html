@@ -32,8 +32,8 @@
     object-fit: cover; transform-origin: center center;
   }
   .photo-img.kb-start { transform: scale(1); }
-  /* 15s = ROTATE_MS: o zoom dura o slide inteiro, até passar para o próximo */
-  .photo-img.kb { transform: scale(1.25); transition: transform 15s linear; }
+  /* news zoom = --news-kb (default 15s = ROTATE_MS): dura o slide inteiro, até passar para o próximo */
+  .photo-img.kb { transform: scale(1.25); transition: transform var(--news-kb, 15s) linear; }
   .wxslide { background: #101820; }
   .wx-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
   .wx-sunny .wx-bg { background: linear-gradient(160deg, #1e6fb8 0%, #4aa3e0 45%, #f5b942 130%); }
@@ -503,12 +503,17 @@
   function lumeClock24() { return !!(lumeCfg && lumeCfg.clockFormat === '24h'); }
   function lumeTempF() { return !!(lumeCfg && lumeCfg.tempUnit === 'F'); }
   function lumeNoTranslate() { return !!(lumeCfg && lumeCfg.language === 'en-US'); }
+  function lumeNewsMs() {
+    if (lumeCfg && [5, 10, 15, 20, 25, 30, 60].indexOf(lumeCfg.slideDuration) !== -1) return lumeCfg.slideDuration * 1000;
+    return ROTATE_MS;
+  }
   function tempVal(v) { return Math.round(lumeTempF() ? v * 9 / 5 + 32 : v); }
   function tempSuffix() { return lumeTempF() ? '°F' : '°C'; }
   function tempBare() { return lumeTempF() ? '°F' : '°'; }
   function lumeApply(cfg) {
     if (!cfg || typeof cfg !== 'object') return;
     lumeCfg = cfg;
+    document.documentElement.style.setProperty('--news-kb', lumeNewsMs() + 'ms');
     if (cfg.city && typeof cfg.city.lat === 'number' && typeof cfg.city.lon === 'number') {
       wxLat = cfg.city.lat;
       wxLon = cfg.city.lon;
@@ -1435,9 +1440,10 @@
     current = next;
     var tw = document.querySelector('.topbar .weather');
     if (tw) tw.style.visibility = '';
-    restartProgress(ROTATE_MS);
+    var newsMs = lumeNewsMs();
+    restartProgress(newsMs);
     preloadNext();
-    resetRotate(ROTATE_MS);
+    resetRotate(newsMs);
     fitHeadline();
     startTyping();
     upgradeImage(items[i]);
