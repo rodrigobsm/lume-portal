@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Default pairing layout: single centered column. A ScrollView with
+     fillViewport wraps the content, so on short displays the screen
+     scrolls instead of cutting anything off; on tall displays the
+     content stays vertically centered. All sizes come from dimens
+     buckets, so the same layout scales from small displays to the
+     Portal. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0b0f16">
+
+    <WebView
+        android:id="@+id/webview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+    <ScrollView
+        android:id="@+id/pairing_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingLeft="@dimen/pairing_padding"
+            android:paddingRight="@dimen/pairing_padding"
+            android:paddingTop="@dimen/pairing_spacing_small"
+            android:paddingBottom="@dimen/pairing_spacing_small">
+
+            <ImageView
+                android:id="@+id/lume_logo"
+                android:layout_width="@dimen/pairing_logo_width"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/lume_logo_description"
+                android:src="@drawable/lume_logo" />
+
+            <TextView
+                android:id="@+id/pairing_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pairing_spacing_medium"
+                android:text="@string/pairing_title"
+                android:textColor="#ffffff"
+                android:textSize="@dimen/pairing_title_size"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/pairing_code"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pairing_spacing_small"
+                android:textColor="#ffffff"
+                android:textSize="@dimen/pairing_code_size"
+                android:textStyle="bold"
+                android:letterSpacing="0.15" />
+
+            <LinearLayout
+                android:id="@+id/pairing_qr_card"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pairing_spacing_medium"
+                android:background="#ffffff"
+                android:padding="@dimen/pairing_qr_card_padding"
+                android:gravity="center">
+
+                <ImageView
+                    android:id="@+id/pairing_qr"
+                    android:layout_width="@dimen/pairing_qr_size"
+                    android:layout_height="@dimen/pairing_qr_size"
+                    android:contentDescription="@string/pairing_qr_description" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/pairing_qr_caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pairing_spacing_small"
+                android:text="@string/pairing_qr_caption"
+                android:textColor="#c8cdd2"
+                android:textSize="@dimen/pairing_instructions_size" />
+
+            <TextView
+                android:id="@+id/pairing_url"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pairing_spacing_small"
+                android:gravity="center"
+                android:textColor="#c8cdd2"
+                android:textSize="@dimen/pairing_url_size"
+                android:typeface="monospace" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pairing_spacing_small"
+                android:gravity="center"
+                android:text="@string/pairing_instructions"
+                android:textColor="#c8cdd2"
+                android:textSize="@dimen/pairing_instructions_size" />
+
+            <TextView
+                android:id="@+id/pairing_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pairing_spacing_small"
+                android:text="@string/pairing_status"
+                android:textColor="#f5b942"
+                android:textSize="@dimen/pairing_status_size" />
+
+            <Button
+                android:id="@+id/open_dashboard"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pairing_spacing_medium"
+                android:minWidth="240dp"
+                android:text="@string/open_dashboard"
+                android:textSize="@dimen/pairing_button_size" />
+
+            <ImageView
+                android:id="@+id/travus_logo"
+                android:layout_width="@dimen/pairing_footer_width"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pairing_spacing_large"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/travus_logo_description"
+                android:src="@drawable/travus_logo" />
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/error_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="48dp"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/load_error"
+            android:textColor="#ffffff"
+            android:textSize="22sp" />
+
+        <Button
+            android:id="@+id/retry_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="@string/retry"
+            android:textSize="20sp" />
+
+    </LinearLayout>
+
+</FrameLayout>

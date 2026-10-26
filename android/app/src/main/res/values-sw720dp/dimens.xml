@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Pairing-screen sizes for large displays (smallest width >= 720dp),
+     which is the Meta Portal's bucket at mdpi density. -->
+<resources>
+    <dimen name="pairing_padding">48dp</dimen>
+    <dimen name="pairing_logo_width">420dp</dimen>
+    <dimen name="pairing_title_size">24sp</dimen>
+    <dimen name="pairing_code_size">64sp</dimen>
+    <dimen name="pairing_qr_size">260dp</dimen>
+    <dimen name="pairing_qr_card_padding">16dp</dimen>
+    <dimen name="pairing_url_size">16sp</dimen>
+    <dimen name="pairing_instructions_size">22sp</dimen>
+    <dimen name="pairing_status_size">20sp</dimen>
+    <dimen name="pairing_button_size">20sp</dimen>
+    <dimen name="pairing_spacing_small">16dp</dimen>
+    <dimen name="pairing_spacing_medium">28dp</dimen>
+    <dimen name="pairing_spacing_large">40dp</dimen>
+    <dimen name="pairing_footer_width">200dp</dimen>
+</resources>

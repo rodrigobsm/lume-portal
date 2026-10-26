@@ -1,95 +1,111 @@
 # Lume Portal
 
-Dashboard de notícias e informações para o **Meta Portal de 1ª geração** (10,1",
-horizontal), que a Meta descontinuou em 2022 — o app quiosque **Lume Portal**
-ressuscita o aparelho como tela de informações sempre ligada, configurável por
-aparelho, em português ou inglês.
+A news and information dashboard for the **first-generation Meta Portal**
+(10.1", landscape), which Meta discontinued in 2022. The native kiosk app
+**Lume Portal** brings the device back as an always-on information display,
+configured per device, in English or Portuguese.
 
-> O código do app Android vive num repositório local separado (não publicado
-> aqui). Este repositório contém toda a parte web: o painel, o site público,
-> a página de configuração e o backend de pareamento (Cloudflare Pages +
-> Workers KV). O APK é hospedado aqui em `public/downloads/`.
+Lume Portal is **open source (MIT)** and community-built. See
+[CONTRIBUTING.md](CONTRIBUTING.md) if you want to improve it, and
+[DISCLAIMER.md](DISCLAIMER.md) for the full disclaimer and privacy notes.
 
-## URLs de produção
+## Production URLs
 
-| O quê | URL |
+| What | URL |
 |---|---|
-| Site público (inglês) | https://lumeportal.travustech.ai/ |
-| Painel (dashboard) | https://lumeportal.travustech.ai/preview/ |
-| Configuração por aparelho | https://lumeportal.travustech.ai/pair/ |
-| Download do APK (sempre a última versão) | https://lumeportal.travustech.ai/downloads/lume-portal.apk |
-| Domínio reserva (mesmo projeto) | https://portal-news-6t7.pages.dev/ |
+| Public website (English) | https://lumeportal.travustech.ai/ |
+| Dashboard | https://lumeportal.travustech.ai/preview/ |
+| Per-device setup | https://lumeportal.travustech.ai/pair/ |
+| APK download (always the latest version) | https://lumeportal.travustech.ai/downloads/lume-portal.apk |
+| Fallback domain (same project) | https://portal-news-6t7.pages.dev/ |
 
-Aparelhos já pareados continuam funcionando: `/?code=XXXXXX` redireciona (302)
-para `/preview/?code=XXXXXX`. **O Immortal (ou qualquer visualizador) deve
-apontar para `/preview/`** — a raiz virou o site público.
+Already-paired devices keep working: `/?code=XXXXXX` redirects (302) to
+`/preview/?code=XXXXXX`. **Any viewer (Immortal or otherwise) must point
+at `/preview/`** — the root is the public website.
 
-## O painel
+## The dashboard
 
-Um único arquivo (`public/preview/index.html`, JS ES5, Chart.js via CDN),
-feito para leitura a ~3 m do sofá: foto em tela cheia com zoom lento contínuo
-(Ken Burns), manchete digitada (typewriter), barra de progresso e topo fixo
-(clima à esquerda, alerta NWS no centro, relógio + data à direita).
+A single file (`public/preview/index.html`, ES5-style JS, Chart.js via
+CDN), designed to be read from ~3 m away from the sofa: full-screen photo
+with a slow continuous zoom (Ken Burns), typewriter headline, progress
+bar, and a fixed top bar (weather left, NWS alert center, clock + date
+right).
 
-**Notícias** — 11 fontes RSS, agregadas no servidor (`functions/api/news.js`):
-G1 Brasil, CNN Brasil, Agência Brasil, G1 Mundo, BBC Brasil, Canaltech, Olhar
-Digital, Tecnoblog, G1 Tecnologia, Fox News (EUA) e Fox 5 Atlanta (local).
-Mix por categoria, sem repetir a mesma fonte em sequência, preferência por
-itens das últimas 48 h com imagem. Catálogo recarregado a cada 10 min, com
-cache em `localStorage` e tela de "sem conexão" (nunca fica em branco).
+**News** — 11 RSS sources, aggregated server-side (`functions/api/news.js`):
+G1 Brasil, CNN Brasil, Agência Brasil, G1 Mundo, BBC Brasil, Canaltech,
+Olhar Digital, Tecnoblog, G1 Tecnologia, Fox News (US), and Fox 5 Atlanta
+(local). Mixed by category, never two items from the same source in a row,
+preferring items from the last 48 h with an image. The catalog refreshes
+every 10 min, with a `localStorage` cache and an offline screen (never a
+blank screen).
 
-**Telas especiais** — sequência `C, W, K, B, A, M, F`: o bloco de abertura
-mostra as 7 em sequência; depois, uma a cada 4 notícias.
+**Special screens** — sequence `C, W, K, B, A, M, F`: the opening block
+shows all 7 in sequence; afterwards, one special after every 4 news items.
 
-- **C — Câmbio**: US$ 1 = R$ X em destaque, EUR/GBP/JPY por US$ 1,
-  BTC/ETH/SOL/BNB/XRP/DOGE em US$ com variação de 24 h; fontes BCE (fiat) e
-  CoinGecko (cripto); gráfico do dólar na última semana.
-- **W — Clima**: temperatura gigante, sensação térmica, umidade, vento,
-  nascer/pôr do sol e previsão de 7 dias (Open-Meteo).
-- **K — Relógio mundial**: 5 relógios analógicos (Atlanta, Los Angeles,
-  Brasília, Londres, Tóquio) com ponteiro de segundos dourado, hora digital e
-  data.
-- **B — Bíblia**: versículo aleatório de 40 passagens conhecidas, via
-  bible-api.com (Almeida em PT, WEB em EN), sem repetir o anterior; fallback
-  com 8 versos fixos.
-- **A — Qualidade do ar**: AQI (EPA) com número gigante, categoria,
-  recomendação de saúde, 6 poluentes (PM2.5, PM10, ozônio, NO₂, CO, SO₂) e
-  gráfico do AQI ao longo do dia (Open-Meteo).
-- **M — Mercados**: 8 índices (EUA, Brasil, Europa, Ásia) via Yahoo Finance
-  (`functions/api/markets.js`), com mini-gráficos do último mês.
-- **F — Você sabia?**: padrão [Wikipedia, Wikipedia, Quiz] — fatos "neste
-  dia" em PT (ou EN) com foto do artigo; a cada 3º, quiz do Open Trivia DB
-  (traduzido via MyMemory em PT; em EN, no original).
+- **C — Currency**: US$ 1 = R$ X in large type, EUR/GBP/JPY per US$ 1,
+  BTC/ETH/SOL/BNB/XRP/DOGE in US$ with 24 h change; sources: ECB/Frankfurter
+  (fiat) and CoinGecko (crypto); dollar chart for the last week.
+- **W — Weather**: giant temperature, feels-like, humidity, wind,
+  sunrise/sunset, and a 7-day forecast (Open-Meteo).
+- **K — World clock**: 5 analog clocks (Atlanta, Los Angeles, Brasília,
+  London, Tokyo) with a gold second hand, digital time and date.
+- **B — Bible**: a random verse from 40 curated passages, via
+  bible-api.com (Almeida in PT, WEB in EN), never repeating the previous
+  one; fallback with 8 hardcoded verses.
+- **A — Air quality**: US AQI (EPA) in giant type, category, health
+  recommendation, 6 pollutants (PM2.5, PM10, ozone, NO₂, CO, SO₂), and an
+  AQI chart for the day (Open-Meteo).
+- **M — Markets**: 8 indices (US, Brazil, Europe, Asia) via Yahoo Finance
+  (`functions/api/markets.js`), with mini-charts for the last month.
+- **F — Did you know?**: pattern [Wikipedia, Wikipedia, Quiz] — "on this
+  day" facts in PT (or EN) with the article's photo; every 3rd one, a quiz
+  from Open Trivia DB (translated via MyMemory in PT; in EN, in the
+  original).
 
-**Duração dos slides** — única para todas as telas (notícias + especiais),
-configurável por aparelho (5/10/15/20/25/30/60 s, padrão 15 s).
+**Slide duration** — a single duration for all screens (news + specials),
+configurable per device (5/10/15/20/25/30/60 s, default 15 s).
 
-**Idiomas (i18n)** — o painel é todo traduzido: `pt-BR` (padrão) e `en-US`,
-via dicionário `I18N` + `t()`. Em PT, manchetes em inglês (EUA/Local) são
-traduzidas no navegador via MyMemory (grátis, sem chave), com cache local; se
-a API falhar, mostra o original. Em EN, as manchetes dos feeds brasileiros
-são traduzidas para o inglês via MyMemory (pt|en), com cache; as manchetes
-em inglês aparecem no original e feeds customizados não são traduzidos. Uma
-nova língua = um novo objeto no dicionário.
+**Languages (i18n)** — the dashboard is fully translated: `pt-BR`
+(default) and `en-US`, via an `I18N` dictionary + `t()`. In PT, English
+headlines (US/local) are translated in the browser via MyMemory (free, no
+key), with a local cache; if translation fails, the original is shown. In
+EN, headlines from the Brazilian feeds are translated to English via
+MyMemory (pt|en), with a cache; English headlines appear in the original
+and custom feeds are not translated. A new language is a new object in the
+dictionary.
 
-**Alertas NWS** — `api.weather.gov/alerts/active`, severidade Extreme/Severe;
-em PT, nomes de eventos traduzidos por mapa; em EN, nome cru do weather.gov
-(`functions/api/alerts.js?lang=en`).
+**Headline translation fallback** — MyMemory's anonymous free tier
+(5,000 chars/day) does not sustain a 24/7 dashboard: under load it answers
+HTTP 429 and headlines stay untranslated. When MyMemory fails, the
+dashboard falls back to Google's unofficial web translation endpoint
+(`translate.googleapis.com`, no key). That endpoint is unofficial and can
+change or stop working without notice; it is a fallback only, and the
+MyMemory path is untouched. If you need guaranteed translation volume, get
+a free MyMemory key (50,000 chars/day) or proxy a paid provider
+server-side — see `functions/api/` for where a server-side translator
+would plug in.
 
-## O app Android (Lume Portal)
+**NWS alerts** — `api.weather.gov/alerts/active`, Extreme/Severe severity;
+in PT, event names are translated via a map; in EN, the raw weather.gov
+name (`functions/api/alerts.js?lang=en`).
 
-App quiosque nativo (WebView em tela cheia) para o Portal. Pacote
-`com.travustech.lumeportal`, minSdk 28, targetSdk 29, **só permissão
-INTERNET**. Não usa MAC real (inacessível a app sideloaded no Android 9/10)
-nem é screensaver do sistema (o Portal não oferece essa opção a terceiros):
-é um app em primeiro plano, com opção de virar home via ADB.
+## The Android app (Lume Portal)
 
-- **Pareamento**: o app gera um código de 6 caracteres (alfabeto
-  `ABCDEFGHJKMNPQRSTUVWXYZ23456789` — sem 0/O/1/I/L), digitado em `/pair/`.
-- **Long-press** em qualquer ponto do WebView reexibe a tela de pairing
-  (código, status, URL, botão de voltar que recarrega o painel).
-- **Instalação** (o APK instala por cima das versões anteriores, sem perder
-  o pareamento — mesma chave de debug em todas as versões):
+A native kiosk app (full-screen WebView) for the Portal. Package
+`com.travustech.lumeportal`, minSdk 28, targetSdk 29, **INTERNET
+permission only**. It does not use the real MAC (unavailable to a
+sideloaded app on Android 9/10) and it is not a system screensaver (the
+Portal does not offer that option to third parties): it is a foreground
+app, with an option to become the home screen via ADB.
+
+- **Pairing**: the app generates a 6-character code (alphabet
+  `ABCDEFGHJKMNPQRSTUVWXYZ23456789` — no 0/O/1/I/L), typed at `/pair/`.
+- **Long-press** anywhere on the WebView re-opens the pairing screen
+  (code, status, URL, back button that reloads the dashboard). The
+  pairing screen also shows a QR code for the full setup URL, generated
+  on-device.
+- **Install** (the APK installs over previous versions without losing the
+  pairing — same debug key in every version):
 
 ```bash
 curl -L -o lume-portal.apk https://lumeportal.travustech.ai/downloads/lume-portal.apk \
@@ -97,91 +113,100 @@ curl -L -o lume-portal.apk https://lumeportal.travustech.ai/downloads/lume-porta
   && adb shell am start -n com.travustech.lumeportal/.MainActivity
 ```
 
-Pré-requisitos: `platform-tools` (adb) no PATH, Portal com ADB ativado
-(Settings > Debug > ADB Enabled), conexão USB-C, `adb devices` reconhecendo
-o aparelho.
+Prerequisites: `platform-tools` (adb) in PATH, Portal with ADB enabled
+(Settings > Debug > ADB Enabled), USB-C connection, `adb devices`
+recognizing the device.
 
-**Versões** (nome do arquivo versionado a cada release — o Portal/aplicativo
-de download pode cachear o nome antigo):
+**Versions** (the file name is versioned on every release — a download
+app may cache the old name):
 
-| Versão | O que mudou |
+| Version | What changed |
 |---|---|
-| v1 | Primeira entrega: pairing + WebView quiosque |
-| v1.1 | Domínio `lumeportal.travustech.ai`, migração da URL antiga, long-press para o pairing, logo e ícone |
-| v1.2 | URL padrão aponta para `/preview/` |
-| v1.3 | Trava de scroll/zoom do WebView (sem barras, sem overscroll) |
-| v1.4 | Trava de arrasto no nível do gesto (arrastar não move mais o conteúdo) |
+| v1 | First delivery: pairing + kiosk WebView |
+| v1.1 | `lumeportal.travustech.ai` domain, old-URL migration, long-press to pairing, logo and icon |
+| v1.2 | Default URL points to `/preview/` |
+| v1.3 | WebView scroll/zoom lock (no bars, no overscroll) |
+| v1.4 | Gesture-level drag lock (dragging no longer moves content) |
+| v1.5 | Pairing screen redesign: full setup URL as text + on-device QR code, color-coded status, responsive layout |
 
-Build manual (Gradle não funciona atrás do proxy da VM de build): aapt2
-compile+link → javac → d8 → zip → zipalign → apksigner, com o debug keystore
-local (fora do versionamento — sem ele, a instalação por cima perde o
-pareamento).
+The app source lives in `android/` in this repo (see
+[`android/README.md`](android/README.md)). Manual build (Gradle does not
+work behind the build VM's proxy): aapt2 compile+link → javac → d8 → zip
+→ zipalign → apksigner, with a local debug keystore (not versioned —
+without it, installing over loses the pairing).
 
-## Pareamento e configuração por aparelho
+## Pairing and per-device configuration
 
-Backend em Cloudflare Pages Functions + Workers KV (namespace `lume-portal`,
-binding `LUME_KV` no projeto Pages, production + preview).
+Backend in Cloudflare Pages Functions + Workers KV (namespace
+`lume-portal`, binding `LUME_KV` on the Pages project, production +
+preview).
 
-- `GET /api/lume/config?code=XXXXXX` → `{paired:false}` ou
+- `GET /api/lume/config?code=XXXXXX` → `{paired:false}` or
   `{paired:true, config, dashboardUrl}` (dashboardUrl =
   `https://lumeportal.travustech.ai/preview/?code=XXXXXX`).
-- `POST /api/lume/pair {code, config}` → valida e salva em KV como
-  `config:<CODE>`. Sem autenticação na v1 — o código é a chave.
+- `POST /api/lume/pair {code, config}` → validates and stores under KV
+  as `config:<CODE>`. No authentication in v1 — the code is the key (see
+  [DISCLAIMER.md](DISCLAIMER.md): keep your device's code private).
 
-**Configuração** (validação compartilhada em `functions/_lib/lume.js`):
+**Configuration** (shared validation in `functions/_lib/lume.js`):
 
-- `language`: `en-US` | `pt-BR` (padrão `en-US` no formulário, `pt-BR` no painel
-  sem código)
-- `city`: `{name, lat, lon}` (padrão Acworth, GA — 34.0658, -84.6769)
+- `language`: `en-US` | `pt-BR` (form default `en-US`; dashboard without a
+  code defaults to `pt-BR`)
+- `city`: `{name, lat, lon}` (default Acworth, GA — 34.0658, -84.6769)
 - `clockFormat`: `12h` | `24h`; `tempUnit`: `C` | `F`
-- `slideDuration`: 5/10/15/20/25/30/60 (qualquer outro valor normaliza para 15)
-- `screens`: `{C, W, K, B, A, M, F}` (booleanos)
-- `screenOrder`: ordem dos especiais (ex.: `["C","W","K","B","A","M","F"]`;
-  sem ele, a ordem padrão; códigos desconhecidos são ignorados e os que
-  faltam vão para o fim)
-- `worldClock`: até 5 `{name, timezone}` para o relógio mundial (sem ele,
-  as 5 cidades padrão: Atlanta, Los Angeles, Brasília, Londres, Tóquio)
-- `feeds`: `{enabled: [...ids conhecidos, máx. 30], custom: [{name, url,
-  category}]}` (custom: máx. 30; categorias `brasil|mundo|tech|eua|atlanta`)
-- Corpo limitado a 16 KB; chaves desconhecidas são removidas.
+- `slideDuration`: 5/10/15/20/25/30/60 (any other value normalizes to 15)
+- `screens`: `{C, W, K, B, A, M, F}` (booleans)
+- `screenOrder`: order of the specials (e.g.
+  `["C","W","K","B","A","M","F"]`; without it, the default order; unknown
+  codes are ignored and missing ones go to the end)
+- `worldClock`: up to 5 `{name, timezone}` for the world clock (without
+  it, the 5 default cities: Atlanta, Los Angeles, Brasília, London, Tokyo)
+- `feeds`: `{enabled: [...known ids, max 30], custom: [{name, url,
+  category}]}` (custom: max 30; categories `brasil|mundo|tech|eua|atlanta`)
+- Body limited to 16 KB; unknown keys are stripped.
 
-A página `/pair/` é mobile-first, com abas (Device, Weather, Screens, World
-clock, Feeds), busca de cidade com autocomplete (Open-Meteo Geocoding, sem
-chave), ordem dos slides com drag-and-drop (ou setas, no celular) e feeds
-RSS customizados sem limite fixo de linhas. Ela aceita `?code=XXXXXX` na
-URL: abre a config pronta para editar — é o fluxo do QR code exibido na
-tela de pairing do app. O código fica salvo no cookie `lumePairCode` (1
-ano): sem `?code=`, a página abre já preenchida e carrega a config sozinha.
+The `/pair/` page is mobile-first, with tabs (Device, Weather, Screens,
+World clock, Feeds), city search with autocomplete (Open-Meteo Geocoding,
+no key), slide order with drag-and-drop (or arrows, on phones), and custom
+RSS feeds with no fixed row limit. It accepts `?code=XXXXXX` in the URL:
+it opens the config ready to edit — that is the flow of the QR code shown
+on the app's pairing screen. The code is saved in the `lumePairCode`
+cookie (1 year): without `?code=`, the page opens pre-filled and loads the
+config on its own.
 
-**Semântica importante**: o app para de sondar a config após o pareamento e
-o painel busca a config só no carregamento (teto de 4 s; se falhar, usa o
-cache `portalNewsLume:<CODE>`). **Mudar a config no site só vale no próximo
-carregamento do painel** (reabrir o app, ou long-press → voltar ao painel).
-Sem `?code=` (ou código inválido/não pareado), o painel usa os 11 feeds
-padrão, Acworth, 12 h e °C.
+**Important semantics**: the app stops polling the config after pairing,
+and the dashboard fetches the config only on load (4 s cap; on failure it
+uses the `portalNewsLume:<CODE>` cache). **Changing the config on the
+site only applies on the next dashboard load** (reopen the app, or
+long-press → back to dashboard). Without `?code=` (or with an invalid /
+unpaired code), the dashboard uses the 11 default feeds, Acworth, 12 h,
+and °C.
 
-## Publicação (Cloudflare Pages)
+## Deployment (Cloudflare Pages)
 
-Conta **Travus Tech, Inc.**, projeto `portal-news`. Deploy direto via script
-(sem integração automática GitHub → Cloudflare):
+Account **Travus Tech, Inc.**, project `portal-news`. Maintainers deploy
+directly (no automatic GitHub → Cloudflare integration). The deploy
+uploads `public/` + `functions/`; static propagation takes ~20–30 s, but
+**Functions can take longer to propagate** — after a deploy, verify a
+Functions behavior (not just static markers) before calling it done.
+
+A deploy needs a Cloudflare API token with **Pages Edit + Account Read +
+Workers KV Storage Read/Edit** (without the KV permission, the API returns
+401). REST API detail: the project's KV binding PATCH uses an object
+keyed by binding name (`{"LUME_KV": {"namespace_id": "..."}}`), not the
+wrangler.toml array shape.
+
+Contributors do not need a Cloudflare account or token: develop locally
+and send a pull request (see [CONTRIBUTING.md](CONTRIBUTING.md)).
+
+## Local development
 
 ```bash
-python3 ~/workspace/custom-connectors/custom.cloudflare/bin/deploy-pages.py ~/workspace/portal-news
+node server.mjs        # local server on port 8901
 ```
 
-O script sobe `public/` + `functions/` e a propagação leva ~20–25 s. O token
-da API precisa de **Pages Edit + Account Read + Workers KV Storage Read/Edit**
-(sem a permissão de KV, a API devolve 401). Detalhe da API REST: o PATCH de
-binding do projeto usa objeto por nome
-(`{"LUME_KV": {"namespace_id": "..."}}`), não array como no wrangler.toml.
-
-## Desenvolvimento local
-
-```bash
-node server.mjs        # servidor local na porta 8901
-```
-
-Checagem de sintaxe do script inline do painel (o painel é um único HTML):
+Syntax check for the dashboard's inline script (the dashboard is a single
+HTML file):
 
 ```bash
 python3 -c "
@@ -192,39 +217,63 @@ open('/tmp/dash.js','w').write(max(blocks, key=len))
 " && node --check /tmp/dash.js
 ```
 
-## Estrutura
+## Structure
 
-- `public/index.html` — site público (inglês) com demo ao vivo em iframe
-- `public/preview/index.html` — **o painel**
-- `public/pair/index.html` — página de configuração por aparelho (inglês)
-- `public/downloads/` — APK estável (`lume-portal.apk`) + cópias versionadas
-- `public/assets/` — logos Lume e TravusTech
-- `functions/api/news.js` — agregador RSS (cache 10 min)
-- `functions/api/og.js`, `alerts.js`, `markets.js`, `pollen.js` — APIs de apoio
-- `functions/api/lume/config.js`, `pair.js` — pareamento e config
-- `functions/_lib/aggregate.js`, `lume.js` — agregação e validação
-- `functions/index.js` — redirect 302 `/?code=` → `/preview/?code=`
+- `public/index.html` — public website (English) with a live demo iframe
+- `public/preview/index.html` — **the dashboard**
+- `public/pair/index.html` — per-device setup page (English)
+- `public/downloads/` — stable APK (`lume-portal.apk`) + versioned copies
+- `public/assets/` — Lume and TravusTech logos
+- `functions/api/news.js` — RSS aggregator (10 min cache)
+- `functions/api/og.js`, `alerts.js`, `markets.js`, `pollen.js` — support APIs
+- `functions/api/lume/config.js`, `pair.js` — pairing and config
+- `functions/_lib/aggregate.js`, `lume.js` — aggregation and validation
+- `functions/index.js` — 302 redirect `/?code=` → `/preview/?code=`
+- `android/` — the Android kiosk app source
+- `LICENSE`, `DISCLAIMER.md`, `CONTRIBUTING.md`, `SECURITY.md`,
+  `CODE_OF_CONDUCT.md` — license and community documents
 
 ## Analytics
 
-Google Analytics (`G-KGXSLWW669`) no `<head>` das três páginas (site, painel
-e config). O painel dentro do iframe da demo e nos Portais também gera
-pageviews — são loads reais; para separar tráfego de marketing de tráfego
-dos aparelhos, filtrar por caminho/host no GA.
+Google Analytics (`G-KGXSLWW669`) in the `<head>` of the three pages
+(website, dashboard, and setup). The dashboard inside the demo iframe and
+on Portals also generates pageviews — those are real loads; to separate
+marketing traffic from device traffic, filter by path/host in GA. See
+[DISCLAIMER.md](DISCLAIMER.md) for the privacy notes.
 
-## Limitações conhecidas
+## Known limitations (the honest list)
 
-- **RSS do G1 Brasil** servia itens de 2018–2023 (filtro de 48 h o exclui do
-  catálogo atual) — problema pré-existente do feed, a acompanhar.
-- **Pólen**: Open-Meteo CAMS retorna nulo para Acworth e pollen.com bloqueia
-  scraping; a seção do painel já existe e aparece sozinha quando
-  `/api/pollen` responder — falta uma fonte com chave (ex.: Tomorrow.io).
-- **Fuso do Open-Meteo fixo em America/New_York** (nascer/pôr do sol de
-  outras cidades saem em horário de NY); NWS cobre só EUA; vento sempre em
-  mph.
-- **NWS em EN com alerta real ainda não observado** (sem alerta ativo nos
-  testes); o caminho de código está deployado.
-- Fontes sem RSS público ou bloqueadas (não re-adicionar sem verificar):
-  TecMundo (HTTP 204), CNN americana (feeds congelados desde 2023), 11Alive
-  (0 itens em produção), AJC/WSB (sem RSS público).
+- **G1 Brasil RSS** served items dated 2018–2023 (the 48 h filter excludes
+  it from the current catalog) — a pre-existing feed problem, to monitor.
+- **Pollen**: Open-Meteo CAMS returns null for Acworth and pollen.com
+  blocks scraping; the dashboard section already exists and appears on
+  its own when `/api/pollen` answers — a key-based source is still missing
+  (e.g. Tomorrow.io).
+- **Open-Meteo timezone fixed at America/New_York** (sunrise/sunset for
+  other cities show in NY time); NWS covers the US only; wind is always
+  in mph.
+- **NWS in EN with a real alert not yet observed** (no active alert during
+  testing); the code path is deployed.
+- **Pairing codes are the only key in v1** — anyone who knows a device's
+  code can view and change its settings. Keep codes private.
+- **Config applies on the next dashboard load only** (see above).
+- **Third-party feeds and APIs can break without notice** (rate limits,
+  discontinued feeds, changed formats). The dashboard degrades to
+  fallbacks and cached content; it never guarantees a feed.
+- Sources with no public RSS or blocked (do not re-add without checking):
+  TecMundo (HTTP 204), US CNN (feeds frozen since 2023), 11Alive (0 items
+  in production), AJC/WSB (no public RSS).
 
+## Disclaimer
+
+Lume Portal is an independent community project — **not affiliated with,
+endorsed by, or sponsored by Meta**. "Meta Portal" and "Portal" are
+trademarks of Meta Platforms, Inc., used here only to identify compatible
+hardware. Installing the app modifies device settings and is
+**use-at-your-own-risk** (reversible by uninstalling, but no guarantees;
+may void warranty). See [DISCLAIMER.md](DISCLAIMER.md) for the full text
+and privacy notes.
+
+## License
+
+MIT — see [LICENSE](LICENSE).

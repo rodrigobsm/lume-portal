@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Lume Portal</string>
+    <string name="pairing_title">Pair this device</string>
+    <string name="pairing_instructions">Scan the QR code with your phone camera, or go to the address below and enter this code.</string>
+    <string name="pairing_qr_description">QR code for the setup page</string>
+    <string name="pairing_qr_caption">Scan with your phone camera</string>
+    <string name="pairing_status">Waiting for setup…</string>
+    <string name="pairing_status_paired">Paired</string>
+    <string name="open_dashboard">Open dashboard</string>
+    <string name="back_to_dashboard">Back to dashboard</string>
+    <string name="travus_logo_description">TravusTech logo</string>
+    <string name="lume_logo_description">Lume Portal logo</string>
+    <string name="load_error">Couldn\'t load the page. Check your connection and try again.</string>
+    <string name="retry">Retry</string>
+</resources>
