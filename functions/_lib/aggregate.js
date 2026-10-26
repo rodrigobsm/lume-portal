@@ -29,7 +29,7 @@ function resolveFeeds(override) {
     list = FEEDS.slice();
   }
   if (Array.isArray(override.custom)) {
-    override.custom.slice(0, 10).forEach(function (c) {
+    override.custom.slice(0, 30).forEach(function (c) {
       if (!c || typeof c !== 'object') return;
       var name = typeof c.name === 'string' ? c.name.trim() : '';
       var url = typeof c.url === 'string' ? c.url.trim() : '';
@@ -104,7 +104,7 @@ function parseDate(itemXml) {
   return isNaN(d.getTime()) ? null : d;
 }
 
-export function parseFeed(xml, sourceName, category) {
+export function parseFeed(xml, sourceName, category, feedId) {
   var items = [];
   var blocks = xml.match(/<(item|entry)[\s>][\s\S]*?<\/\1>/gi) || [];
   for (var i = 0; i < blocks.length; i++) {
@@ -120,6 +120,7 @@ export function parseFeed(xml, sourceName, category) {
       image: extractImage(b),
       source: sourceName,
       category: category,
+      feed: feedId || 'custom',
       published_at: date ? date.toISOString() : null,
       published_ts: date ? date.getTime() : 0
     });
@@ -202,7 +203,7 @@ export async function aggregate(fetchImpl, feedsOverride) {
       var res = await fetchWithTimeout(doFetch, f.url, 8000);
       if (!res.ok) return { feed: f, items: [], error: 'HTTP ' + res.status };
       var xml = await res.text();
-      return { feed: f, items: parseFeed(xml, f.name, f.category), error: null };
+      return { feed: f, items: parseFeed(xml, f.name, f.category, f.id), error: null };
     } catch (e) {
       return { feed: f, items: [], error: String((e && e.message) || e) };
     }
@@ -263,6 +264,7 @@ export async function aggregate(fetchImpl, feedsOverride) {
       image: upgradeImageURL(it.image),
       source: it.source,
       category: it.category,
+      feed: it.feed || 'custom',
       published_at: it.published_at
     };
   });

@@ -1010,11 +1010,34 @@
       localStorage.setItem('portalNewsTrans', JSON.stringify(transCache));
     } catch (e) {}
   }
-  function isTranslatable(it) { return !lumeNoTranslate() && it && (it.category === 'eua' || it.category === 'atlanta'); }
-  function applyTranslation(it, translated) {
-    transCache[it.title] = translated;
+  var PT_FEED_IDS = ['g1-brasil', 'cnn-brasil', 'agencia-brasil', 'g1-mundo', 'bbc-brasil', 'canaltech', 'olhar-digital', 'tecnoblog', 'g1-tecnologia'];
+  function transKey(dir, title) { return dir + '|' + title; }
+  // Translation direction for one headline, or null when it stays as-is.
+  // PT mode: EN headlines (eua/atlanta) -> PT (existing behavior).
+  // EN mode: headlines from known PT feeds -> EN (reverse path). Custom
+  // feeds stay as-is: their language is unknown (items carry feed 'custom').
+  // Cache keys carry the direction so PT-mode and EN-mode entries never
+  // collide; PT mode still honors legacy plain-title entries.
+  function transEntry(it) {
+    if (!it || !it.title) return null;
+    if (isEN()) {
+      if (PT_FEED_IDS.indexOf(it.feed) !== -1) return { dir: 'pt|en', pair: 'pt%7Cen', field: 'titleEN' };
+      return null;
+    }
+    if (!lumeNoTranslate() && (it.category === 'eua' || it.category === 'atlanta')) return { dir: 'en|pt-BR', pair: 'en%7Cpt-BR', field: 'titlePT' };
+    return null;
+  }
+  function isTranslatable(it) { return !!transEntry(it); }
+  function applyTranslation(it, translated, entry) {
+    entry = entry || transEntry(it);
+    if (entry) {
+      transCache[transKey(entry.dir, it.title)] = translated;
+      it[entry.field] = translated;
+    } else {
+      transCache[it.title] = translated;
+      it.titlePT = translated;
+    }
     saveTransCache();
-    it.titlePT = translated;
     if (curKind === 'news' && items[curNewsIdx] === it) {
       var el = slides[current];
       if (el) {
@@ -1031,13 +1054,15 @@
     }
   }
   function translateTitle(it) {
-    if (!isTranslatable(it) || !it.title) return;
-    if (transCache[it.title]) { it.titlePT = transCache[it.title]; return; }
-    if (transBusy[it.title]) return;
-    transBusy[it.title] = true;
+    var entry = transEntry(it);
+    if (!entry) return;
+    var key = transKey(entry.dir, it.title);
+    if (it[entry.field] || transCache[key]) { it[entry.field] = it[entry.field] || transCache[key]; return; }
+    if (transBusy[key]) return;
+    transBusy[key] = true;
     var query = it.title.slice(0, 450);
-    xhrGet('https://api.mymemory.translated.net/get?q=' + encodeURIComponent(query) + '&langpair=en%7Cpt-BR', function (err, txt) {
-      transBusy[it.title] = false;
+    xhrGet('https://api.mymemory.translated.net/get?q=' + encodeURIComponent(query) + '&langpair=' + entry.pair, function (err, txt) {
+      transBusy[key] = false;
       if (err) return;
       try {
         var d = JSON.parse(txt);
@@ -1045,7 +1070,7 @@
         if (!t) return;
         if (t.indexOf('MYMEMORY WARNING') === 0 || t.indexOf('QUERY LENGTH LIMIT') === 0) return;
         if (d.responseStatus && String(d.responseStatus) !== '200') return;
-        applyTranslation(it, t);
+        applyTranslation(it, t, entry);
       } catch (e) {}
     });
   }
@@ -1073,7 +1098,12 @@
     if (!items.length) return;
     var queue = [];
     items.forEach(function (it) {
-      if (isTranslatable(it) && !transCache[it.title] && !transBusy[it.title]) queue.push(it);
+      var e = transEntry(it);
+      if (!e) return;
+      var k = transKey(e.dir, it.title);
+      if (it[e.field] || transCache[k] || transBusy[k]) return;
+      if (e.dir === 'en|pt-BR' && transCache[it.title]) return;
+      queue.push(it);
     });
     if (!queue.length) return;
     if (transTimer) { clearTimeout(transTimer); transTimer = null; }
@@ -1117,8 +1147,15 @@
       logo.src = 'https://www.google.com/s2/favicons?domain=' + a.hostname + '&sz=64';
     } catch (e) { logo.style.display = 'none'; }
     q('.src', el).textContent = it.source.toUpperCase() + ' · ' + catLabel(it.category).toUpperCase();
-    var dispTitle = it.titlePT || transCache[it.title] || it.title;
-    if (!it.titlePT && !transCache[it.title]) translateTitle(it);
+    var dispTitle, needTrans;
+    if (isEN()) {
+      dispTitle = it.titleEN || transCache[transKey('pt|en', it.title)] || it.title;
+      needTrans = !it.titleEN && !transCache[transKey('pt|en', it.title)];
+    } else {
+      dispTitle = it.titlePT || transCache[transKey('en|pt-BR', it.title)] || transCache[it.title] || it.title;
+      needTrans = !it.titlePT && !transCache[transKey('en|pt-BR', it.title)] && !transCache[it.title];
+    }
+    if (needTrans) translateTitle(it);
     q('.headline', el).textContent = dispTitle;
     el._fullTitle = dispTitle;
     q('.meta', el).textContent = fmtRelative(it.published_at);
@@ -1343,9 +1380,15 @@
   }
   function buildSeq() {
     var all = ['C', 'W', 'K', 'B', 'A', 'M', 'F'];
-    var specials = all;
+    var order = all;
+    if (lumeCfg && Array.isArray(lumeCfg.screenOrder) && lumeCfg.screenOrder.length) {
+      order = [];
+      lumeCfg.screenOrder.forEach(function (k) { if (all.indexOf(k) !== -1 && order.indexOf(k) === -1) order.push(k); });
+      all.forEach(function (k) { if (order.indexOf(k) === -1) order.push(k); });
+    }
+    var specials = order;
     if (lumeCfg && lumeCfg.screens) {
-      specials = all.filter(function (k) { return lumeCfg.screens[k] !== false; });
+      specials = order.filter(function (k) { return lumeCfg.screens[k] !== false; });
     }
     seq = specials.slice();
     var si = 0;
@@ -1609,11 +1652,31 @@
     upgradeImage(items[i]);
   }
 
+  var clockCitiesCache = null;
+  // Active world-clock cities: config worldClock when present (entries with
+  // an Intl-accepted timezone only), else the 5 built-in defaults. Cached:
+  // the config never changes during a page lifetime.
+  function clockCities() {
+    if (clockCitiesCache) return clockCitiesCache;
+    var list = null;
+    if (lumeCfg && Array.isArray(lumeCfg.worldClock) && lumeCfg.worldClock.length) {
+      list = [];
+      lumeCfg.worldClock.forEach(function (w) {
+        if (!w || !w.name || !w.timezone) return;
+        try { new Intl.DateTimeFormat('en-US', { timeZone: w.timezone }); }
+        catch (e) { return; }
+        var n = String(w.name).toUpperCase();
+        list.push({ name: n, en: n, tz: w.timezone, off: 0 });
+      });
+    }
+    clockCitiesCache = (list && list.length) ? list : CLOCK_CITIES;
+    return clockCitiesCache;
+  }
   function buildClockFaces() {
     var row = q('.clock-row', clockSlide);
     if (!row || row.children.length) return;
     var html = '';
-    CLOCK_CITIES.forEach(function (c, i) {
+    clockCities().forEach(function (c, i) {
       var ticks = '';
       for (var t = 0; t < 12; t++) {
         ticks += '<div class="tick" style="transform: rotate(' + (t * 30) + 'deg) translateY(-580%)"></div>';
@@ -1653,8 +1716,9 @@
     var row = q('.clock-row', clockSlide);
     if (!row) return;
     var cards = row.children;
-    for (var i = 0; i < CLOCK_CITIES.length && i < cards.length; i++) {
-      var c = CLOCK_CITIES[i];
+    var cities = clockCities();
+    for (var i = 0; i < cities.length && i < cards.length; i++) {
+      var c = cities[i];
       var p = zoneParts(c.tz, c.off);
       var card = cards[i];
       var hour = q('.hand.hour', card);

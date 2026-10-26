@@ -15,30 +15,80 @@
 <title>Lume Portal — Set up your display</title>
 <link rel="icon" href="/assets/lume-icon.png">
 <style>
+  /* Mobile-first: base styles target phones; larger layouts come from
+     min-width breakpoints below. */
   * { box-sizing: border-box; }
-  body { margin: 0; background: #0b0f16; color: #e6edf3; font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; line-height: 1.5; }
-  .wrap { max-width: 720px; margin: 0 auto; padding: 32px 20px 64px; }
-  h1 { color: #f5b942; margin: 0 0 4px; font-size: 32px; }
-  .hero-logo { width: 100%; max-width: 320px; display: block; margin: 0 auto 16px; }
-  .footer { text-align: center; margin-top: 32px; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; overflow-x: hidden; background: #0b0f16; color: #e6edf3; font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; line-height: 1.5; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 20px 16px 48px; }
+  h1 { color: #f5b942; margin: 0 0 4px; font-size: 26px; }
+  .hero-logo { width: 100%; max-width: 280px; display: block; margin: 0 auto 12px; }
+  .footer { text-align: center; margin-top: 28px; }
   .footer img { width: 120px; opacity: 0.85; }
-  .sub { color: #8b949e; margin: 0 0 28px; }
-  .card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+  .sub { color: #8b949e; margin: 0 0 20px; font-size: 15px; }
+  .card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
   h2 { font-size: 18px; margin: 0 0 14px; color: #f5b942; }
   label { display: block; font-size: 14px; color: #c8cdd2; margin-bottom: 4px; }
-  input[type="text"], input[type="number"], select { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15); background: #161b22; color: #e6edf3; font-size: 16px; margin-bottom: 12px; }
-  .row { display: flex; gap: 12px; }
+  input[type="text"], input[type="number"], input[type="search"], select {
+    width: 100%; min-height: 44px; padding: 10px 12px; border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.15); background: #161b22; color: #e6edf3;
+    font-size: 16px; margin-bottom: 12px;
+  }
+  .row { display: flex; flex-direction: column; gap: 0; }
   .row > div { flex: 1; }
+  .row-inline { display: flex; gap: 12px; align-items: flex-start; }
+  .row-inline > div:first-child { flex: 1; min-width: 0; }
   .check { display: flex; align-items: center; gap: 10px; padding: 8px 0; font-size: 15px; }
-  .check input { width: 18px; height: 18px; margin: 0; }
-  .code-big { font-size: 40px; font-weight: 700; letter-spacing: 0.25em; text-align: center; color: #f5b942; margin: 8px 0 4px; min-height: 60px; }
-  button { background: #f5b942; color: #111; border: none; border-radius: 8px; padding: 12px 24px; font-size: 16px; font-weight: 700; cursor: pointer; }
+  .check input { width: 20px; height: 20px; margin: 0; flex: 0 0 auto; }
+  .code-big { font-size: 34px; font-weight: 700; letter-spacing: 0.2em; text-align: center; color: #f5b942; margin: 8px 0 4px; min-height: 52px; word-break: break-all; }
+  button { background: #f5b942; color: #111; border: none; border-radius: 8px; padding: 12px 20px; font-size: 16px; font-weight: 700; cursor: pointer; min-height: 44px; }
   button.secondary { background: #21262d; color: #e6edf3; border: 1px solid rgba(255,255,255,0.15); }
   button:disabled { opacity: 0.5; cursor: default; }
+  #saveBtn { width: 100%; }
   .msg { margin-top: 14px; font-size: 15px; min-height: 22px; }
   .msg.ok { color: #7ee787; }
   .msg.err { color: #ff7b72; }
   .hint { color: #8b949e; font-size: 13px; margin-top: -6px; margin-bottom: 12px; }
+  /* Tabs: horizontally scrollable row on phones. */
+  .tabs { display: flex; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 6px; margin-bottom: 16px; scrollbar-width: thin; }
+  .tab { flex: 0 0 auto; background: #21262d; color: #e6edf3; border: 1px solid rgba(255,255,255,0.15); font-weight: 600; padding: 10px 16px; white-space: nowrap; }
+  .tab[aria-selected="true"] { background: #f5b942; color: #111; border-color: #f5b942; }
+  .panel[hidden] { display: none; }
+  /* Screen order rows: drag handle (mouse) + arrow buttons (touch). */
+  .scr-row { display: flex; align-items: center; gap: 6px; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .scr-row:last-child { border-bottom: none; }
+  .scr-row.drag-over { border-top: 2px solid #f5b942; }
+  .drag { cursor: grab; font-size: 20px; line-height: 1; padding: 10px 8px; color: #8b949e; min-width: 44px; text-align: center; }
+  .scr-row .check { flex: 1; padding: 0; min-width: 0; }
+  .scr-row .check label { margin: 0; }
+  .arrow-btn { background: #21262d; color: #e6edf3; border: 1px solid rgba(255,255,255,0.15); min-width: 44px; padding: 10px 0; font-size: 16px; }
+  .arrow-btn:disabled { opacity: 0.35; }
+  /* City autocomplete: full-width dropdown, never clipped by the card. */
+  .search-wrap { position: relative; }
+  .results { position: absolute; top: 100%; left: 0; right: 0; z-index: 20; background: #161b22; border: 1px solid rgba(255,255,255,0.25); border-radius: 8px; max-height: 260px; overflow-y: auto; box-shadow: 0 12px 32px rgba(0,0,0,0.5); }
+  .results[hidden] { display: none; }
+  .res-item { display: block; width: 100%; text-align: left; background: none; border: none; border-bottom: 1px solid rgba(255,255,255,0.08); color: #e6edf3; padding: 12px; font-size: 15px; font-weight: 400; border-radius: 0; }
+  .res-item:last-child { border-bottom: none; }
+  .nores { padding: 12px; color: #8b949e; font-size: 14px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+  .chip { background: #21262d; color: #e6edf3; border: 1px solid rgba(255,255,255,0.15); font-weight: 600; padding: 10px 14px; }
+  .chip.active { background: #f5b942; color: #111; border-color: #f5b942; }
+  .slot { border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 12px; margin-bottom: 12px; }
+  .slot-head { font-weight: 700; font-size: 15px; margin-bottom: 8px; }
+  .slot-head span { color: #8b949e; font-weight: 400; }
+  .feed-row { border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 12px; margin-bottom: 12px; }
+  .feed-row .remove-btn { width: 100%; }
+  @media (min-width: 640px) {
+    .wrap { padding: 32px 20px 64px; }
+    h1 { font-size: 32px; }
+    .hero-logo { max-width: 320px; margin-bottom: 16px; }
+    .card { padding: 20px; margin-bottom: 20px; }
+    .sub { margin-bottom: 28px; }
+    .code-big { font-size: 40px; letter-spacing: 0.25em; min-height: 60px; }
+    .row { flex-direction: row; gap: 12px; }
+    #saveBtn { width: auto; }
+    .feed-row .remove-btn { width: auto; }
+  }
 </style>
 </head>
 <body>
@@ -48,88 +98,107 @@
   <p class="sub">Set up your display. Enter the 6-character code shown on your Portal, adjust the settings, and save — your Portal picks them up within seconds.</p>
 
   <div class="card">
-    <h2>1. Your Portal code</h2>
-    <div class="row">
+    <h2>Your Portal code</h2>
+    <div class="row-inline">
       <div><input type="text" id="code" maxlength="6" placeholder="e.g. K7M2QX" autocapitalize="characters" autocomplete="off"></div>
-      <div style="flex:0 0 auto;"><button class="secondary" id="loadBtn" type="button">Load</button></div>
+      <div><button class="secondary" id="loadBtn" type="button">Load</button></div>
     </div>
     <div class="code-big" id="codeBig"></div>
     <div class="msg" id="codeMsg"></div>
   </div>
 
-  <div class="card">
-    <h2>2. Language</h2>
-    <label for="language">Dashboard language</label>
-    <select id="language">
-      <option value="en-US">English (US)</option>
-      <option value="pt-BR">Português (BR)</option>
-    </select>
+  <div class="tabs" role="tablist" aria-label="Settings sections">
+    <button class="tab" type="button" role="tab" aria-selected="true" data-tab="device">Device</button>
+    <button class="tab" type="button" role="tab" aria-selected="false" data-tab="weather">Weather</button>
+    <button class="tab" type="button" role="tab" aria-selected="false" data-tab="screens">Screens</button>
+    <button class="tab" type="button" role="tab" aria-selected="false" data-tab="clock">World clock</button>
+    <button class="tab" type="button" role="tab" aria-selected="false" data-tab="feeds">Feeds</button>
   </div>
 
-  <div class="card">
-    <h2>3. Location</h2>
-    <label for="cityPreset">City</label>
-    <select id="cityPreset">
-      <option value="Acworth, GA|34.0658|-84.6769">Acworth, GA</option>
-      <option value="Atlanta, GA|33.7490|-84.3880">Atlanta, GA</option>
-      <option value="New York, NY|40.7128|-74.0060">New York, NY</option>
-      <option value="São Paulo, Brazil|-23.5505|-46.6333">São Paulo, Brazil</option>
-      <option value="Brasília, Brazil|-15.7801|-47.9292">Brasília, Brazil</option>
-      <option value="custom">Custom…</option>
-    </select>
-    <div class="row">
-      <div><label for="lat">Latitude</label><input type="number" id="lat" step="any" value="34.0658"></div>
-      <div><label for="lon">Longitude</label><input type="number" id="lon" step="any" value="-84.6769"></div>
+  <div class="panel" id="panel-device" role="tabpanel">
+    <div class="card">
+      <h2>Language</h2>
+      <label for="language">Dashboard language</label>
+      <select id="language">
+        <option value="en-US">English (US)</option>
+        <option value="pt-BR">Português (BR)</option>
+      </select>
     </div>
-    <p class="hint">Used for the weather and air quality screens.</p>
+    <div class="card">
+      <h2>Display</h2>
+      <label for="clockFormat">Clock format</label>
+      <select id="clockFormat">
+        <option value="12h">12-hour (AM/PM)</option>
+        <option value="24h">24-hour</option>
+      </select>
+      <label for="tempUnit">Temperature</label>
+      <select id="tempUnit">
+        <option value="C">Celsius (°C)</option>
+        <option value="F">Fahrenheit (°F)</option>
+      </select>
+      <label for="slideDuration">Slide duration</label>
+      <select id="slideDuration">
+        <option value="5">5 seconds</option>
+        <option value="10">10 seconds</option>
+        <option value="15" selected>15 seconds</option>
+        <option value="20">20 seconds</option>
+        <option value="25">25 seconds</option>
+        <option value="30">30 seconds</option>
+        <option value="60">60 seconds</option>
+      </select>
+    </div>
   </div>
 
-  <div class="card">
-    <h2>4. Display</h2>
-    <label for="clockFormat">Clock format</label>
-    <select id="clockFormat">
-      <option value="12h">12-hour (AM/PM)</option>
-      <option value="24h">24-hour</option>
-    </select>
-    <label for="tempUnit">Temperature</label>
-    <select id="tempUnit">
-      <option value="C">Celsius (°C)</option>
-      <option value="F">Fahrenheit (°F)</option>
-    </select>
-    <label for="slideDuration">Slide duration</label>
-    <select id="slideDuration">
-      <option value="5">5 seconds</option>
-      <option value="10">10 seconds</option>
-      <option value="15" selected>15 seconds</option>
-      <option value="20">20 seconds</option>
-      <option value="25">25 seconds</option>
-      <option value="30">30 seconds</option>
-      <option value="60">60 seconds</option>
-    </select>
+  <div class="panel" id="panel-weather" role="tabpanel" hidden>
+    <div class="card">
+      <h2>Weather city</h2>
+      <label for="citySearch">Search a city</label>
+      <div class="search-wrap">
+        <input type="search" id="citySearch" placeholder="Type at least 2 letters…" autocomplete="off">
+        <div class="results" id="cityResults" hidden></div>
+      </div>
+      <p class="hint">Pick a result to set the city, or use a preset or manual coordinates below.</p>
+      <label>Presets</label>
+      <div class="chips" id="cityChips"></div>
+      <label for="cityName">City name</label>
+      <input type="text" id="cityName" value="Acworth, GA">
+      <div class="row">
+        <div><label for="lat">Latitude</label><input type="number" id="lat" step="any" value="34.0658"></div>
+        <div><label for="lon">Longitude</label><input type="number" id="lon" step="any" value="-84.6769"></div>
+      </div>
+      <p class="hint">Used for the weather and air quality screens.</p>
+    </div>
   </div>
 
-  <div class="card">
-    <h2>5. Screens</h2>
-    <p class="hint">Choose which special screens appear in the rotation.</p>
-    <div class="check"><input type="checkbox" id="scr-C" checked><label for="scr-C" style="margin:0;">Currency</label></div>
-    <div class="check"><input type="checkbox" id="scr-W" checked><label for="scr-W" style="margin:0;">Weather</label></div>
-    <div class="check"><input type="checkbox" id="scr-K" checked><label for="scr-K" style="margin:0;">World Clock</label></div>
-    <div class="check"><input type="checkbox" id="scr-B" checked><label for="scr-B" style="margin:0;">Bible</label></div>
-    <div class="check"><input type="checkbox" id="scr-A" checked><label for="scr-A" style="margin:0;">Air Quality</label></div>
-    <div class="check"><input type="checkbox" id="scr-M" checked><label for="scr-M" style="margin:0;">Markets</label></div>
-    <div class="check"><input type="checkbox" id="scr-F" checked><label for="scr-F" style="margin:0;">Fun Facts</label></div>
+  <div class="panel" id="panel-screens" role="tabpanel" hidden>
+    <div class="card">
+      <h2>Screens</h2>
+      <p class="hint">Choose which special screens appear, and drag rows (or use the arrows) to set their rotation order.</p>
+      <div id="screenList"></div>
+    </div>
   </div>
 
-  <div class="card">
-    <h2>6. News sources</h2>
-    <p class="hint">Choose which feeds appear in the news rotation.</p>
-    <div id="feedList"></div>
+  <div class="panel" id="panel-clock" role="tabpanel" hidden>
+    <div class="card">
+      <h2>World clock cities</h2>
+      <p class="hint">Search a city per slot. The dashboard shows its analog clock, digital time and date.</p>
+      <div id="clockSlots"></div>
+      <button class="secondary" id="clockReset" type="button">Reset to defaults</button>
+    </div>
   </div>
 
-  <div class="card">
-    <h2>7. Custom RSS feeds (optional)</h2>
-    <p class="hint">Add up to 3 of your own RSS feeds.</p>
-    <div id="customList"></div>
+  <div class="panel" id="panel-feeds" role="tabpanel" hidden>
+    <div class="card">
+      <h2>News sources</h2>
+      <p class="hint">Choose which feeds appear in the news rotation.</p>
+      <div id="feedList"></div>
+    </div>
+    <div class="card">
+      <h2>Custom RSS feeds (optional)</h2>
+      <p class="hint">Add as many of your own RSS feeds as you like.</p>
+      <div id="customList"></div>
+      <button class="secondary" id="addFeedBtn" type="button">+ Add feed</button>
+    </div>
   </div>
 
   <button id="saveBtn" type="button">Save setup</button>
@@ -149,12 +218,178 @@
     ['g1-tecnologia', 'G1 — Technology']
   ];
   var CATS = [['brasil', 'Brazil'], ['mundo', 'World'], ['tech', 'Tech'], ['eua', 'USA'], ['atlanta', 'Atlanta']];
-  var SCREENS = ['C', 'W', 'K', 'B', 'A', 'M', 'F'];
+  var SCREENS = [['C', 'Currency'], ['W', 'Weather'], ['K', 'World Clock'], ['B', 'Bible'], ['A', 'Air Quality'], ['M', 'Markets'], ['F', 'Fun Facts']];
+  var SCREEN_KEYS = ['C', 'W', 'K', 'B', 'A', 'M', 'F'];
   var ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+  var DEFAULT_CLOCK = [
+    { name: 'Atlanta', timezone: 'America/New_York' },
+    { name: 'Los Angeles', timezone: 'America/Los_Angeles' },
+    { name: 'Brasilia', timezone: 'America/Sao_Paulo' },
+    { name: 'London', timezone: 'Europe/London' },
+    { name: 'Tokyo', timezone: 'Asia/Tokyo' }
+  ];
+  var PRESETS = [
+    ['Acworth, GA', 34.0658, -84.6769], ['Atlanta, GA', 33.7490, -84.3880],
+    ['New York, NY', 40.7128, -74.0060], ['São Paulo, Brazil', -23.5505, -46.6333],
+    ['Brasília, Brazil', -15.7801, -47.9292]
+  ];
 
   function $(id) { return document.getElementById(id); }
 
-  // Build feed checkboxes.
+  // ---- Tabs ----
+  var tabBtns = document.querySelectorAll('.tab');
+  function switchTab(name) {
+    for (var i = 0; i < tabBtns.length; i++) {
+      var on = tabBtns[i].getAttribute('data-tab') === name;
+      tabBtns[i].setAttribute('aria-selected', on ? 'true' : 'false');
+    }
+    ['device', 'weather', 'screens', 'clock', 'feeds'].forEach(function (t) {
+      $('panel-' + t).hidden = (t !== name);
+    });
+  }
+  for (var t = 0; t < tabBtns.length; t++) {
+    tabBtns[t].addEventListener('click', function (e) { switchTab(e.currentTarget.getAttribute('data-tab')); });
+  }
+
+  // ---- City search (Open-Meteo Geocoding, no key) ----
+  function attachCitySearch(inputEl, resultsEl, onPick) {
+    var timer = null;
+    function close() { resultsEl.innerHTML = ''; resultsEl.hidden = true; }
+    inputEl.addEventListener('input', function () {
+      var q = inputEl.value.trim();
+      if (timer) clearTimeout(timer);
+      if (q.length < 2) { close(); return; }
+      timer = setTimeout(function () {
+        fetch('https://geocoding-api.open-meteo.com/v1/search?name=' + encodeURIComponent(q) + '&count=8&language=en&format=json')
+          .then(function (r) { return r.json(); })
+          .then(function (d) {
+            var list = (d && d.results) || [];
+            if (!list.length) { resultsEl.innerHTML = '<div class="nores">No cities found.</div>'; resultsEl.hidden = false; return; }
+            resultsEl.innerHTML = '';
+            list.forEach(function (r) {
+              var b = document.createElement('button');
+              b.type = 'button'; b.className = 'res-item';
+              b.textContent = r.name + (r.admin1 ? ', ' + r.admin1 : '') + (r.country ? ' (' + r.country + ')' : '');
+              b.addEventListener('click', function () { close(); inputEl.value = ''; onPick(r); });
+              resultsEl.appendChild(b);
+            });
+            resultsEl.hidden = false;
+          })
+          .catch(function () { close(); });
+      }, 300);
+    });
+    inputEl.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+    document.addEventListener('click', function (e) {
+      if (!inputEl.contains(e.target) && !resultsEl.contains(e.target)) close();
+    });
+  }
+
+  // ---- Weather city ----
+  var cityName = 'Acworth, GA';
+  PRESETS.forEach(function (p) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'chip'; b.textContent = p[0];
+    b.setAttribute('data-lat', p[1]); b.setAttribute('data-lon', p[2]);
+    b.addEventListener('click', function () {
+      cityName = p[0];
+      $('cityName').value = p[0];
+      $('lat').value = p[1];
+      $('lon').value = p[2];
+      refreshChips();
+    });
+    $('cityChips').appendChild(b);
+  });
+  function refreshChips() {
+    var chips = $('cityChips').children;
+    var lat = parseFloat($('lat').value), lon = parseFloat($('lon').value);
+    for (var i = 0; i < chips.length; i++) {
+      chips[i].className = 'chip' + ((parseFloat(chips[i].getAttribute('data-lat')) === lat && parseFloat(chips[i].getAttribute('data-lon')) === lon)) ? ' active' : '';
+    }
+  }
+  $('lat').addEventListener('input', refreshChips);
+  $('lon').addEventListener('input', refreshChips);
+  $('cityName').addEventListener('input', function () { cityName = $('cityName').value; });
+  attachCitySearch($('citySearch'), $('cityResults'), function (r) {
+    cityName = r.name + (r.admin1 ? ', ' + r.admin1 : (r.country ? ', ' + r.country : ''));
+    $('cityName').value = cityName;
+    $('lat').value = r.latitude;
+    $('lon').value = r.longitude;
+    refreshChips();
+  });
+
+  // ---- Screens: state + draggable rows + arrows ----
+  var screensState = {};
+  var screenOrder = SCREEN_KEYS.slice();
+  SCREEN_KEYS.forEach(function (k) { screensState[k] = true; });
+  var dragIndex = null;
+  function renderScreens() {
+    var list = $('screenList');
+    list.innerHTML = '';
+    screenOrder.forEach(function (k, i) {
+      var label = '';
+      SCREENS.forEach(function (s) { if (s[0] === k) label = s[1]; });
+      var row = document.createElement('div');
+      row.className = 'scr-row';
+      row.draggable = true;
+      row.setAttribute('data-idx', i);
+      row.innerHTML =
+        '<span class="drag" title="Drag to reorder" aria-hidden="true">⋮⋮</span>' +
+        '<div class="check"><input type="checkbox" id="scr-' + k + '"' + (screensState[k] ? ' checked' : '') + '><label for="scr-' + k + '" style="margin:0;">' + label + '</label></div>' +
+        '<button class="arrow-btn" type="button" aria-label="Move ' + label + ' up"' + (i === 0 ? ' disabled' : '') + '>↑</button>' +
+        '<button class="arrow-btn" type="button" aria-label="Move ' + label + ' down"' + (i === screenOrder.length - 1 ? ' disabled' : '') + '>↓</button>';
+      row.querySelector('input').addEventListener('change', function (e) { screensState[k] = e.target.checked; });
+      var btns = row.querySelectorAll('.arrow-btn');
+      btns[0].addEventListener('click', function () { moveScreen(i, -1); });
+      btns[1].addEventListener('click', function () { moveScreen(i, 1); });
+      row.addEventListener('dragstart', function (e) { dragIndex = i; e.dataTransfer.effectAllowed = 'move'; });
+      row.addEventListener('dragover', function (e) { e.preventDefault(); row.className = 'scr-row drag-over'; });
+      row.addEventListener('dragleave', function () { row.className = 'scr-row'; });
+      row.addEventListener('drop', function (e) {
+        e.preventDefault();
+        row.className = 'scr-row';
+        if (dragIndex === null || dragIndex === i) return;
+        var moved = screenOrder.splice(dragIndex, 1)[0];
+        screenOrder.splice(i, 0, moved);
+        dragIndex = null;
+        renderScreens();
+      });
+      list.appendChild(row);
+    });
+  }
+  function moveScreen(i, dir) {
+    var j = i + dir;
+    if (j < 0 || j >= screenOrder.length) return;
+    var tmp = screenOrder[i]; screenOrder[i] = screenOrder[j]; screenOrder[j] = tmp;
+    renderScreens();
+  }
+  renderScreens();
+
+  // ---- World clock slots ----
+  var worldClock = DEFAULT_CLOCK.map(function (c) { return { name: c.name, timezone: c.timezone }; });
+  function renderClockSlots() {
+    var wrap = $('clockSlots');
+    wrap.innerHTML = '';
+    worldClock.forEach(function (slot, i) {
+      var div = document.createElement('div');
+      div.className = 'slot';
+      div.innerHTML =
+        '<div class="slot-head">Clock ' + (i + 1) + ': ' + slot.name + ' <span>(' + slot.timezone + ')</span></div>' +
+        '<label for="clockSearch-' + i + '">Search a city to replace it</label>' +
+        '<div class="search-wrap"><input type="search" id="clockSearch-' + i + '" placeholder="Type at least 2 letters…" autocomplete="off"><div class="results" id="clockResults-' + i + '" hidden></div></div>';
+      wrap.appendChild(div);
+      attachCitySearch($('clockSearch-' + i), $('clockResults-' + i), function (r) {
+        worldClock[i] = { name: r.name, timezone: r.timezone };
+        renderClockSlots();
+      });
+    });
+  }
+  $('clockReset').addEventListener('click', function () {
+    worldClock = DEFAULT_CLOCK.map(function (c) { return { name: c.name, timezone: c.timezone }; });
+    renderClockSlots();
+  });
+  renderClockSlots();
+
+  // ---- Feed checkboxes ----
   FEEDS.forEach(function (f) {
     var div = document.createElement('div');
     div.className = 'check';
@@ -166,21 +401,51 @@
     $('feedList').appendChild(div);
   });
 
-  // Build custom RSS rows.
-  for (var i = 0; i < 3; i++) {
-    var row = document.createElement('div');
-    row.innerHTML =
-      '<label>Feed ' + (i + 1) + ' name</label>' +
-      '<input type="text" data-custom-name="' + i + '" placeholder="My blog">' +
-      '<label>Feed ' + (i + 1) + ' RSS URL</label>' +
-      '<input type="text" data-custom-url="' + i + '" placeholder="https://example.com/feed/">' +
-      '<label>Feed ' + (i + 1) + ' category</label>' +
-      '<select data-custom-cat="' + i + '">' +
-        CATS.map(function (c) { return '<option value="' + c[0] + '">' + c[1] + '</option>'; }).join('') +
-      '</select>';
-    $('customList').appendChild(row);
+  // ---- Custom RSS: dynamic list ----
+  var customState = [];
+  function harvestCustom() {
+    var rows = $('customList').querySelectorAll('.feed-row');
+    customState = [];
+    for (var i = 0; i < rows.length; i++) {
+      customState.push({
+        name: rows[i].querySelector('[data-custom-name]').value,
+        url: rows[i].querySelector('[data-custom-url]').value,
+        category: rows[i].querySelector('[data-custom-cat]').value
+      });
+    }
   }
+  function renderCustom() {
+    var list = $('customList');
+    list.innerHTML = '';
+    customState.forEach(function (c, i) {
+      var row = document.createElement('div');
+      row.className = 'feed-row';
+      row.innerHTML =
+        '<label>Feed name</label>' +
+        '<input type="text" data-custom-name placeholder="My blog" value="' + c.name.replace(/"/g, '&quot;') + '">' +
+        '<label>RSS URL</label>' +
+        '<input type="text" data-custom-url placeholder="https://example.com/feed/" value="' + c.url.replace(/"/g, '&quot;') + '">' +
+        '<label>Category</label>' +
+        '<select data-custom-cat">' +
+          CATS.map(function (ct) { return '<option value="' + ct[0] + '"' + (ct[0] === c.category ? ' selected' : '') + '>' + ct[1] + '</option>'; }).join('') +
+        '</select>' +
+        '<button class="secondary remove-btn" type="button">Remove this feed</button>';
+      row.querySelector('.remove-btn').addEventListener('click', function () {
+        harvestCustom();
+        customState.splice(i, 1);
+        renderCustom();
+      });
+      list.appendChild(row);
+    });
+  }
+  $('addFeedBtn').addEventListener('click', function () {
+    harvestCustom();
+    customState.push({ name: '', url: '', category: 'brasil' });
+    renderCustom();
+  });
+  renderCustom();
 
+  // ---- Code ----
   function cleanCode() {
     var v = $('code').value.toUpperCase().replace(/[^A-Z2-9]/g, '');
     v = v.split('').filter(function (ch) { return ALPHABET.indexOf(ch) !== -1; }).join('').slice(0, 6);
@@ -190,14 +455,7 @@
   }
   $('code').addEventListener('input', cleanCode);
 
-  $('cityPreset').addEventListener('change', function () {
-    var v = $('cityPreset').value;
-    if (v === 'custom') return;
-    var p = v.split('|');
-    $('lat').value = p[1];
-    $('lon').value = p[2];
-  });
-
+  // ---- Load / save ----
   function applyConfig(cfg) {
     if (!cfg) return;
     $('language').value = cfg.language || 'en-US';
@@ -205,19 +463,28 @@
     $('tempUnit').value = cfg.tempUnit || 'C';
     $('slideDuration').value = [5, 10, 15, 20, 25, 30, 60].indexOf(cfg.slideDuration) !== -1 ? cfg.slideDuration : 15;
     if (cfg.city) {
+      cityName = cfg.city.name || 'Acworth, GA';
+      $('cityName').value = cityName;
       $('lat').value = cfg.city.lat;
       $('lon').value = cfg.city.lon;
-      var preset = $('cityPreset');
-      var matched = false;
-      for (var i = 0; i < preset.options.length; i++) {
-        var p = preset.options[i].value.split('|');
-        if (p.length === 3 && parseFloat(p[1]) === cfg.city.lat && parseFloat(p[2]) === cfg.city.lon) {
-          preset.selectedIndex = i; matched = true; break;
-        }
-      }
-      if (!matched) preset.value = 'custom';
+      refreshChips();
     }
-    if (cfg.screens) SCREENS.forEach(function (k) { $('scr-' + k).checked = cfg.screens[k] !== false; });
+    if (cfg.screens) SCREEN_KEYS.forEach(function (k) { screensState[k] = cfg.screens[k] !== false; });
+    if (Array.isArray(cfg.screenOrder) && cfg.screenOrder.length) {
+      var ord = [];
+      cfg.screenOrder.forEach(function (k) { if (SCREEN_KEYS.indexOf(k) !== -1 && ord.indexOf(k) === -1) ord.push(k); });
+      SCREEN_KEYS.forEach(function (k) { if (ord.indexOf(k) === -1) ord.push(k); });
+      screenOrder = ord;
+    }
+    renderScreens();
+    if (Array.isArray(cfg.worldClock) && cfg.worldClock.length) {
+      var wc = [];
+      cfg.worldClock.slice(0, 5).forEach(function (w) {
+        if (w && w.name && w.timezone) wc.push({ name: w.name, timezone: w.timezone });
+      });
+      if (wc.length) worldClock = wc;
+    }
+    renderClockSlots();
     if (cfg.feeds) {
       if (cfg.feeds.enabled) {
         var on = {};
@@ -225,29 +492,23 @@
         FEEDS.forEach(function (f) { $('feed-' + f[0]).checked = !!on[f[0]]; });
       }
       if (cfg.feeds.custom) {
-        cfg.feeds.custom.slice(0, 3).forEach(function (c, i) {
-          document.querySelector('[data-custom-name="' + i + '"]').value = c.name || '';
-          document.querySelector('[data-custom-url="' + i + '"]').value = c.url || '';
-          document.querySelector('[data-custom-cat="' + i + '"]').value = c.category || 'brasil';
+        customState = cfg.feeds.custom.map(function (c) {
+          return { name: c.name || '', url: c.url || '', category: c.category || 'brasil' };
         });
+        renderCustom();
       }
     }
   }
 
   function collectConfig() {
-    var screens = {};
-    SCREENS.forEach(function (k) { screens[k] = $('scr-' + k).checked; });
+    harvestCustom();
     var enabled = FEEDS.filter(function (f) { return $('feed-' + f[0]).checked; }).map(function (f) { return f[0]; });
-    var custom = [];
-    for (var i = 0; i < 3; i++) {
-      var name = document.querySelector('[data-custom-name="' + i + '"]').value.trim();
-      var url = document.querySelector('[data-custom-url="' + i + '"]').value.trim();
-      var cat = document.querySelector('[data-custom-cat="' + i + '"]').value;
-      if (name && url) custom.push({ name: name, url: url, category: cat });
-    }
-    var preset = $('cityPreset').value;
-    var cityName = 'Acworth, GA';
-    if (preset !== 'custom') cityName = preset.split('|')[0];
+    var custom = customState.filter(function (c) { return c.name.trim() && c.url.trim(); }).map(function (c) {
+      return { name: c.name.trim(), url: c.url.trim(), category: c.category };
+    });
+    var wc = worldClock.filter(function (w) { return w && w.name && w.timezone; }).slice(0, 5);
+    var screens = {};
+    SCREEN_KEYS.forEach(function (k) { screens[k] = !!screensState[k]; });
     return {
       language: $('language').value,
       city: { name: cityName, lat: parseFloat($('lat').value), lon: parseFloat($('lon').value) },
@@ -255,6 +516,8 @@
       tempUnit: $('tempUnit').value,
       slideDuration: parseInt($('slideDuration').value, 10),
       screens: screens,
+      screenOrder: screenOrder.slice(),
+      worldClock: wc,
       feeds: { enabled: enabled, custom: custom }
     };
   }
@@ -264,7 +527,7 @@
     el.className = 'msg ' + (ok ? 'ok' : 'err');
   }
 
-  $('loadBtn').addEventListener('click', function () {
+  function loadConfig() {
     var code = cleanCode();
     if (code.length !== 6) { setMsg($('codeMsg'), 'Enter the full 6-character code from your Portal.', false); return; }
     setMsg($('codeMsg'), 'Loading…', true);
@@ -278,7 +541,9 @@
         setMsg($('codeMsg'), 'Could not load: ' + (d.error || 'unknown error'), false);
       }
     }).catch(function () { setMsg($('codeMsg'), 'Network error. Try again.', false); });
-  });
+  }
+
+  $('loadBtn').addEventListener('click', loadConfig);
 
   $('saveBtn').addEventListener('click', function () {
     var code = cleanCode();
@@ -303,9 +568,13 @@
     });
   });
 
-  // Support ?code=XXXXXX links.
+  // Support ?code=XXXXXX links (e.g. QR codes from the app's pairing
+  // screen): prefill the code AND auto-load it, exactly like Load.
   var m = /[?&]code=([A-Za-z0-9]+)/.exec(location.search);
-  if (m) { $('code').value = m[1].toUpperCase(); cleanCode(); }
+  if (m) {
+    $('code').value = m[1].toUpperCase();
+    if (cleanCode().length === 6) loadConfig();
+  }
 })();
 </script>
 </body>

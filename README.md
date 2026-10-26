@@ -67,8 +67,10 @@ configurável por aparelho (5/10/15/20/25/30/60 s, padrão 15 s).
 **Idiomas (i18n)** — o painel é todo traduzido: `pt-BR` (padrão) e `en-US`,
 via dicionário `I18N` + `t()`. Em PT, manchetes em inglês (EUA/Local) são
 traduzidas no navegador via MyMemory (grátis, sem chave), com cache local; se
-a API falhar, mostra o original. Em EN, as manchetes em inglês aparecem no
-original. Uma nova língua = um novo objeto no dicionário.
+a API falhar, mostra o original. Em EN, as manchetes dos feeds brasileiros
+são traduzidas para o inglês via MyMemory (pt|en), com cache; as manchetes
+em inglês aparecem no original e feeds customizados não são traduzidos. Uma
+nova língua = um novo objeto no dicionário.
 
 **Alertas NWS** — `api.weather.gov/alerts/active`, severidade Extreme/Severe;
 em PT, nomes de eventos traduzidos por mapa; em EN, nome cru do weather.gov
@@ -134,9 +136,21 @@ binding `LUME_KV` no projeto Pages, production + preview).
 - `clockFormat`: `12h` | `24h`; `tempUnit`: `C` | `F`
 - `slideDuration`: 5/10/15/20/25/30/60 (qualquer outro valor normaliza para 15)
 - `screens`: `{C, W, K, B, A, M, F}` (booleanos)
+- `screenOrder`: ordem dos especiais (ex.: `["C","W","K","B","A","M","F"]`;
+  sem ele, a ordem padrão; códigos desconhecidos são ignorados e os que
+  faltam vão para o fim)
+- `worldClock`: até 5 `{name, timezone}` para o relógio mundial (sem ele,
+  as 5 cidades padrão: Atlanta, Los Angeles, Brasília, Londres, Tóquio)
 - `feeds`: `{enabled: [...ids conhecidos, máx. 30], custom: [{name, url,
-  category}]}` (custom: máx. 10; categorias `brasil|mundo|tech|eua|atlanta`)
+  category}]}` (custom: máx. 30; categorias `brasil|mundo|tech|eua|atlanta`)
 - Corpo limitado a 16 KB; chaves desconhecidas são removidas.
+
+A página `/pair/` é mobile-first, com abas (Device, Weather, Screens, World
+clock, Feeds), busca de cidade com autocomplete (Open-Meteo Geocoding, sem
+chave), ordem dos slides com drag-and-drop (ou setas, no celular) e feeds
+RSS customizados sem limite fixo de linhas. Ela aceita `?code=XXXXXX` na
+URL: abre a config pronta para editar — é o fluxo do QR code exibido na
+tela de pairing do app.
 
 **Semântica importante**: o app para de sondar a config após o pareamento e
 o painel busca a config só no carregamento (teto de 4 s; se falhar, usa o
@@ -213,9 +227,3 @@ dos aparelhos, filtrar por caminho/host no GA.
   TecMundo (HTTP 204), CNN americana (feeds congelados desde 2023), 11Alive
   (0 itens em produção), AJC/WSB (sem RSS público).
 
-## Em andamento
-
-- Tradução reversa das manchetes (PT→EN quando o aparelho está em inglês).
-- Nova página de config: abas por tipo, ordem dos slides com drag-and-drop,
-  cidades do relógio mundial, autocomplete de cidade (Open-Meteo Geocoding)
-  e feeds RSS customizados sem limite fixo de linhas.

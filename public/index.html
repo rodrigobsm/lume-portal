@@ -28,42 +28,62 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+  /* Mobile-first: base styles target phones; larger layouts come from
+     min-width breakpoints below. */
   * { box-sizing: border-box; }
-  body { margin: 0; background: #0b0f16; color: #e6edf3; font-family: 'Poppins', system-ui, sans-serif; line-height: 1.6; }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  body { margin: 0; overflow-x: hidden; background: #0b0f16; color: #e6edf3; font-family: 'Poppins', system-ui, sans-serif; line-height: 1.6; padding-top: 64px; }
   a { color: #4db2ff; }
-  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
-  nav { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; padding: 20px 0; }
-  .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: #fff; font-weight: 700; font-size: 20px; margin-right: auto; }
-  .brand img { width: 36px; height: 36px; border-radius: 9px; }
-  .navlink { color: #c3cdd9; text-decoration: none; font-size: 15px; }
-  .navlink:hover { color: #fff; }
-  .btn { display: inline-block; background: #0071bc; color: #fff; text-decoration: none; font-weight: 600; padding: 12px 22px; border-radius: 10px; }
-  .btn:hover { background: #0090e7; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+  /* Fixed top menu: stays visible on scroll, solid blurred background. */
+  nav.site-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 50; background: rgba(11, 15, 22, 0.92); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid #1e293b; }
+  .nav-inner { max-width: 1080px; margin: 0 auto; padding: 0 16px; display: flex; align-items: center; gap: 16px; min-height: 64px; }
+  .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: #fff; font-weight: 700; font-size: 18px; margin-right: auto; }
+  .brand img { width: 34px; height: 34px; border-radius: 9px; }
+  .nav-toggle { display: flex; flex-direction: column; justify-content: center; gap: 6px; width: 44px; height: 44px; background: transparent; border: 1px solid #2a3648; border-radius: 10px; cursor: pointer; padding: 0 11px; }
+  .nav-toggle span { display: block; height: 2px; background: #e6edf3; border-radius: 2px; transition: transform 0.25s ease, opacity 0.25s ease; }
+  nav.site-nav.open .nav-toggle span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+  nav.site-nav.open .nav-toggle span:nth-child(2) { opacity: 0; }
+  nav.site-nav.open .nav-toggle span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+  .nav-links { display: none; position: absolute; top: 64px; left: 0; right: 0; background: rgba(11, 15, 22, 0.98); border-bottom: 1px solid #1e293b; padding: 12px 16px 20px; flex-direction: column; gap: 4px; }
+  nav.site-nav.open .nav-links { display: flex; animation: menuIn 0.25s ease; }
+  @keyframes menuIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+  .navlink { color: #c3cdd9; text-decoration: none; font-size: 16px; min-height: 44px; display: flex; align-items: center; padding: 0 8px; border-radius: 8px; }
+  .navlink:hover { color: #fff; background: rgba(255,255,255,0.05); }
+  .btn { display: inline-flex; align-items: center; justify-content: center; background: #0071bc; color: #fff; text-decoration: none; font-weight: 600; padding: 12px 22px; min-height: 44px; border-radius: 10px; transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease; }
+  .btn:hover { background: #0090e7; transform: translateY(-1px); }
   .btn.ghost { background: transparent; border: 1px solid #2a3648; color: #e6edf3; }
   .btn.ghost:hover { border-color: #0071bc; }
   .btn.small { padding: 9px 16px; font-size: 14px; }
-  header.hero { padding: 72px 0 56px; text-align: center; }
-  .hero-icon { width: 96px; height: 96px; border-radius: 22px; box-shadow: 0 12px 40px rgba(0, 113, 188, .45); }
-  .eyebrow { color: #4db2ff; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; font-size: 13px; margin: 24px 0 8px; }
-  h1 { font-size: 48px; line-height: 1.15; margin: 0 0 16px; }
-  h1 span { background: linear-gradient(90deg, #0090e7, #00b4ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .lede { font-size: 19px; color: #c3cdd9; max-width: 720px; margin: 0 auto 32px; }
+  header.hero { padding: 44px 0 36px; text-align: center; }
+  .hero-icon { width: 88px; height: 88px; border-radius: 22px; box-shadow: 0 12px 40px rgba(0, 113, 188, .45); animation: floaty 6s ease-in-out infinite, glowPulse 6s ease-in-out infinite; }
+  @keyframes floaty { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+  @keyframes glowPulse { 0%, 100% { box-shadow: 0 12px 40px rgba(0, 113, 188, .45); } 50% { box-shadow: 0 16px 56px rgba(0, 144, 231, .65); } }
+  .eyebrow { color: #4db2ff; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; font-size: 12px; margin: 24px 0 8px; }
+  .free-badge { display: inline-block; background: rgba(126, 231, 135, 0.12); border: 1px solid rgba(126, 231, 135, 0.4); color: #7ee787; font-weight: 600; font-size: 14px; padding: 6px 14px; border-radius: 999px; margin: 0 0 20px; }
+  h1 { font-size: 32px; line-height: 1.15; margin: 0 0 16px; }
+  h1 span { background: linear-gradient(90deg, #0090e7, #00b4ff, #0090e7); background-size: 200% auto; -webkit-background-clip: text; background-clip: text; color: transparent; animation: gradientShift 8s ease infinite alternate; }
+  @keyframes gradientShift { from { background-position: 0% center; } to { background-position: 100% center; } }
+  .lede { font-size: 17px; color: #c3cdd9; max-width: 720px; margin: 0 auto 28px; }
   .ctas { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
-  section { padding: 56px 0; }
-  h2 { font-size: 32px; line-height: 1.25; margin: 0 0 12px; }
-  .section-lede { color: #c3cdd9; max-width: 720px; margin: 0 0 32px; }
-  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-  .card { background: #121826; border: 1px solid #1e293b; border-radius: 16px; padding: 24px; }
+  section { padding: 40px 0; scroll-margin-top: 84px; }
+  h2 { font-size: 27px; line-height: 1.25; margin: 0 0 12px; }
+  .section-lede { color: #c3cdd9; max-width: 720px; margin: 0 0 28px; }
+  .cards { display: grid; grid-template-columns: 1fr; gap: 16px; }
+  .card { background: #121826; border: 1px solid #1e293b; border-radius: 16px; padding: 24px; transition: transform 0.2s ease, border-color 0.2s ease; }
+  .card:hover { transform: translateY(-2px); border-color: #2a3a52; }
   .card h3 { margin: 0 0 8px; font-size: 18px; }
   .card p { margin: 0; color: #c3cdd9; font-size: 15px; }
-  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; counter-reset: step; }
-  .step { background: #121826; border: 1px solid #1e293b; border-radius: 16px; padding: 24px; }
+  .card .ic, .step .ic { width: 30px; height: 30px; color: #4db2ff; margin-bottom: 12px; }
+  .steps { display: grid; grid-template-columns: 1fr; gap: 16px; counter-reset: step; }
+  .step { background: #121826; border: 1px solid #1e293b; border-radius: 16px; padding: 24px; transition: transform 0.2s ease, border-color 0.2s ease; }
+  .step:hover { transform: translateY(-2px); border-color: #2a3a52; }
   .step .num { display: inline-block; width: 36px; height: 36px; line-height: 36px; text-align: center; border-radius: 50%; background: #0071bc; color: #fff; font-weight: 700; margin-bottom: 12px; }
   .step h3 { margin: 0 0 8px; font-size: 18px; }
   .step p { margin: 0; color: #c3cdd9; font-size: 15px; }
-  .portal-frame { background: #000; border: 1px solid #232c3a; border-radius: 28px; padding: 18px 18px 22px; box-shadow: 0 24px 80px rgba(0, 0, 0, .65), 0 0 0 1px rgba(255, 255, 255, .04); }
-  .portal-cam { width: 8px; height: 8px; border-radius: 50%; background: #1c2534; margin: 0 auto 14px; box-shadow: inset 0 0 2px #000; }
-  .portal-screen { position: relative; overflow: hidden; border-radius: 14px; background: #000; }
+  .portal-frame { background: #000; border: 1px solid #232c3a; border-radius: 28px; padding: 14px 14px 18px; box-shadow: 0 24px 80px rgba(0, 0, 0, .65), 0 0 0 1px rgba(255, 255, 255, .04); }
+  .portal-cam { width: 8px; height: 8px; border-radius: 50%; background: #1c2534; margin: 0 auto 12px; box-shadow: inset 0 0 2px #000; }
+  .portal-screen { position: relative; overflow: hidden; border-radius: 14px; background: #000; width: 100%; }
   .portal-screen iframe { display: block; width: 1280px; height: 800px; border: 0; }
   .caption { text-align: center; color: #9aa7b4; font-size: 14px; margin-top: 16px; }
   pre { background: #0d1420; border: 1px solid #1e293b; border-radius: 12px; padding: 16px 18px; overflow-x: auto; font-size: 13.5px; line-height: 1.5; color: #dbe7f3; white-space: pre-wrap; word-break: break-all; }
@@ -74,28 +94,58 @@
   footer .foot-note { color: #9aa7b4; font-size: 14px; margin-right: auto; }
   footer a { color: #c3cdd9; text-decoration: none; font-size: 14px; }
   footer a:hover { color: #fff; }
-  @media (max-width: 820px) {
-    h1 { font-size: 34px; }
-    header.hero { padding: 48px 0 36px; }
-    .cards, .steps { grid-template-columns: 1fr; }
-    section { padding: 40px 0; }
+  /* Scroll-reveal: sections fade/slide in as they enter the viewport. */
+  .reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.visible { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .hero-icon, h1 span { animation: none; }
+    .reveal { opacity: 1; transform: none; transition: none; }
+    .btn, .card, .step { transition: none; }
+  }
+  @media (min-width: 820px) {
+    body { padding-top: 72px; }
+    .wrap { padding: 0 24px; }
+    .nav-inner { min-height: 72px; }
+    .nav-toggle { display: none; }
+    .nav-links { display: flex; position: static; background: none; border: none; padding: 0; flex-direction: row; align-items: center; gap: 28px; }
+    .navlink { min-height: 0; padding: 0; font-size: 15px; }
+    .brand { font-size: 20px; }
+    .brand img { width: 36px; height: 36px; }
+    h1 { font-size: 48px; }
+    header.hero { padding: 72px 0 56px; }
+    .hero-icon { width: 96px; height: 96px; }
+    .eyebrow { font-size: 13px; }
+    .lede { font-size: 19px; margin-bottom: 32px; }
+    section { padding: 56px 0; scroll-margin-top: 96px; }
+    h2 { font-size: 32px; }
+    .section-lede { margin-bottom: 32px; }
+    .cards, .steps { grid-template-columns: repeat(3, 1fr); }
+    .portal-frame { padding: 18px 18px 22px; }
+    .portal-cam { margin-bottom: 14px; }
   }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <nav aria-label="Main">
-    <a class="brand" href="/"><img src="/assets/lume-icon.png" alt="Lume Portal icon">Lume Portal</a>
-    <a class="navlink" href="#how">How it works</a>
-    <a class="navlink" href="#features">Features</a>
-    <a class="navlink" href="#demo">Live demo</a>
-    <a class="navlink" href="#install">Install</a>
-    <a class="btn small" href="/downloads/lume-portal.apk">Download APK</a>
+<nav class="site-nav" aria-label="Main">
+    <div class="nav-inner">
+      <a class="brand" href="/"><img src="/assets/lume-icon.png" alt="Lume Portal icon">Lume Portal</a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Open menu"><span></span><span></span><span></span></button>
+      <div class="nav-links" id="nav-links">
+        <a class="navlink" href="#how">How it works</a>
+        <a class="navlink" href="#features">Features</a>
+        <a class="navlink" href="#demo">Live demo</a>
+        <a class="navlink" href="#install">Install</a>
+        <a class="btn small" href="/downloads/lume-portal.apk">Download APK</a>
+      </div>
+    </div>
   </nav>
+<div class="wrap">
 
   <header class="hero">
     <img class="hero-icon" src="/assets/lume-icon.png" alt="Lume Portal app icon">
     <p class="eyebrow">For Meta Portal (1st generation)</p>
+    <p><span class="free-badge">Free for now — no subscription, no account</span></p>
     <h1>Your Portal wasn't dead.<br>It was <span>waiting for Lume.</span></h1>
     <p class="lede">Meta discontinued Portal in 2022 and left great hardware behind. Lume Portal turns it into a beautiful always-on smart display — news, weather, markets, world clock and more — set up from your phone in minutes.</p>
     <div class="ctas">
@@ -104,27 +154,27 @@
     </div>
   </header>
 
-  <section id="problem">
+  <section id="problem" class="reveal">
     <h2>Abandoned by Meta. Not by you.</h2>
     <p class="section-lede">The first-generation Meta Portal is a well-built 10-inch display with good speakers — and since 2022, no purpose. The usual workarounds don't cut it:</p>
     <div class="cards">
-      <div class="card"><h3>It closes when you touch it</h3><p>Browser and screensaver workarounds quit the moment you tap the screen, so you can't even navigate between views.</p></div>
-      <div class="card"><h3>No remote setup</h3><p>Every change means walking up to the device and fiddling with it on the spot.</p></div>
-      <div class="card"><h3>One device, one setup</h3><p>Nothing follows the device itself — each Portal is a new manual chore.</p></div>
+      <div class="card"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="5" y1="5" x2="19" y2="19"/></svg><h3>It closes when you touch it</h3><p>Browser and screensaver workarounds quit the moment you tap the screen, so you can't even navigate between views.</p></div>
+      <div class="card"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M5 11a10 10 0 0 1 14 0M8 14a6 6 0 0 1 8 0"/><circle cx="12" cy="18" r="1.5" fill="currentColor"/></svg><h3>No remote setup</h3><p>Every change means walking up to the device and fiddling with it on the spot.</p></div>
+      <div class="card"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="12" rx="2"/><line x1="9" y1="21" x2="15" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><h3>One device, one setup</h3><p>Nothing follows the device itself — each Portal is a new manual chore.</p></div>
     </div>
   </section>
 
-  <section id="how">
+  <section id="how" class="reveal">
     <h2>How it works</h2>
     <p class="section-lede">Three steps, no account, no cloud lock-in. Your settings live per device and can be changed from anywhere.</p>
     <div class="steps">
-      <div class="step"><span class="num">1</span><h3>Install the app</h3><p>Sideload one APK onto the Portal over ADB. A single command does it — see <a href="#install">Install</a>. No Play Store, no account needed.</p></div>
-      <div class="step"><span class="num">2</span><h3>Pair it</h3><p>Open Lume Portal on the device. It shows a 6-character pairing code on screen.</p></div>
-      <div class="step"><span class="num">3</span><h3>Configure from anywhere</h3><p>Enter the code at <a href="/pair/">/pair/</a> and choose language, city, screens and news sources. The Portal picks up the new setup when the dashboard reloads.</p></div>
+      <div class="step"><span class="num">1</span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0l-4-4m4 4l4-4M4 20h16"/></svg><h3>Install the app</h3><p>Sideload one APK onto the Portal over ADB. A single command does it — see <a href="#install">Install</a>. No Play Store, no account needed.</p></div>
+      <div class="step"><span class="num">2</span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M11 12L21 2m-4 0h4v4"/></svg><h3>Pair it</h3><p>Open Lume Portal on the device. It shows a 6-character pairing code on screen.</p></div>
+      <div class="step"><span class="num">3</span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><circle cx="15" cy="7" r="2.5"/><line x1="4" y1="17" x2="20" y2="17"/><circle cx="9" cy="17" r="2.5"/></svg><h3>Configure from anywhere</h3><p>Enter the code at <a href="/pair/">/pair/</a> and choose language, city, screens and news sources. The Portal picks up the new setup when the dashboard reloads.</p></div>
     </div>
   </section>
 
-  <section id="demo">
+  <section id="demo" class="reveal">
     <h2>Live demo</h2>
     <p class="section-lede">This is the real thing, not a mockup — the actual dashboard, running right now, framed like a Portal screen.</p>
     <div class="portal-frame">
@@ -136,23 +186,23 @@
     <p class="caption">Live demo — the actual dashboard running right now.<br>The dashboard's default content language is Portuguese; content language (English or Portuguese) is configurable per device.</p>
   </section>
 
-  <section id="features">
+  <section id="features" class="reveal">
     <h2>Everything your Portal shows</h2>
     <div class="cards">
-      <div class="card"><h3>News from 11 sources</h3><p>Brazil, world, tech, US and Atlanta headlines with full-screen photos.</p></div>
-      <div class="card"><h3>Weather</h3><p>Current conditions and a 7-day forecast for your city.</p></div>
-      <div class="card"><h3>World clock</h3><p>Five analog clocks: Atlanta, Los Angeles, Brasília, London and Tokyo.</p></div>
-      <div class="card"><h3>Markets</h3><p>S&amp;P 500, Dow, Nasdaq, Ibovespa, FTSE, DAX, Nikkei and Hang Seng at a glance.</p></div>
-      <div class="card"><h3>Air quality</h3><p>US AQI, health guidance and six pollutants for your city.</p></div>
-      <div class="card"><h3>Bible verse</h3><p>A daily verse on a classic backdrop.</p></div>
-      <div class="card"><h3>Fun facts &amp; quiz</h3><p>“On this day” facts and a quick trivia quiz.</p></div>
-      <div class="card"><h3>Currency</h3><p>Dollar exchange rates and crypto prices with a weekly chart.</p></div>
+      <div class="card"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><line x1="7" y1="9" x2="13" y2="9"/><line x1="7" y1="13" x2="17" y2="13"/><line x1="7" y1="17" x2="17" y2="17"/></svg><h3>News from 11 sources</h3><p>Brazil, world, tech, US and Atlanta headlines with full-screen photos.</p></div>
+      <div class="card"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"/></svg><h3>Weather</h3><p>Current conditions and a 7-day forecast for your city.</p></div>
+      <div class="card"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><h3>World clock</h3><p>Five analog clocks: Atlanta, Los Angeles, Brasília, London and Tokyo.</p></div>
+      <div class="card"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 19l5-6 4 3 6-8"/><path d="M15 8h4v4"/></svg><h3>Markets</h3><p>S&amp;P 500, Dow, Nasdaq, Ibovespa, FTSE, DAX, Nikkei and Hang Seng at a glance.</p></div>
+      <div class="card"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 8h9a3 3 0 1 0-3-3M3 12h13a3 3 0 1 1-3 3M3 16h6"/></svg><h3>Air quality</h3><p>US AQI, health guidance and six pollutants for your city.</p></div>
+      <div class="card"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5c-2-1.5-5-1.5-8 0v14c3-1.5 6-1.5 8 0 2-1.5 5-1.5 8 0V5c-3-1.5-6-1.5-8 0z"/><line x1="12" y1="5" x2="12" y2="19"/></svg><h3>Bible verse</h3><p>A daily verse on a classic backdrop.</p></div>
+      <div class="card"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.8c.6.5 1 1.2 1 2.2h5c0-1 .4-1.7 1-2.2A6 6 0 0 0 12 3z"/></svg><h3>Fun facts &amp; quiz</h3><p>“On this day” facts and a quick trivia quiz.</p></div>
+      <div class="card"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 6v12M15 8.5c0-1-1.3-1.5-3-1.5s-3 .7-3 2c0 2.8 6 1.2 6 4 0 1.3-1.3 2-3 2s-3-.5-3-1.5"/></svg><h3>Currency</h3><p>Dollar exchange rates and crypto prices with a weekly chart.</p></div>
     </div>
   </section>
 
-  <section id="install">
+  <section id="install" class="reveal">
     <h2>Install</h2>
-    <p class="section-lede">One command installs the app and launches it on the Portal. Or download the APK and install it yourself.</p>
+    <p class="section-lede">One command installs the app and launches it on the Portal. Or download the APK and install it yourself. Everything is free for now — the app, the dashboard, and setup.</p>
     <p><a class="btn" href="/downloads/lume-portal.apk">Download APK</a></p>
     <h3>macOS / Linux</h3>
     <pre><code>curl -L -o lume-portal.apk https://lumeportal.travustech.ai/downloads/lume-portal.apk &amp;&amp; adb install -r lume-portal.apk &amp;&amp; adb shell am start -n com.travustech.lumeportal/.MainActivity</code></pre>
@@ -169,7 +219,7 @@
 
   <footer>
     <img src="/assets/travustech-logo.svg" alt="TravusTech">
-    <span class="foot-note">Built by <a href="https://travustech.ai">TravusTech</a></span>
+    <span class="foot-note">Built by <a href="https://travustech.ai">TravusTech</a> · Free for now</span>
     <a href="/pair/">Configure your device</a>
     <a href="/preview/">Live dashboard</a>
   </footer>
@@ -185,6 +235,42 @@
     }
     window.addEventListener('resize', fitDemo);
     fitDemo();
+    // Hamburger menu: toggle panel, close on link click, Esc, outside tap.
+    var nav = document.querySelector('nav.site-nav');
+    var toggle = document.querySelector('.nav-toggle');
+    var links = document.getElementById('nav-links');
+    function closeMenu() {
+      nav.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.setAttribute('aria-label', 'Open menu');
+    }
+    toggle.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var open = nav.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    });
+    links.addEventListener('click', function (e) {
+      if (e.target.closest('a')) closeMenu();
+    });
+    document.addEventListener('click', function (e) {
+      if (nav.classList.contains('open') && !nav.contains(e.target)) closeMenu();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeMenu();
+    });
+    // Scroll-reveal: sections fade/slide in as they enter the viewport.
+    var revealEls = document.querySelectorAll('.reveal');
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting) { en.target.classList.add('visible'); io.unobserve(en.target); }
+        });
+      }, { threshold: 0.12 });
+      revealEls.forEach(function (el) { io.observe(el); });
+    } else {
+      revealEls.forEach(function (el) { el.classList.add('visible'); });
+    }
   })();
 </script>
 </body>

@@ -42,13 +42,36 @@ export function normalizeConfig(input) {
   var ssrc = (src.screens && typeof src.screens === 'object') ? src.screens : {};
   SCREEN_KEYS.forEach(function (k) { screens[k] = ssrc[k] !== false; });
   cfg.screens = screens;
+  // Slide order: keep only known codes, dedupe, append any missing codes
+  // at the end, so old configs without screenOrder stay valid (default order).
+  var order = [];
+  if (Array.isArray(src.screenOrder)) {
+    src.screenOrder.forEach(function (k) {
+      if (SCREEN_KEYS.indexOf(k) !== -1 && order.indexOf(k) === -1) order.push(k);
+    });
+  }
+  SCREEN_KEYS.forEach(function (k) { if (order.indexOf(k) === -1) order.push(k); });
+  cfg.screenOrder = order;
+  // World-clock cities: up to 5 {name, timezone} entries. Timezone strings
+  // are sanitized here; the dashboard skips entries Intl rejects.
+  var wc = [];
+  if (Array.isArray(src.worldClock)) {
+    src.worldClock.slice(0, 5).forEach(function (w) {
+      if (!w || typeof w !== 'object') return;
+      var name = str(w.name, 80).trim();
+      var tz = typeof w.timezone === 'string' ? w.timezone.trim() : '';
+      if (!name || !tz || tz.length > 80 || !/^[A-Za-z0-9_\/+-]+$/.test(tz)) return;
+      wc.push({ name: name, timezone: tz });
+    });
+  }
+  cfg.worldClock = wc;
   var fsrc = (src.feeds && typeof src.feeds === 'object') ? src.feeds : {};
   var enabled = Array.isArray(fsrc.enabled)
     ? fsrc.enabled.filter(function (id) { return FEED_IDS.indexOf(id) !== -1; }).slice(0, 30)
     : FEED_IDS.slice();
   var custom = [];
   if (Array.isArray(fsrc.custom)) {
-    fsrc.custom.slice(0, 10).forEach(function (c) {
+    fsrc.custom.slice(0, 30).forEach(function (c) {
       if (!c || typeof c !== 'object') return;
       var name = str(c.name, 60).trim();
       var url = typeof c.url === 'string' ? c.url.trim() : '';
