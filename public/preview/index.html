@@ -2363,19 +2363,6 @@
   // Generation guard so ended/error handlers from a previous item
   // never act on the item currently showing.
   var photoVideoToken = 0;
-  // Video start smoothness: the next video is downloaded in full into
-  // memory (Blob URL) during the slides before it appears, so playback
-  // reads locally instead of streaming through the proxy mid-play.
-  // This does not depend on the <video> element's visibility: after a
-  // photo slide the element is display:none, and the old WebView may
-  // not fetch anything for it until the slide becomes visible — which
-  // is exactly the stall the user saw right after the fade-in.
-  // Only one blob is kept; it is revoked when replaced. Files larger
-  // than the cap keep the old direct-stream behaviour.
-  var preloadBlobUrl = null;
-  var preloadBlobFor = null;
-  var preloadBlobFetching = null;
-  var PRELOAD_BLOB_MAX_BYTES = 120 * 1024 * 1024;
   // Metadata overlay (P screen): capture/upload date + reverse-geocoded
   // city/state/country, only when the file actually has them. The date
   // shows immediately; the place name arrives async and is cached per
@@ -2556,31 +2543,18 @@
   // is the current slide's playing video.
   function preloadNextMedia() {
     if (!photoList.length || !photoFolderId()) return;
+    if (curKind === 'P' && photoCurKind === 'video') return;
+    var vid = q('.photo-video', photoSlide);
+    if (vid && vid.style.display !== 'none' && !vid.paused) return;
     var n = (photoIdxMem >= 0 ? photoIdxMem : photoIdxSaved()) % photoList.length;
     var item = photoList[n];
     if (!item) return;
-    if (item.kind === 'video') {
-      // Never preload a video by setting src on the display element
-      // while another video is playing, and never stream it twice:
-      // the Blob download below is the only preload for videos.
-      if (curKind === 'P' && photoCurKind === 'video') return;
-      if (preloadBlobFor === item.id && preloadBlobUrl) return;
-      if (preloadBlobFetching === item.id) return;
-      preloadBlobFetching = item.id;
-      fetch(item.url).then(function (r) {
-        var len = parseInt(r.headers.get('content-length') || '0', 10);
-        if (len > PRELOAD_BLOB_MAX_BYTES) {
-          try { if (r.body && r.body.cancel) r.body.cancel(); } catch (e) {}
-          return null;
-        }
-        return r.blob();
-      }).then(function (b) {
-        preloadBlobFetching = null;
-        if (!b) return;
-        if (preloadBlobUrl) { try { URL.revokeObjectURL(preloadBlobUrl); } catch (e) {} }
-        preloadBlobUrl = URL.createObjectURL(b);
-        preloadBlobFor = item.id;
-      }).catch(function () { preloadBlobFetching = null; });
+    if (item.kind === 'video' && vid) {
+      if (vid.getAttribute('data-src') !== item.url) {
+        vid.setAttribute('data-src', item.url);
+        vid.src = item.url;
+        try { vid.load(); } catch (e) {}
+      }
     } else if (item.kind === 'image') {
       var im = new Image();
       im.src = item.url;
@@ -2613,11 +2587,7 @@
         if (photoErrTries < 3) { photoErrTries++; photoIdxMem = idx + 2; photoIdxSave(photoIdxMem); renderMedia(idx + 1); }
       };
       try { vid.pause(); } catch (e) {}
-      // Prefer the fully-downloaded Blob when the preload finished in
-      // time; otherwise stream directly (old behaviour, e.g. slow link
-      // or oversized file). data-src tracks whichever URL is in use.
-      var playUrl = (preloadBlobFor === item.id && preloadBlobUrl) ? preloadBlobUrl : item.url;
-      if (vid.getAttribute('data-src') !== playUrl) { vid.setAttribute('data-src', playUrl); vid.src = playUrl; }
+      if (vid.getAttribute('data-src') !== item.url) { vid.setAttribute('data-src', item.url); vid.src = item.url; }
       if (item.poster) { try { vid.poster = item.poster; } catch (e) {} }
       try { vid.currentTime = 0; } catch (e) {}
       var p = null;
