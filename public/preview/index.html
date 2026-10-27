@@ -191,7 +191,11 @@
   .photo-photo.kb-start { transform: scale(1); }
   .photo-photo.kb { transform: scale(1.12); transition: transform var(--slide-kb, 15s) linear; }
   .photo-video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; background: #000; display: none; }
-  .photo-meta { position: absolute; left: 3vw; bottom: 4vh; z-index: 3; background: rgba(0,0,0,.55); color: #fff; padding: .55em 1em; border-radius: .6em; font-size: 2.8vw; line-height: 1.45; display: none; max-width: 70vw; }
+  .photo-wash { position: absolute; pointer-events: none; z-index: 1; }
+  .photo-wash-tr { top: 0; right: 0; width: 44vw; height: 20vh; background: linear-gradient(to bottom left, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0) 100%); }
+  .photo-wash-bl { left: 0; bottom: 0; width: 50vw; height: 32vh; background: linear-gradient(to top right, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0) 100%); display: none; }
+  #slidePhoto.active ~ .topbar { background: none; }
+  .photo-meta { position: absolute; left: 3vw; bottom: 4vh; z-index: 3; color: #fff; font-size: 2.8vw; line-height: 1.45; display: none; max-width: 70vw; text-shadow: 0 1px 10px rgba(0,0,0,.8); pointer-events: none; }
   .photo-meta.on { display: block; }
   .photo-meta .meta-loc { opacity: .85; }
   .fact-shade { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.45) 100%); }
@@ -479,6 +483,8 @@
   <div class="slide photoslide" id="slidePhoto">
     <img class="photo-photo" alt="">
     <video class="photo-video" muted playsinline preload="auto"></video>
+    <div class="photo-wash photo-wash-tr"></div>
+    <div class="photo-wash photo-wash-bl"></div>
     <div class="photo-meta" id="photoMeta"></div>
   </div>
   <div class="topbar">
@@ -2402,9 +2408,11 @@
   function renderPhotoMeta(item) {
     var el = document.getElementById('photoMeta');
     if (!el) return;
+    var wash = q('.photo-wash-bl', photoSlide);
     photoMetaId = item.id;
     el.textContent = '';
     el.className = el.className.replace(/\bon\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '');
+    if (wash) wash.style.display = 'none';
     var d = parsePhotoDate(item.takenTime) || parsePhotoDate(item.createdTime);
     var dateLine = d ? formatPhotoDate(d) : '';
     function paint(locLine) {
@@ -2412,7 +2420,10 @@
       el.textContent = '';
       if (dateLine) { var a = document.createElement('div'); a.textContent = dateLine; el.appendChild(a); }
       if (locLine) { var b = document.createElement('div'); b.className = 'meta-loc'; b.textContent = locLine; el.appendChild(b); }
-      if (dateLine || locLine) { if (el.className.indexOf('on') === -1) el.className += ' on'; }
+      if (dateLine || locLine) {
+        if (el.className.indexOf('on') === -1) el.className += ' on';
+        if (wash) wash.style.display = 'block';
+      }
     }
     if (dateLine) paint('');
     if (typeof item.lat === 'number' && typeof item.lon === 'number') {
@@ -2485,7 +2496,7 @@
     deactivateAll();
     el.className = el.className.replace(/\bactive\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '') + ' active';
     var tw = document.querySelector('.topbar .weather');
-    if (tw) tw.style.visibility = '';
+    if (tw) tw.style.visibility = 'hidden';
     var showMs = slideMs();
     var rotateMs = showMs;
     if (item && item.kind === 'video') {
