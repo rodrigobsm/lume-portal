@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DEMONSTRAÇÃO — Selo de alerta do Lume Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Poppins', system-ui, sans-serif; background: #0a0a0a; color: #fff;
+    min-height: 100vh; overflow: hidden;
+    background: linear-gradient(160deg, #1a2433 0%, #0a0a0a 60%);
+  }
+  .topbar {
+    position: absolute; top: 0; left: 0; right: 0; z-index: 2;
+    display: flex; justify-content: space-between; align-items: flex-start;
+    padding: 2vw 3vw 6vh 3vw;
+    background:
+      radial-gradient(45% 90% at 0% 0%, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0) 100%),
+      radial-gradient(45% 90% at 100% 0%, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0) 100%);
+  }
+  .weather { font-size: 2.2vw; color: #e8eaed; display: flex; flex-direction: column; align-items: flex-start; flex: none; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
+  .weather .top { display: flex; align-items: center; }
+  .weather .cond { font-size: 1.7vw; color: #c8cdd2; }
+  .clock { font-size: 4.8vw; font-weight: 700; line-height: 1; text-shadow: 0 2px 12px rgba(0,0,0,0.6); text-align: right; }
+  .date { font-size: 1.9vw; color: #c8cdd2; margin-top: 0.4vw; text-transform: capitalize; }
+  .alert {
+    display: flex; align-items: center; gap: 0.6vw; align-self: center; flex: none;
+    background: rgba(229,72,77,0.92); color: #fff; font-size: 1.7vw; font-weight: 700;
+    padding: 0.5vw 1.1vw; border-radius: 999px; max-width: 36vw;
+  }
+  .alert .warn { display: inline-flex; flex: none; }
+  .alert .warn svg { width: 1.8vw; height: 1.8vw; min-width: 20px; min-height: 20px; }
+  .alert .alertevt { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .caption {
+    position: absolute; left: 0; right: 0; bottom: 0; padding: 4vh 5vw;
+    text-align: center; font-size: 1.6vw; line-height: 1.6; color: #e8eaed;
+  }
+  .caption b { color: #f5c518; }
+  @media (max-width: 700px) {
+    .weather { font-size: 4.8vw; }
+    .weather .cond { font-size: 3.6vw; }
+    .clock { font-size: 11vw; }
+    .date { font-size: 4.2vw; }
+    .alert { font-size: 3.4vw; }
+    .alert .warn svg { width: 4vw; height: 4vw; }
+    .caption { font-size: 3.8vw; }
+  }
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="weather"><div class="top">16°C</div><div class="cond">Nublado</div></div>
+    <div class="alert"><span class="warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg></span><span class="alertevt">Tempestade Severa</span></div>
+    <div><div class="clock">8:56 PM</div><div class="date">Seg, 26 Outubro 2026</div></div>
+  </div>
+  <div class="caption">
+    <b>DEMONSTRAÇÃO — não é um alerta real.</b><br>
+    Não há nenhum alerta ativo agora em Acworth. Quando o Serviço Nacional de Meteorologia emitir um alerta
+    <b>Severo ou Extremo</b> para a sua cidade, o selo vermelho aparece exatamente assim, no centro do topo,
+    e some sozinho quando o alerta termina. Alertas menores não aparecem.
+  </div>
+</body>
+</html>
