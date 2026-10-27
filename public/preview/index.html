@@ -314,10 +314,20 @@
   #offline .offlogo { width: 22vw; max-width: 300px; margin-bottom: 2vw; }
   #loading {
     position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 20;
-    display: flex; align-items: center; justify-content: center;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3vh;
     background: #0a0a0a;
   }
-  #loading img { width: 30vw; max-width: 420px; }
+  .ld-logo { width: 24vw; max-width: 300px; }
+  .ld-bar { width: 40vw; max-width: 480px; height: 6px; border-radius: 999px; background: rgba(255,255,255,0.15); overflow: hidden; }
+  .ld-fill { height: 100%; width: 0%; background: #f5c518; border-radius: 999px; transition: width 0.3s ease; }
+  .ld-by { display: flex; align-items: center; gap: 0.6vw; font-size: 1.6vw; color: #c8cdd2; }
+  .ld-by img { height: 2.4vw; width: auto; }
+  @media (max-aspect-ratio: 1/1) {
+    .ld-logo { width: 44vw; }
+    .ld-bar { width: 70vw; }
+    .ld-by { font-size: 3.6vw; gap: 1.5vw; }
+    .ld-by img { height: 5vw; }
+  }
   @media (max-aspect-ratio: 1/1) {
     .topbar { padding: 4vw 5vw 9vh 5vw; }
     .topright { gap: 3vw; }
@@ -518,7 +528,11 @@
     <div class="msg">Sem conexão com as notícias no momento — tentando novamente…</div>
     <div class="brand">PORTAL NEWS</div>
   </div>
-  <div id="loading"><img src="/assets/travustech-logo.svg" alt="TravusTech"></div>
+  <div id="loading">
+    <img class="ld-logo" src="/assets/lume-icon.png" alt="Lume">
+    <div class="ld-bar"><div class="ld-fill" id="ldFill"></div></div>
+    <div class="ld-by">by <img src="/assets/travustech-logo.svg" alt="TravusTech"></div>
+  </div>
 </div>
 <div id="progress"><div id="bar"></div></div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
@@ -1264,9 +1278,24 @@
     });
   }
 
+  // Loading overlay progress: real boot milestones, not a fake timer
+  // (10 = boot started, 40 = config ready, 70 = news loaded,
+  // 100 = first slide rendered).
+  function setLoadProgress(pct) {
+    var f = document.getElementById('ldFill');
+    if (f) f.style.width = pct + '%';
+  }
+
   function restartProgress(ms) {
     var ld = document.getElementById('loading');
-    if (ld) ld.style.display = 'none';
+    if (ld && ld.style.display !== 'none') {
+      // First slide rendered: real progress hits 100%, then the
+      // overlay fades out so the full bar is actually seen.
+      setLoadProgress(100);
+      ld.style.transition = 'opacity 0.4s ease';
+      ld.style.opacity = '0';
+      setTimeout(function () { ld.style.display = 'none'; }, 450);
+    }
     var bar = document.getElementById('bar');
     bar.style.transition = 'none';
     bar.style.width = '0%';
@@ -2673,6 +2702,7 @@
             if (curNewsIdx >= items.length) curNewsIdx = 0;
             try { localStorage.setItem('portalNewsCache', JSON.stringify({ saved_at: Date.now(), items: items })); } catch (e) {}
             hideOffline();
+            setLoadProgress(70);
             prefetchTranslations();
             if (changed) {
               buildSeq();
@@ -2749,9 +2779,10 @@
   // se houver, senão os padrões. Sem código, boot imediato, como sempre.
   // O teto de 4s garante que uma rede lenta nunca trave a abertura.
   function start() {
+    setLoadProgress(10);
     if (!lumeCode) { boot(); return; }
     var done = false;
-    function go() { if (done) return; done = true; boot(); }
+    function go() { if (done) return; done = true; setLoadProgress(40); boot(); }
     setTimeout(go, 4000);
     xhrGet('/api/lume/config?code=' + lumeCode, function (err, txt) {
       if (!done && !err) {
