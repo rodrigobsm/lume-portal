@@ -64,9 +64,11 @@ items.
   original).
 - **P — Photos**: personal photos from a public Google Drive folder
   (config `photosFolder`, set on `/pair/`). Each appearance shows the
-  next photo in filename order, looping; the index persists per device,
-  so a reload resumes where it stopped, and a new folder restarts from
-  its first photo. Photos are shown directly with a plain `<img>`
+  next photo in filename order, looping; the index advances in memory
+  and persists per device, so a reload resumes where it stopped, and a
+  new folder restarts from its first photo (photos keep advancing even
+  where the viewing WebView blocks storage; only a reload then restarts
+  from the first photo). Photos are shown directly with a plain `<img>`
   (Drive thumbnail URL) — no Drive iframe or Drive UI. The list is
   fetched server-side (`functions/api/photos.js`, Drive API v3) and
   refreshed every 30 min; a failed or empty folder skips the screen

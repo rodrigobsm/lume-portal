@@ -2303,6 +2303,10 @@
   var photoLoading = false;
   var photoSkipCount = 0;
   var photoErrTries = 0;
+  // In-memory index: authoritative during a session, so photos keep
+  // advancing even where the viewing WebView blocks localStorage (the
+  // saved bookmark then only matters across page reloads).
+  var photoIdxMem = -1;
   function photoFolderId() {
     return (lumeCfg && lumeCfg.photosFolder) || '';
   }
@@ -2334,6 +2338,13 @@
   function photoIdxSave(n) {
     try { localStorage.setItem('portalNewsPhoto', JSON.stringify({ folder: photoFolderId(), idx: n })); } catch (e) {}
   }
+  function photoIdxNext() {
+    if (photoIdxMem < 0) photoIdxMem = photoIdxSaved();
+    var idx = photoIdxMem % photoList.length;
+    photoIdxMem = idx + 1;
+    photoIdxSave(photoIdxMem);
+    return idx;
+  }
   function showPhotoSlide() {
     restoreHeadlines();
     curKind = 'P';
@@ -2353,7 +2364,7 @@
     }
     photoSkipCount = 0;
     photoErrTries = 0;
-    var idx = photoIdxSaved() % photoList.length;
+    var idx = photoIdxNext();
     renderPhoto(idx);
     var el = photoSlide;
     deactivateAll();
@@ -2365,11 +2376,10 @@
   }
   function renderPhoto(idx) {
     var ph = photoList[idx % photoList.length];
-    photoIdxSave(idx + 1);
     var img = q('.photo-photo', photoSlide);
     if (!img) return;
     img.onerror = function () {
-      if (photoErrTries < 3) { photoErrTries++; renderPhoto(idx + 1); }
+      if (photoErrTries < 3) { photoErrTries++; photoIdxMem = idx + 2; photoIdxSave(photoIdxMem); renderPhoto(idx + 1); }
     };
     if (img.getAttribute('data-src') !== ph.url) { img.src = ph.url; img.setAttribute('data-src', ph.url); }
     kbOn(img);
