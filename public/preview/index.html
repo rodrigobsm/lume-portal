@@ -1286,7 +1286,7 @@
     if (f) f.style.width = pct + '%';
   }
 
-  function restartProgress(ms) {
+  function hideLoadingOnce() {
     var ld = document.getElementById('loading');
     if (ld && ld.style.display !== 'none') {
       // First slide rendered: real progress hits 100%, then the
@@ -1296,12 +1296,27 @@
       ld.style.opacity = '0';
       setTimeout(function () { ld.style.display = 'none'; }, 450);
     }
+  }
+
+  function restartProgress(ms) {
+    hideLoadingOnce();
     var bar = document.getElementById('bar');
     bar.style.transition = 'none';
     bar.style.width = '0%';
     void bar.offsetWidth;
     bar.style.transition = 'width ' + ms + 'ms linear';
     bar.style.width = '100%';
+  }
+
+  // Video slides: the bar must NOT run on wall clock from slide
+  // appearance, or it finishes while the video is still playing
+  // (buffering + the reveal hold delay playback). It stays at 0
+  // until playback moves, and is then driven from currentTime.
+  function holdProgress() {
+    hideLoadingOnce();
+    var bar = document.getElementById('bar');
+    bar.style.transition = 'none';
+    bar.style.width = '0%';
   }
 
   function resetRotate(ms) {
@@ -2573,8 +2588,10 @@
     if (item && item.kind === 'video') {
       showMs = Math.min(item.durationMs || VIDEO_CAP_MS, VIDEO_CAP_MS);
       rotateMs = showMs + VIDEO_GRACE_MS;
+      holdProgress();
+    } else {
+      restartProgress(showMs);
     }
-    restartProgress(showMs);
     resetRotate(rotateMs);
   }
   var photoCurKind = null;
@@ -2635,6 +2652,19 @@
       var endAdvanced = false;
       vid.ontimeupdate = function () {
         if (token !== photoVideoToken || curKind !== 'P' || endAdvanced) return;
+        // Bar follows actual playback: 0 while buffering, frozen on a
+        // stall, reaching 100% exactly at the advance point (early
+        // advance 1s before the end, or the cap+grace timer for videos
+        // longer than the cap) — never finished before the video.
+        var bar = document.getElementById('bar');
+        if (bar) {
+          var bd = vid.duration;
+          if (!isFinite(bd) || bd <= 0) bd = (item.durationMs || VIDEO_CAP_MS) / 1000;
+          var full = Math.min(bd - VIDEO_END_LEAD_MS / 1000, (VIDEO_CAP_MS + VIDEO_GRACE_MS) / 1000);
+          if (!(full > 1)) full = 1;
+          bar.style.transition = 'none';
+          bar.style.width = (100 * Math.min(vid.currentTime / full, 1)) + '%';
+        }
         var dur = vid.duration;
         if (isFinite(dur) && dur > 1.5 && !vid.ended && (dur - vid.currentTime) <= VIDEO_END_LEAD_MS / 1000) {
           endAdvanced = true;
