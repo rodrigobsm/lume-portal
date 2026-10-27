@@ -2757,12 +2757,18 @@
                 var pn = seq.indexOf(curNewsIdx);
                 showSeq(pn === -1 ? 0 : pn);
               } else if (!hasShown) {
-                // First load only: show the current special, exactly as
-                // before — this renders the first slide and hides the
-                // loading overlay. Without this branch a fresh boot
-                // never renders anything (regression in 41e945e).
-                var ps = seq.indexOf(curKind);
-                showSeq(ps === -1 ? 0 : ps);
+                // First load only: show the FIRST element of the
+                // sequence — buildSeq already ordered it by the user's
+                // screenOrder, so this is the first screen they
+                // configured. (The old code showed
+                // seq.indexOf(curKind), but curKind is still its
+                // initial placeholder 'C' at boot, so a custom order
+                // like [P, W, C, ...] always opened on Currency
+                // instead of Photos. With the default order C is
+                // already first, which is why this went unnoticed.)
+                // Without this branch a fresh boot never renders
+                // anything (regression in 41e945e).
+                showSeq(0);
               }
               // Refreshes while on a special (hasShown): do NOT re-show.
               // Re-showing would jump to the special's first occurrence
