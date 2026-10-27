@@ -1449,6 +1449,7 @@
     else if (s === 'F') { showFactSlide(); }
     else if (s === 'P') { showPhotoSlide(); }
     else { curNewsIdx = s; curKind = 'news'; showSlide(s); }
+    preloadNextMedia();
   }
   function nextSeq() {
     if (!seq.length) return;
@@ -2435,6 +2436,7 @@
           if (d && d.ok && Array.isArray(list) && list.length) {
             photoList = list;
             photoListAt = Date.now();
+            preloadNextMedia();
           }
         } catch (e) {}
       }
@@ -2483,7 +2485,7 @@
     deactivateAll();
     el.className = el.className.replace(/\bactive\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '') + ' active';
     var tw = document.querySelector('.topbar .weather');
-    if (tw) tw.style.visibility = 'hidden';
+    if (tw) tw.style.visibility = '';
     var showMs = slideMs();
     var rotateMs = showMs;
     if (item && item.kind === 'video') {
@@ -2493,8 +2495,34 @@
     restartProgress(showMs);
     resetRotate(rotateMs);
   }
+  var photoCurKind = null;
+  // Preload the next P item in the background while another slide is
+  // showing, so a video is already buffered when its slide appears and
+  // starts playing without a stall. Images get the same treatment via
+  // a plain Image object. Never touches the display <video> while it
+  // is the current slide's playing video.
+  function preloadNextMedia() {
+    if (!photoList.length || !photoFolderId()) return;
+    if (curKind === 'P' && photoCurKind === 'video') return;
+    var vid = q('.photo-video', photoSlide);
+    if (vid && vid.style.display !== 'none' && !vid.paused) return;
+    var n = (photoIdxMem >= 0 ? photoIdxMem : photoIdxSaved()) % photoList.length;
+    var item = photoList[n];
+    if (!item) return;
+    if (item.kind === 'video' && vid) {
+      if (vid.getAttribute('data-src') !== item.url) {
+        vid.setAttribute('data-src', item.url);
+        vid.src = item.url;
+        try { vid.load(); } catch (e) {}
+      }
+    } else if (item.kind === 'image') {
+      var im = new Image();
+      im.src = item.url;
+    }
+  }
   function renderMedia(idx) {
     var item = photoList[idx % photoList.length];
+    photoCurKind = item.kind;
     renderPhotoMeta(item);
     var img = q('.photo-photo', photoSlide);
     var vid = q('.photo-video', photoSlide);
@@ -2506,7 +2534,7 @@
         if (token === photoVideoToken && curKind === 'P') { nextSeq(); }
       };
       vid.onerror = function () {
-        if (token !== photoVideoToken) return;
+        if (token !== photoVideoToken || curKind !== 'P') return;
         if (photoErrTries < 3) { photoErrTries++; photoIdxMem = idx + 2; photoIdxSave(photoIdxMem); renderMedia(idx + 1); }
       };
       try { vid.pause(); } catch (e) {}
@@ -2516,7 +2544,7 @@
       var p = null;
       try { p = vid.play(); } catch (e) {}
       if (p && p.catch) p.catch(function () {
-        if (token !== photoVideoToken) return;
+        if (token !== photoVideoToken || curKind !== 'P') return;
         if (photoErrTries < 3) { photoErrTries++; photoIdxMem = idx + 2; photoIdxSave(photoIdxMem); renderMedia(idx + 1); }
       });
       return;

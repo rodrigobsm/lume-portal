@@ -74,7 +74,10 @@ items.
   Drive API key never reaches the client — no Drive iframe or Drive UI.
   A bottom-left overlay shows the capture/upload date and, for photos
   with GPS EXIF, the reverse-geocoded city/state/country (cached per
-  place; raw coordinates are never displayed). The list is fetched
+  place; raw coordinates are never displayed). The topbar weather stays
+  visible on this screen (like news/Bible), and the next video is
+  preloaded in the background while other slides show, so playback
+  starts without a buffering stall. The list is fetched
   server-side (`functions/api/photos.js`, Drive API v3) and refreshed
   every 30 min; a failed or empty folder skips the screen silently. The
   screen appears only when a folder is configured.
