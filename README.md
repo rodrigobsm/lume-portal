@@ -62,17 +62,19 @@ items.
   day" facts in PT (or EN) with the article's photo; every 3rd one, a quiz
   from Open Trivia DB (translated via MyMemory in PT; in EN, in the
   original).
-- **P — Photos**: personal photos from a public Google Drive folder
-  (config `photosFolder`, set on `/pair/`). Each appearance shows the
-  next photo in filename order, looping; the index advances in memory
+- **P — Photos**: personal photos and videos from a public Google Drive
+  folder (config `photosFolder`, set on `/pair/`). Each appearance shows
+  the next item in filename order, looping; the index advances in memory
   and persists per device, so a reload resumes where it stopped, and a
   new folder restarts from its first photo (photos keep advancing even
   where the viewing WebView blocks storage; only a reload then restarts
   from the first photo). Photos are shown directly with a plain `<img>`
-  (Drive thumbnail URL) — no Drive iframe or Drive UI. The list is
-  fetched server-side (`functions/api/photos.js`, Drive API v3) and
-  refreshed every 30 min; a failed or empty folder skips the screen
-  silently. The screen appears only when a folder is configured.
+  (Drive thumbnail URL); videos play muted with a plain `<video>` until
+  they end (60s cap), streamed through `functions/api/media.js` so the
+  Drive API key never reaches the client — no Drive iframe or Drive UI.
+  The list is fetched server-side (`functions/api/photos.js`, Drive API
+  v3) and refreshed every 30 min; a failed or empty folder skips the
+  screen silently. The screen appears only when a folder is configured.
 
 **Slide duration** — a single duration for all screens (news + specials),
 configurable per device (5/10/15/20/25/30/60 s, default 15 s).
@@ -249,6 +251,7 @@ open('/tmp/dash.js','w').write(max(blocks, key=len))
 - `public/assets/` — Lume and TravusTech logos
 - `functions/api/news.js` — RSS aggregator (10 min cache)
 - `functions/api/photos.js` — Drive folder listing for the Photos screen
+- `functions/api/media.js` — video streaming proxy for the Photos screen
 - `functions/api/og.js`, `alerts.js`, `markets.js`, `pollen.js` — support APIs
 - `functions/api/lume/config.js`, `pair.js` — pairing and config
 - `functions/_lib/aggregate.js`, `lume.js` — aggregation and validation
@@ -280,9 +283,10 @@ marketing traffic from device traffic, filter by path/host in GA. See
   testing); the code path is deployed.
 - **Pairing codes are the only key in v1** — anyone who knows a device's
   code can view and change its settings. Keep codes private.
-- **Photos (v1 limits)**: only the first 100 images in a folder (Drive
-  API page size); the folder must be public ("Anyone with the link can
-  view") or listing fails and the screen is skipped; listing needs the
+- **Photos (v1 limits)**: only the first 100 items in a folder (Drive
+  API page size, photos and videos combined); the folder must be public
+  ("Anyone with the link can view") or listing fails and the screen is
+  skipped; listing needs the
   server-side Drive API key (see Deployment). Anyone with the folder link
   can view the photos, and anyone near the Portal can see them on screen.
 - **Config applies on the next dashboard load only** (see above).

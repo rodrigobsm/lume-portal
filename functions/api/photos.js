@@ -1,7 +1,9 @@
 // Cloudflare Pages Function: GET /api/photos?folder=<drive-folder-id>
-// Lists image files in a public Google Drive folder (Drive API v3) and
-// returns direct thumbnail URLs. The dashboard displays each photo with
-// a plain <img> — no Drive iframe, no Drive UI anywhere.
+// Lists image AND video files in a public Google Drive folder (Drive API
+// v3), in filename order, looping. Photos are shown directly with a
+// plain <img> (Drive thumbnail URL); videos play muted with a plain
+// <video> whose src is /api/media (server-side proxy — the API key
+// never reaches the client). No Drive iframe, no Drive UI anywhere.
 // Requires GOOGLE_DRIVE_API_KEY in the Pages project environment
 // (server-side only, never in client code). Without it, the dashboard
 // simply skips the Photos screen: {ok:false, error:'no_key'}.
@@ -16,9 +18,9 @@ export async function onRequest(context) {
   }
   var key = context.env && context.env.GOOGLE_DRIVE_API_KEY;
   if (!key) return jsonResponse({ ok: false, error: 'no_key' });
-  var q = "'" + folder + "' in parents and mimeType contains 'image/' and trashed = false";
+  var q = "'" + folder + "' in parents and (mimeType contains 'image/' or mimeType contains 'video/') and trashed = false";
   var api = 'https://www.googleapis.com/drive/v3/files?q=' + encodeURIComponent(q) +
-    '&orderBy=name&pageSize=100&fields=files(id,name,mimeType)&key=' + encodeURIComponent(key);
+    '&orderBy=name&pageSize=100&fields=files(id,name,mimeType,videoMediaMetadata)&key=' + encodeURIComponent(key);
   var res;
   try {
     res = await fetch(api);
@@ -27,8 +29,29 @@ export async function onRequest(context) {
   }
   if (!res.ok) return jsonResponse({ ok: false, error: 'drive_' + res.status });
   var data = await res.json();
-  var photos = (data.files || []).map(function (f) {
-    return { id: f.id, name: f.name, url: 'https://drive.google.com/thumbnail?id=' + f.id + '&sz=w1920' };
+  var photos = [];
+  var videos = [];
+  var items = (data.files || []).map(function (f) {
+    var isVideo = (f.mimeType || '').indexOf('video/') === 0;
+    var item;
+    if (isVideo) {
+      item = {
+        id: f.id, name: f.name, kind: 'video',
+        url: '/api/media?id=' + encodeURIComponent(f.id),
+        poster: 'https://drive.google.com/thumbnail?id=' + f.id + '&sz=w1920'
+      };
+      if (f.videoMediaMetadata && typeof f.videoMediaMetadata.durationMillis === 'number') {
+        item.durationMs = f.videoMediaMetadata.durationMillis;
+      }
+      videos.push(item);
+    } else {
+      item = {
+        id: f.id, name: f.name, kind: 'image',
+        url: 'https://drive.google.com/thumbnail?id=' + f.id + '&sz=w1920'
+      };
+      photos.push(item);
+    }
+    return item;
   });
-  return jsonResponse({ ok: true, count: photos.length, photos: photos });
+  return jsonResponse({ ok: true, count: items.length, photos: photos, videos: videos, items: items });
 }

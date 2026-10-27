@@ -190,6 +190,7 @@
   .photo-photo { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transform-origin: center center; }
   .photo-photo.kb-start { transform: scale(1); }
   .photo-photo.kb { transform: scale(1.12); transition: transform var(--slide-kb, 15s) linear; }
+  .photo-video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; background: #000; display: none; }
   .fact-shade { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.45) 100%); }
   .fact-content { position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 12vh 6vw 6vw 6vw; }
   .fact-label { font-size: 1.8vw; font-weight: 700; letter-spacing: 0.25em; color: #f5b942; text-shadow: 0 1px 8px rgba(0,0,0,0.6); margin-bottom: 3vh; }
@@ -474,6 +475,7 @@
   </div>
   <div class="slide photoslide" id="slidePhoto">
     <img class="photo-photo" alt="">
+    <video class="photo-video" muted playsinline preload="auto"></video>
   </div>
   <div class="topbar">
     <div class="weather"></div>
@@ -1425,10 +1427,15 @@
       if ((i + 1) % 4 === 0 && specials.length) { seq.push(specials[si % specials.length]); si++; }
     }
   }
+  function pausePhotoVideo() {
+    var v = q('.photo-video', photoSlide);
+    if (v) { try { v.pause(); } catch (e) {} }
+  }
   function showSeq(p) {
     if (!seq.length) return;
     seqPos = ((p % seq.length) + seq.length) % seq.length;
     var s = seq[seqPos];
+    if (s !== 'P') { pausePhotoVideo(); }
     if (s === 'W') { showWeatherSlide(); }
     else if (s === 'C') { showFxSlide(); }
     else if (s === 'K') { showClockSlide(); }
@@ -2291,9 +2298,11 @@
     restartProgress(slideMs());
     resetRotate(slideMs());
   }
-  // ---- Personal photos (P): one photo per appearance, in filename
-  // order, looping. The photo is shown directly with a plain <img>
-  // (Drive thumbnail URL) — no Drive iframe or Drive UI anywhere.
+  // ---- Personal photos (P): one item per appearance, in filename
+  // order, looping. Photos are shown directly with a plain <img>
+  // (Drive thumbnail URL); videos play muted with a plain <video>
+  // (same-origin /api/media proxy, poster = Drive thumbnail) until
+  // they end, with a 60s cap — no Drive iframe or Drive UI anywhere.
   // The index persists per device, so a reload resumes where it stopped
   // instead of restarting from the first photo; a new folder restarts
   // from its first photo. A failed or empty folder skips the screen
@@ -2307,6 +2316,13 @@
   // advancing even where the viewing WebView blocks localStorage (the
   // saved bookmark then only matters across page reloads).
   var photoIdxMem = -1;
+  // A video slide ends when the video ends; the cap only guards a
+  // video that never ends (stall, missing metadata, very long file).
+  var VIDEO_CAP_MS = 60 * 1000;
+  var VIDEO_GRACE_MS = 10 * 1000;
+  // Generation guard so ended/error handlers from a previous item
+  // never act on the item currently showing.
+  var photoVideoToken = 0;
   function photoFolderId() {
     return (lumeCfg && lumeCfg.photosFolder) || '';
   }
@@ -2320,8 +2336,9 @@
       if (!err) {
         try {
           var d = JSON.parse(txt);
-          if (d && d.ok && Array.isArray(d.photos) && d.photos.length) {
-            photoList = d.photos;
+          var list = (d && d.ok && d.items) || (d && d.photos);
+          if (d && d.ok && Array.isArray(list) && list.length) {
+            photoList = list;
             photoListAt = Date.now();
           }
         } catch (e) {}
@@ -2365,23 +2382,56 @@
     photoSkipCount = 0;
     photoErrTries = 0;
     var idx = photoIdxNext();
-    renderPhoto(idx);
+    var item = photoList[idx % photoList.length];
+    renderMedia(idx);
     var el = photoSlide;
     deactivateAll();
     el.className = el.className.replace(/\bactive\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '') + ' active';
     var tw = document.querySelector('.topbar .weather');
     if (tw) tw.style.visibility = 'hidden';
-    restartProgress(slideMs());
-    resetRotate(slideMs());
+    var showMs = slideMs();
+    var rotateMs = showMs;
+    if (item && item.kind === 'video') {
+      showMs = Math.min(item.durationMs || VIDEO_CAP_MS, VIDEO_CAP_MS);
+      rotateMs = showMs + VIDEO_GRACE_MS;
+    }
+    restartProgress(showMs);
+    resetRotate(rotateMs);
   }
-  function renderPhoto(idx) {
-    var ph = photoList[idx % photoList.length];
+  function renderMedia(idx) {
+    var item = photoList[idx % photoList.length];
     var img = q('.photo-photo', photoSlide);
+    var vid = q('.photo-video', photoSlide);
+    if (item.kind === 'video' && vid) {
+      if (img) img.style.display = 'none';
+      vid.style.display = 'block';
+      var token = ++photoVideoToken;
+      vid.onended = function () {
+        if (token === photoVideoToken && curKind === 'P') { nextSeq(); }
+      };
+      vid.onerror = function () {
+        if (token !== photoVideoToken) return;
+        if (photoErrTries < 3) { photoErrTries++; photoIdxMem = idx + 2; photoIdxSave(photoIdxMem); renderMedia(idx + 1); }
+      };
+      try { vid.pause(); } catch (e) {}
+      if (vid.getAttribute('data-src') !== item.url) { vid.setAttribute('data-src', item.url); vid.src = item.url; }
+      if (item.poster) { try { vid.poster = item.poster; } catch (e) {} }
+      try { vid.currentTime = 0; } catch (e) {}
+      var p = null;
+      try { p = vid.play(); } catch (e) {}
+      if (p && p.catch) p.catch(function () {
+        if (token !== photoVideoToken) return;
+        if (photoErrTries < 3) { photoErrTries++; photoIdxMem = idx + 2; photoIdxSave(photoIdxMem); renderMedia(idx + 1); }
+      });
+      return;
+    }
+    if (vid) { try { vid.pause(); } catch (e) {} vid.style.display = 'none'; }
+    if (img) img.style.display = '';
     if (!img) return;
     img.onerror = function () {
-      if (photoErrTries < 3) { photoErrTries++; photoIdxMem = idx + 2; photoIdxSave(photoIdxMem); renderPhoto(idx + 1); }
+      if (photoErrTries < 3) { photoErrTries++; photoIdxMem = idx + 2; photoIdxSave(photoIdxMem); renderMedia(idx + 1); }
     };
-    if (img.getAttribute('data-src') !== ph.url) { img.src = ph.url; img.setAttribute('data-src', ph.url); }
+    if (img.getAttribute('data-src') !== item.url) { img.src = item.url; img.setAttribute('data-src', item.url); }
     kbOn(img);
   }
   function showOffline() {

@@ -148,10 +148,10 @@
       </select>
     </div>
     <div class="card">
-      <h2>Personal photos (optional)</h2>
+      <h2>Photos &amp; videos (optional)</h2>
       <label for="photosFolder">Google Drive folder link</label>
       <input type="text" id="photosFolder" placeholder="https://drive.google.com/drive/folders/…" autocomplete="off">
-      <p class="hint">Paste a public folder link (Anyone with the link can view). The dashboard shows one photo per appearance, in filename order, looping — displayed directly, no Drive viewer. Anyone with the link can view these photos, and anyone near the Portal can see them on screen.</p>
+      <p class="hint">Paste a public folder link (Anyone with the link can view). The dashboard shows one photo or video per appearance, in filename order, looping — photos displayed directly, videos played muted until they end (60s max), no Drive viewer. Anyone with the link can view these files, and anyone near the Portal can see them on screen.</p>
       <div class="row-inline">
         <div><button class="secondary" id="photosCheckBtn" type="button">Check folder</button></div>
         <div><span class="msg" id="photosCheckMsg"></span></div>
@@ -492,7 +492,13 @@
     if (!id) { setMsg($('photosCheckMsg'), 'Paste a Drive folder link first.', false); return; }
     setMsg($('photosCheckMsg'), 'Checking…', true);
     fetch('/api/photos?folder=' + encodeURIComponent(id)).then(function (r) { return r.json(); }).then(function (d) {
-      if (d.ok) { setMsg($('photosCheckMsg'), d.count + (d.count === 1 ? ' photo found.' : ' photos found.'), true); }
+      if (d.ok) {
+        var np = (d.photos || []).length, nv = (d.videos || []).length;
+        var n = (d.items && d.items.length) || (np + nv);
+        var msg = n + ' item' + (n === 1 ? '' : 's') + ' found (' + np + ' photo' + (np === 1 ? '' : 's');
+        if (nv) { msg += ', ' + nv + ' video' + (nv === 1 ? '' : 's'); }
+        setMsg($('photosCheckMsg'), msg + ').', true);
+      }
       else if (d.error === 'no_key') { setMsg($('photosCheckMsg'), 'Photo service is not set up on the server yet (missing Drive API key).', false); }
       else if (d.error === 'bad_folder') { setMsg($('photosCheckMsg'), 'Could not read that folder link.', false); }
       else { setMsg($('photosCheckMsg'), 'Drive could not list this folder. Make sure it is shared as “Anyone with the link can view”.', false); }
