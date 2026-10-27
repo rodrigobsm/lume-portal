@@ -185,6 +185,18 @@
       <h2>Screens</h2>
       <p class="hint">Choose which special screens appear, and drag rows (or use the arrows) to set their rotation order. Photos appears only when a Drive folder is set on the Device tab.</p>
       <div id="screenList"></div>
+      <label for="newsPerBlock">News in a row</label>
+      <select id="newsPerBlock">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4" selected>4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+      </select>
+      <p class="hint">How many news slides play before a special screen (1–8). Default 4.</p>
     </div>
   </div>
 
@@ -512,6 +524,7 @@
     $('clockFormat').value = cfg.clockFormat || '12h';
     $('tempUnit').value = cfg.tempUnit || 'C';
     $('slideDuration').value = [5, 10, 15, 20, 25, 30, 60].indexOf(cfg.slideDuration) !== -1 ? cfg.slideDuration : 15;
+    $('newsPerBlock').value = (cfg.newsPerBlock >= 1 && cfg.newsPerBlock <= 8) ? cfg.newsPerBlock : 4;
     if (cfg.city) {
       cityName = cfg.city.name || 'Acworth, GA';
       $('cityName').value = cityName;
@@ -566,6 +579,7 @@
       clockFormat: $('clockFormat').value,
       tempUnit: $('tempUnit').value,
       slideDuration: parseInt($('slideDuration').value, 10),
+      newsPerBlock: parseInt($('newsPerBlock').value, 10),
       screens: screens,
       screenOrder: screenOrder.slice(),
       photosFolder: extractDriveFolderId($('photosFolder').value),

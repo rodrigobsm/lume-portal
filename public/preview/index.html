@@ -1444,10 +1444,18 @@
     loadPhotos();
     seq = specials.slice();
     var si = 0;
+    // News slides in a row before each special (config newsPerBlock,
+    // 1-8, default 4).
+    var npb = (lumeCfg && lumeCfg.newsPerBlock >= 1 && lumeCfg.newsPerBlock <= 8) ? lumeCfg.newsPerBlock : 4;
     for (var i = 0; i < items.length; i++) {
       seq.push(i);
-      if ((i + 1) % 4 === 0 && specials.length) { seq.push(specials[si % specials.length]); si++; }
+      if ((i + 1) % npb === 0 && specials.length) { seq.push(specials[si % specials.length]); si++; }
     }
+    // The rotation wraps from the last element back to the first; if
+    // the last element is the same special as the first (possible when
+    // the news count lines up with the specials cycle), it would play
+    // twice in a row — drop the trailing duplicate.
+    if (seq.length > 1 && typeof seq[seq.length - 1] === 'string' && seq[seq.length - 1] === seq[0]) seq.pop();
   }
   function pausePhotoVideo() {
     var v = q('.photo-video', photoSlide);
@@ -2666,10 +2674,14 @@
               if (curKind === 'news') {
                 var pn = seq.indexOf(curNewsIdx);
                 showSeq(pn === -1 ? 0 : pn);
-              } else {
-                var ps = seq.indexOf(curKind);
-                showSeq(ps === -1 ? 0 : ps);
               }
+              // Specials (incl. Photos) are NOT re-shown here. Re-showing
+              // would jump to the special's first occurrence in the new
+              // sequence, so a Photos slide would advance to the next
+              // photo/video with no news in between (two videos
+              // back-to-back). The current slide keeps playing; the
+              // rebuilt sequence takes over at the next advance
+              // (seqPos is modulo-wrapped by showSeq).
             }
             return;
           }

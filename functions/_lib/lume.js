@@ -50,6 +50,9 @@ export function normalizeConfig(input) {
   cfg.tempUnit = (src.tempUnit === 'F') ? 'F' : 'C';
   var DURATIONS = [5, 10, 15, 20, 25, 30, 60];
   cfg.slideDuration = DURATIONS.indexOf(src.slideDuration) !== -1 ? src.slideDuration : 15;
+  // News slides in a row before a special screen (1-8, default 4).
+  var npb = parseInt(src.newsPerBlock, 10);
+  cfg.newsPerBlock = (npb >= 1 && npb <= 8) ? npb : 4;
   cfg.photosFolder = driveFolderId(src.photosFolder);
   var screens = {};
   var ssrc = (src.screens && typeof src.screens === 'object') ? src.screens : {};

@@ -175,6 +175,7 @@ preview).
 - `city`: `{name, lat, lon}` (default Acworth, GA — 34.0658, -84.6769)
 - `clockFormat`: `12h` | `24h`; `tempUnit`: `C` | `F`
 - `slideDuration`: 5/10/15/20/25/30/60 (any other value normalizes to 15)
+- `newsPerBlock`: news slides in a row before a special screen, 1–8 (any other value normalizes to 4)
 - `screens`: `{C, W, K, B, A, M, F, P}` (booleans)
 - `screenOrder`: order of the specials (e.g.
   `["C","W","K","B","A","M","F","P"]`; without it, the default order;
