@@ -40,8 +40,10 @@ export async function onRequest(context) {
         url: '/api/media?id=' + encodeURIComponent(f.id),
         poster: 'https://drive.google.com/thumbnail?id=' + f.id + '&sz=w1920'
       };
-      if (f.videoMediaMetadata && typeof f.videoMediaMetadata.durationMillis === 'number') {
-        item.durationMs = f.videoMediaMetadata.durationMillis;
+      if (f.videoMediaMetadata && f.videoMediaMetadata.durationMillis != null) {
+        // Drive returns durationMillis as a string (int64 in JSON).
+        var dm = parseInt(f.videoMediaMetadata.durationMillis, 10);
+        if (isFinite(dm) && dm > 0) item.durationMs = dm;
       }
       videos.push(item);
     } else {
