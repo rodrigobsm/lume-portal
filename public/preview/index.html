@@ -113,7 +113,8 @@
   .clock-content { position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 2; display: flex; flex-direction: column; justify-content: flex-start; gap: 3vh; padding: 13vh 3vw 3vw 3vw; }
   .clock-label { font-size: 1.8vw; font-weight: 700; letter-spacing: 0.25em; color: #f5b942; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
   .clock-row { display: flex; gap: 1.5vw; flex: 1; align-items: stretch; }
-  .clock-card { flex: 1; background: rgba(0,0,0,0.45); border-radius: 1vw; padding: 1.5vw 0.5vw; display: flex; flex-direction: column; align-items: center; justify-content: center; animation: wxRise 0.7s ease both; }
+  .clock-card { flex: 1; background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.4) 55%, rgba(0,0,0,0) 100%); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border-radius: 1vw; padding: 1.5vw 0.5vw; display: flex; flex-direction: column; align-items: center; justify-content: center; animation: wxRise 0.7s ease both; }
+  .wx-day, .fx-chart, .fx-box, .air-box, .air-chart, .mkt-card { -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
   .clock-face { position: relative; width: 15.5vw; height: 15.5vw; border-radius: 50%; background: radial-gradient(circle at 50% 35%, rgba(255,255,255,0.14) 0%, rgba(0,0,0,0.55) 70%); border: 2px solid rgba(255,255,255,0.35); box-shadow: 0 4px 24px rgba(0,0,0,0.5); }
   .clock-face .tick { position: absolute; left: 50%; top: 50%; width: 3px; height: 8%; margin-left: -1.5px; margin-top: -4%; background: rgba(255,255,255,0.9); }
   .clock-face .cnum { position: absolute; font-size: 1.6vw; font-weight: 700; color: #fff; transform: translate(-50%, -50%); text-shadow: 0 1px 6px rgba(0,0,0,0.6); }
@@ -2405,6 +2406,7 @@
   var photoSkipCount = 0;
   var photoWaitTries = 0;
   var photoErrTries = 0;
+  var photoReplaceTries = 0;
   // In-memory index: authoritative during a session, so photos keep
   // advancing even where the viewing WebView blocks localStorage (the
   // saved bookmark then only matters across page reloads).
@@ -2593,6 +2595,7 @@
     }
     photoWaitTries = 0;
     photoSkipCount = 0;
+    photoReplaceTries = 0;
     photoErrTries = 0;
     var idx = photoIdxNext();
     var item = photoList[idx % photoList.length];
@@ -2705,6 +2708,24 @@
       // it. One element reset (drop src, reload, set src, play again)
       // is the kick that can free a stuck decoder, so try it once
       // before giving up on the item.
+      // Second-level recovery: if the shared element's decoder is
+      // wedged, no same-element reset helps. Swap in a brand-new
+      // <video> (fresh decoder) and retry the item, once per slide.
+      var replaceVideoEl = function () {
+        if (photoReplaceTries >= 1) return false;
+        var old = q('.photo-video', photoSlide);
+        if (!old || !old.parentNode) return false;
+        photoReplaceTries++;
+        var nv = document.createElement('video');
+        nv.className = 'photo-video';
+        nv.setAttribute('muted', '');
+        nv.muted = true;
+        nv.setAttribute('playsinline', '');
+        nv.playsInline = true;
+        nv.preload = 'auto';
+        old.parentNode.replaceChild(nv, old);
+        return true;
+      };
       var resetTried = false;
       var doReset = function () {
         if (resetTried) return false;
@@ -2716,7 +2737,11 @@
         try { vid.currentTime = 0; } catch (e) {}
         var p2 = null;
         try { p2 = vid.play(); } catch (e) {}
-        if (p2 && p2.catch) p2.catch(function () {});
+        if (p2 && p2.catch) p2.catch(function () {
+          if (token !== photoVideoToken || curKind !== 'P') return;
+          if (replaceVideoEl()) { renderMedia(idx); return; }
+          if (photoErrTries < 3) { photoErrTries++; photoIdxMem = idx + 2; photoIdxSave(photoIdxMem); renderMedia(idx + 1); }
+        });
         return true;
       };
       if (p && p.catch) p.catch(function () {
@@ -2739,6 +2764,7 @@
           if (stuck >= 2) {
             stuck = 0;
             if (doReset()) { lastCt = -1; setTimeout(watch, 5000); }
+            else if (replaceVideoEl()) { renderMedia(idx); }
             return;
           }
         } else {
