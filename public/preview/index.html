@@ -2403,6 +2403,7 @@
   var photoListAt = 0;
   var photoLoading = false;
   var photoSkipCount = 0;
+  var photoWaitTries = 0;
   var photoErrTries = 0;
   // In-memory index: authoritative during a session, so photos keep
   // advancing even where the viewing WebView blocks localStorage (the
@@ -2562,6 +2563,23 @@
     if (!photoList.length) {
       loadPhotos();
       if (!photoList.length) {
+        // Fresh boot: the photo fetch started with buildSeq a moment
+        // ago and is still in flight, so the list is empty right now.
+        // Wait for it (bounded) instead of skipping — otherwise
+        // Photos can never be the opening slide: it always skips to
+        // the next screen (Weather). If no fetch is in flight (dead
+        // folder / failed fetch), skip at once as before; a hung
+        // fetch is capped at ~6s, and user navigation cancels the
+        // pending retry via the curKind/seqPos guard.
+        if (photoLoading && photoWaitTries < 12) {
+          photoWaitTries++;
+          var pos = seqPos;
+          setTimeout(function () {
+            if (curKind === 'P' && seqPos === pos) showPhotoSlide();
+          }, 500);
+          return;
+        }
+        photoWaitTries = 0;
         photoSkipCount++;
         if (photoSkipCount > seq.length) {
           photoSkipCount = 0;
@@ -2573,6 +2591,7 @@
         return;
       }
     }
+    photoWaitTries = 0;
     photoSkipCount = 0;
     photoErrTries = 0;
     var idx = photoIdxNext();
