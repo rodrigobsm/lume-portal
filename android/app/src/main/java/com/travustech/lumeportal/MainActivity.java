@@ -58,6 +58,9 @@ public class MainActivity extends Activity {
     private String pairingCode;
     private String lastUrl;
     private boolean paired;
+    // True after onPause: distinguishes the first onResume (after
+    // onCreate, no reload) from a return from background (reload).
+    private boolean wasPaused = false;
     private Handler pollHandler;
     private Runnable pollRunnable;
 
@@ -247,6 +250,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
+        wasPaused = true;
         if (webView != null) {
             webView.onPause();
         }
@@ -257,6 +261,24 @@ public class MainActivity extends Activity {
         super.onResume();
         if (webView != null) {
             webView.onResume();
+        }
+        // Returning from background (home, screen off) reloads the
+        // dashboard, so newly saved setup-site config and new panel
+        // code apply without a manual restart. Never reloads over the
+        // pairing screen: if the user opened pairing on purpose, it
+        // stays. The first onResume after onCreate does not reload
+        // (wasPaused is still false).
+        if (wasPaused) {
+            wasPaused = false;
+            if (paired && webView != null && webView.getVisibility() == View.VISIBLE) {
+                String url = lastUrl;
+                if (url == null || url.isEmpty()) {
+                    url = getSharedPreferences(PREFS, MODE_PRIVATE).getString(KEY_URL, null);
+                }
+                if (url != null && !url.isEmpty()) {
+                    loadUrl(url);
+                }
+            }
         }
     }
 
