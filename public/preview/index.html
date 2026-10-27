@@ -1441,11 +1441,23 @@
     var v = q('.photo-video', photoSlide);
     if (v) { try { v.pause(); } catch (e) {} }
   }
+  // Pause only after the 0.8s crossfade, so a video keeps moving while
+  // it fades out instead of freezing on its last frame mid-transition.
+  // Skipped if playback moved on to another item in the meantime, and
+  // never interrupts a video that is only preloading (paused already).
+  function pausePhotoVideoSoon() {
+    var v = q('.photo-video', photoSlide);
+    if (!v) return;
+    var tok = photoVideoToken;
+    setTimeout(function () {
+      if (tok === photoVideoToken && curKind !== 'P' && !v.paused) { try { v.pause(); } catch (e) {} }
+    }, FADE_MS + 300);
+  }
   function showSeq(p) {
     if (!seq.length) return;
     seqPos = ((p % seq.length) + seq.length) % seq.length;
     var s = seq[seqPos];
-    if (s !== 'P') { pausePhotoVideo(); }
+    if (s !== 'P') { pausePhotoVideoSoon(); }
     if (s === 'W') { showWeatherSlide(); }
     else if (s === 'C') { showFxSlide(); }
     else if (s === 'K') { showClockSlide(); }
@@ -2331,6 +2343,11 @@
   // video that never ends (stall, missing metadata, very long file).
   var VIDEO_CAP_MS = 60 * 1000;
   var VIDEO_GRACE_MS = 10 * 1000;
+  // Slide crossfade duration (matches .slide transition in CSS).
+  var FADE_MS = 800;
+  // Advance this far before a video ends, so the fade starts while the
+  // video is still playing instead of on a frozen last frame.
+  var VIDEO_END_LEAD_MS = FADE_MS + 200;
   // Generation guard so ended/error handlers from a previous item
   // never act on the item currently showing.
   var photoVideoToken = 0;
@@ -2543,6 +2560,15 @@
       var token = ++photoVideoToken;
       vid.onended = function () {
         if (token === photoVideoToken && curKind === 'P') { nextSeq(); }
+      };
+      var endAdvanced = false;
+      vid.ontimeupdate = function () {
+        if (token !== photoVideoToken || curKind !== 'P' || endAdvanced) return;
+        var dur = vid.duration;
+        if (isFinite(dur) && dur > 1.5 && !vid.ended && (dur - vid.currentTime) <= VIDEO_END_LEAD_MS / 1000) {
+          endAdvanced = true;
+          nextSeq();
+        }
       };
       vid.onerror = function () {
         if (token !== photoVideoToken || curKind !== 'P') return;
