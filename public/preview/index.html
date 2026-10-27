@@ -187,6 +187,9 @@
   .fact-photo { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transform-origin: center center; }
   .fact-photo.kb-start { transform: scale(1); }
   .fact-photo.kb { transform: scale(1.12); transition: transform var(--slide-kb, 15s) linear; }
+  .photo-photo { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transform-origin: center center; }
+  .photo-photo.kb-start { transform: scale(1); }
+  .photo-photo.kb { transform: scale(1.12); transition: transform var(--slide-kb, 15s) linear; }
   .fact-shade { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.45) 100%); }
   .fact-content { position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 12vh 6vw 6vw 6vw; }
   .fact-label { font-size: 1.8vw; font-weight: 700; letter-spacing: 0.25em; color: #f5b942; text-shadow: 0 1px 8px rgba(0,0,0,0.6); margin-bottom: 3vh; }
@@ -468,6 +471,9 @@
       <div class="fact-tag"></div>
       <div class="fact-answer"></div>
     </div>
+  </div>
+  <div class="slide photoslide" id="slidePhoto">
+    <img class="photo-photo" alt="">
   </div>
   <div class="topbar">
     <div class="weather"></div>
@@ -833,6 +839,7 @@
   var airSlide = document.getElementById('slideAir');
   var mktSlide = document.getElementById('slideMkt');
   var factSlide = document.getElementById('slideFact');
+  var photoSlide = document.getElementById('slidePhoto');
   var airData = null;
   var airPollen = null;
   var mktData = null;
@@ -1397,7 +1404,7 @@
     days.innerHTML = html;
   }
   function buildSeq() {
-    var all = ['C', 'W', 'K', 'B', 'A', 'M', 'F'];
+    var all = ['C', 'W', 'K', 'B', 'A', 'M', 'F', 'P'];
     var order = all;
     if (lumeCfg && Array.isArray(lumeCfg.screenOrder) && lumeCfg.screenOrder.length) {
       order = [];
@@ -1408,6 +1415,9 @@
     if (lumeCfg && lumeCfg.screens) {
       specials = order.filter(function (k) { return lumeCfg.screens[k] !== false; });
     }
+    // Photos appear only when a Drive folder is configured.
+    if (!photoFolderId()) specials = specials.filter(function (k) { return k !== 'P'; });
+    loadPhotos();
     seq = specials.slice();
     var si = 0;
     for (var i = 0; i < items.length; i++) {
@@ -1426,6 +1436,7 @@
     else if (s === 'A') { showAirSlide(); }
     else if (s === 'M') { showMktSlide(); }
     else if (s === 'F') { showFactSlide(); }
+    else if (s === 'P') { showPhotoSlide(); }
     else { curNewsIdx = s; curKind = 'news'; showSlide(s); }
   }
   function nextSeq() {
@@ -1437,7 +1448,7 @@
     showSeq(seqPos - 1);
   }
   function deactivateAll() {
-    var all = [slides.A, slides.B, wxSlide, fxSlide, clockSlide, bibleSlide, airSlide, mktSlide, factSlide];
+    var all = [slides.A, slides.B, wxSlide, fxSlide, clockSlide, bibleSlide, airSlide, mktSlide, factSlide, photoSlide];
     for (var i = 0; i < all.length; i++) {
       if (all[i]) all[i].className = all[i].className.replace(/\bactive\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '');
     }
@@ -2279,6 +2290,89 @@
     if (tw) tw.style.visibility = 'hidden';
     restartProgress(slideMs());
     resetRotate(slideMs());
+  }
+  // ---- Personal photos (P): one photo per appearance, in filename
+  // order, looping. The photo is shown directly with a plain <img>
+  // (Drive thumbnail URL) — no Drive iframe or Drive UI anywhere.
+  // The index persists per device, so a reload resumes where it stopped
+  // instead of restarting from the first photo; a new folder restarts
+  // from its first photo. A failed or empty folder skips the screen
+  // silently instead of showing a blank slide.
+  var photoList = [];
+  var photoListAt = 0;
+  var photoLoading = false;
+  var photoSkipCount = 0;
+  var photoErrTries = 0;
+  function photoFolderId() {
+    return (lumeCfg && lumeCfg.photosFolder) || '';
+  }
+  function loadPhotos() {
+    var fid = photoFolderId();
+    if (!fid || photoLoading) return;
+    if (photoList.length && Date.now() - photoListAt < 30 * 60 * 1000) return;
+    photoLoading = true;
+    xhrGet('/api/photos?folder=' + encodeURIComponent(fid), function (err, txt) {
+      photoLoading = false;
+      if (!err) {
+        try {
+          var d = JSON.parse(txt);
+          if (d && d.ok && Array.isArray(d.photos) && d.photos.length) {
+            photoList = d.photos;
+            photoListAt = Date.now();
+          }
+        } catch (e) {}
+      }
+    });
+  }
+  function photoIdxSaved() {
+    try {
+      var s = JSON.parse(localStorage.getItem('portalNewsPhoto') || 'null');
+      if (s && s.folder === photoFolderId() && typeof s.idx === 'number') return s.idx;
+    } catch (e) {}
+    return 0;
+  }
+  function photoIdxSave(n) {
+    try { localStorage.setItem('portalNewsPhoto', JSON.stringify({ folder: photoFolderId(), idx: n })); } catch (e) {}
+  }
+  function showPhotoSlide() {
+    restoreHeadlines();
+    curKind = 'P';
+    if (!photoList.length) {
+      loadPhotos();
+      if (!photoList.length) {
+        photoSkipCount++;
+        if (photoSkipCount > seq.length) {
+          photoSkipCount = 0;
+          if (items.length) { curNewsIdx = 0; curKind = 'news'; showSlide(0); }
+          else { showOffline(); }
+        } else {
+          nextSeq();
+        }
+        return;
+      }
+    }
+    photoSkipCount = 0;
+    photoErrTries = 0;
+    var idx = photoIdxSaved() % photoList.length;
+    renderPhoto(idx);
+    var el = photoSlide;
+    deactivateAll();
+    el.className = el.className.replace(/\bactive\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '') + ' active';
+    var tw = document.querySelector('.topbar .weather');
+    if (tw) tw.style.visibility = 'hidden';
+    restartProgress(slideMs());
+    resetRotate(slideMs());
+  }
+  function renderPhoto(idx) {
+    var ph = photoList[idx % photoList.length];
+    photoIdxSave(idx + 1);
+    var img = q('.photo-photo', photoSlide);
+    if (!img) return;
+    img.onerror = function () {
+      if (photoErrTries < 3) { photoErrTries++; renderPhoto(idx + 1); }
+    };
+    if (img.getAttribute('data-src') !== ph.url) { img.src = ph.url; img.setAttribute('data-src', ph.url); }
+    kbOn(img);
   }
   function showOffline() {
     var ld = document.getElementById('loading');

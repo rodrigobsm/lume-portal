@@ -147,6 +147,16 @@
         <option value="60">60 seconds</option>
       </select>
     </div>
+    <div class="card">
+      <h2>Personal photos (optional)</h2>
+      <label for="photosFolder">Google Drive folder link</label>
+      <input type="text" id="photosFolder" placeholder="https://drive.google.com/drive/folders/…" autocomplete="off">
+      <p class="hint">Paste a public folder link (Anyone with the link can view). The dashboard shows one photo per appearance, in filename order, looping — displayed directly, no Drive viewer. Anyone with the link can view these photos, and anyone near the Portal can see them on screen.</p>
+      <div class="row-inline">
+        <div><button class="secondary" id="photosCheckBtn" type="button">Check folder</button></div>
+        <div><span class="msg" id="photosCheckMsg"></span></div>
+      </div>
+    </div>
   </div>
 
   <div class="panel" id="panel-weather" role="tabpanel" hidden>
@@ -173,7 +183,7 @@
   <div class="panel" id="panel-screens" role="tabpanel" hidden>
     <div class="card">
       <h2>Screens</h2>
-      <p class="hint">Choose which special screens appear, and drag rows (or use the arrows) to set their rotation order.</p>
+      <p class="hint">Choose which special screens appear, and drag rows (or use the arrows) to set their rotation order. Photos appears only when a Drive folder is set on the Device tab.</p>
       <div id="screenList"></div>
     </div>
   </div>
@@ -218,8 +228,8 @@
     ['g1-tecnologia', 'G1 — Technology']
   ];
   var CATS = [['brasil', 'Brazil'], ['mundo', 'World'], ['tech', 'Tech'], ['eua', 'USA'], ['atlanta', 'Atlanta']];
-  var SCREENS = [['C', 'Currency'], ['W', 'Weather'], ['K', 'World Clock'], ['B', 'Bible'], ['A', 'Air Quality'], ['M', 'Markets'], ['F', 'Fun Facts']];
-  var SCREEN_KEYS = ['C', 'W', 'K', 'B', 'A', 'M', 'F'];
+  var SCREENS = [['C', 'Currency'], ['W', 'Weather'], ['K', 'World Clock'], ['B', 'Bible'], ['A', 'Air Quality'], ['M', 'Markets'], ['F', 'Fun Facts'], ['P', 'Photos']];
+  var SCREEN_KEYS = ['C', 'W', 'K', 'B', 'A', 'M', 'F', 'P'];
   var ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
   var DEFAULT_CLOCK = [
     { name: 'Atlanta', timezone: 'America/New_York' },
@@ -467,6 +477,28 @@
     try { document.cookie = CODE_COOKIE + '=' + encodeURIComponent(code) + '; max-age=31536000; path=/; SameSite=Lax'; } catch (e) {}
   }
 
+  // ---- Personal photos: Drive folder link -> folder ID ----
+  function extractDriveFolderId(v) {
+    if (!v) return '';
+    var s = String(v).trim();
+    var m = s.match(/\/folders\/([A-Za-z0-9_-]+)/) || s.match(/[?&]id=([A-Za-z0-9_-]+)/);
+    if (m) return m[1];
+    if (/^[A-Za-z0-9_-]{10,100}$/.test(s)) return s;
+    return '';
+  }
+
+  $('photosCheckBtn').addEventListener('click', function () {
+    var id = extractDriveFolderId($('photosFolder').value);
+    if (!id) { setMsg($('photosCheckMsg'), 'Paste a Drive folder link first.', false); return; }
+    setMsg($('photosCheckMsg'), 'Checking…', true);
+    fetch('/api/photos?folder=' + encodeURIComponent(id)).then(function (r) { return r.json(); }).then(function (d) {
+      if (d.ok) { setMsg($('photosCheckMsg'), d.count + (d.count === 1 ? ' photo found.' : ' photos found.'), true); }
+      else if (d.error === 'no_key') { setMsg($('photosCheckMsg'), 'Photo service is not set up on the server yet (missing Drive API key).', false); }
+      else if (d.error === 'bad_folder') { setMsg($('photosCheckMsg'), 'Could not read that folder link.', false); }
+      else { setMsg($('photosCheckMsg'), 'Drive could not list this folder. Make sure it is shared as “Anyone with the link can view”.', false); }
+    }).catch(function () { setMsg($('photosCheckMsg'), 'Network error. Try again.', false); });
+  });
+
   // ---- Load / save ----
   function applyConfig(cfg) {
     if (!cfg) return;
@@ -488,6 +520,7 @@
       SCREEN_KEYS.forEach(function (k) { if (ord.indexOf(k) === -1) ord.push(k); });
       screenOrder = ord;
     }
+    $('photosFolder').value = cfg.photosFolder ? 'https://drive.google.com/drive/folders/' + cfg.photosFolder : '';
     renderScreens();
     if (Array.isArray(cfg.worldClock) && cfg.worldClock.length) {
       var wc = [];
@@ -529,6 +562,7 @@
       slideDuration: parseInt($('slideDuration').value, 10),
       screens: screens,
       screenOrder: screenOrder.slice(),
+      photosFolder: extractDriveFolderId($('photosFolder').value),
       worldClock: wc,
       feeds: { enabled: enabled, custom: custom }
     };

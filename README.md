@@ -39,8 +39,9 @@ preferring items from the last 48 h with an image. The catalog refreshes
 every 10 min, with a `localStorage` cache and an offline screen (never a
 blank screen).
 
-**Special screens** — sequence `C, W, K, B, A, M, F`: the opening block
-shows all 7 in sequence; afterwards, one special after every 4 news items.
+**Special screens** — sequence `C, W, K, B, A, M, F, P`: the opening
+block shows all 8 in sequence; afterwards, one special after every 4 news
+items.
 
 - **C — Currency**: US$ 1 = R$ X in large type, EUR/GBP/JPY per US$ 1,
   BTC/ETH/SOL/BNB/XRP/DOGE in US$ with 24 h change; sources: ECB/Frankfurter
@@ -61,6 +62,15 @@ shows all 7 in sequence; afterwards, one special after every 4 news items.
   day" facts in PT (or EN) with the article's photo; every 3rd one, a quiz
   from Open Trivia DB (translated via MyMemory in PT; in EN, in the
   original).
+- **P — Photos**: personal photos from a public Google Drive folder
+  (config `photosFolder`, set on `/pair/`). Each appearance shows the
+  next photo in filename order, looping; the index persists per device,
+  so a reload resumes where it stopped, and a new folder restarts from
+  its first photo. Photos are shown directly with a plain `<img>`
+  (Drive thumbnail URL) — no Drive iframe or Drive UI. The list is
+  fetched server-side (`functions/api/photos.js`, Drive API v3) and
+  refreshed every 30 min; a failed or empty folder skips the screen
+  silently. The screen appears only when a folder is configured.
 
 **Slide duration** — a single duration for all screens (news + specials),
 configurable per device (5/10/15/20/25/30/60 s, default 15 s).
@@ -155,10 +165,13 @@ preview).
 - `city`: `{name, lat, lon}` (default Acworth, GA — 34.0658, -84.6769)
 - `clockFormat`: `12h` | `24h`; `tempUnit`: `C` | `F`
 - `slideDuration`: 5/10/15/20/25/30/60 (any other value normalizes to 15)
-- `screens`: `{C, W, K, B, A, M, F}` (booleans)
+- `screens`: `{C, W, K, B, A, M, F, P}` (booleans)
 - `screenOrder`: order of the specials (e.g.
-  `["C","W","K","B","A","M","F"]`; without it, the default order; unknown
-  codes are ignored and missing ones go to the end)
+  `["C","W","K","B","A","M","F","P"]`; without it, the default order;
+  unknown codes are ignored and missing ones go to the end)
+- `photosFolder`: a Google Drive folder ID, or a full folder link (the
+  ID is extracted). Empty = no Photos screen. The folder must be shared
+  as "Anyone with the link can view".
 - `worldClock`: up to 5 `{name, timezone}` for the world clock (without
   it, the 5 default cities: Atlanta, Los Angeles, Brasília, London, Tokyo)
 - `feeds`: `{enabled: [...known ids, max 30], custom: [{name, url,
@@ -196,6 +209,14 @@ Workers KV Storage Read/Edit** (without the KV permission, the API returns
 keyed by binding name (`{"LUME_KV": {"namespace_id": "..."}}`), not the
 wrangler.toml array shape.
 
+The Photos screen needs one more server-side setting: a Google Drive API
+key as the Pages environment variable `GOOGLE_DRIVE_API_KEY` (Google
+Cloud Console → enable the Google Drive API → create an API key,
+restricted to the Drive API). The key never appears in client code; it
+only lets the server list public folders. Without it, `/api/photos`
+answers `{ok:false, error:'no_key'}` and the dashboard skips the Photos
+screen. Self-hosters set their own key.
+
 Contributors do not need a Cloudflare account or token: develop locally
 and send a pull request (see [CONTRIBUTING.md](CONTRIBUTING.md)).
 
@@ -225,6 +246,7 @@ open('/tmp/dash.js','w').write(max(blocks, key=len))
 - `public/downloads/` — stable APK (`lume-portal.apk`) + versioned copies
 - `public/assets/` — Lume and TravusTech logos
 - `functions/api/news.js` — RSS aggregator (10 min cache)
+- `functions/api/photos.js` — Drive folder listing for the Photos screen
 - `functions/api/og.js`, `alerts.js`, `markets.js`, `pollen.js` — support APIs
 - `functions/api/lume/config.js`, `pair.js` — pairing and config
 - `functions/_lib/aggregate.js`, `lume.js` — aggregation and validation
@@ -256,6 +278,11 @@ marketing traffic from device traffic, filter by path/host in GA. See
   testing); the code path is deployed.
 - **Pairing codes are the only key in v1** — anyone who knows a device's
   code can view and change its settings. Keep codes private.
+- **Photos (v1 limits)**: only the first 100 images in a folder (Drive
+  API page size); the folder must be public ("Anyone with the link can
+  view") or listing fails and the screen is skipped; listing needs the
+  server-side Drive API key (see Deployment). Anyone with the folder link
+  can view the photos, and anyone near the Portal can see them on screen.
 - **Config applies on the next dashboard load only** (see above).
 - **Third-party feeds and APIs can break without notice** (rate limits,
   discontinued feeds, changed formats). The dashboard degrades to

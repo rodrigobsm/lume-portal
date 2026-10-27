@@ -10,7 +10,7 @@ export var FEED_IDS = [
   'g1-tecnologia'
 ];
 
-export var SCREEN_KEYS = ['C', 'W', 'K', 'B', 'A', 'M', 'F'];
+export var SCREEN_KEYS = ['C', 'W', 'K', 'B', 'A', 'M', 'F', 'P'];
 
 export var FEED_CATEGORIES = ['brasil', 'mundo', 'tech', 'eua', 'atlanta'];
 
@@ -21,6 +21,18 @@ export function validCode(code) {
 function isNum(n) { return typeof n === 'number' && isFinite(n); }
 
 function str(v, max) { return typeof v === 'string' ? v.slice(0, max) : ''; }
+
+// Accepts a full Drive folder link (…/drive/folders/<ID>, …?id=<ID>) or a
+// bare folder ID; anything else normalizes to '' (no photos screen).
+function driveFolderId(v) {
+  if (typeof v !== 'string') return '';
+  var s = v.trim();
+  if (!s) return '';
+  var m = s.match(/\/folders\/([A-Za-z0-9_-]+)/) || s.match(/[?&]id=([A-Za-z0-9_-]+)/);
+  if (m) return m[1].slice(0, 100);
+  if (/^[A-Za-z0-9_-]{10,100}$/.test(s)) return s;
+  return '';
+}
 
 export function normalizeConfig(input) {
   var cfg = {};
@@ -38,6 +50,7 @@ export function normalizeConfig(input) {
   cfg.tempUnit = (src.tempUnit === 'F') ? 'F' : 'C';
   var DURATIONS = [5, 10, 15, 20, 25, 30, 60];
   cfg.slideDuration = DURATIONS.indexOf(src.slideDuration) !== -1 ? src.slideDuration : 15;
+  cfg.photosFolder = driveFolderId(src.photosFolder);
   var screens = {};
   var ssrc = (src.screens && typeof src.screens === 'object') ? src.screens : {};
   SCREEN_KEYS.forEach(function (k) { screens[k] = ssrc[k] !== false; });
