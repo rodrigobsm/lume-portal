@@ -855,6 +855,10 @@
   var fxFailed = false;
   var seq = [];
   var seqPos = 0;
+  // True once any slide has been shown. Used to tell the first load
+  // (which must render a slide, hiding the loading overlay) apart from
+  // later catalog refreshes (which must not jump the current slide).
+  var hasShown = false;
   var slides = { A: document.getElementById('slideA'), B: document.getElementById('slideB') };
   var wxSlide = document.getElementById('slideWeather');
   var fxSlide = document.getElementById('slideFx');
@@ -1475,6 +1479,7 @@
   }
   function showSeq(p) {
     if (!seq.length) return;
+    hasShown = true;
     seqPos = ((p % seq.length) + seq.length) % seq.length;
     var s = seq[seqPos];
     if (s !== 'P') { pausePhotoVideoSoon(); }
@@ -2674,13 +2679,20 @@
               if (curKind === 'news') {
                 var pn = seq.indexOf(curNewsIdx);
                 showSeq(pn === -1 ? 0 : pn);
+              } else if (!hasShown) {
+                // First load only: show the current special, exactly as
+                // before — this renders the first slide and hides the
+                // loading overlay. Without this branch a fresh boot
+                // never renders anything (regression in 41e945e).
+                var ps = seq.indexOf(curKind);
+                showSeq(ps === -1 ? 0 : ps);
               }
-              // Specials (incl. Photos) are NOT re-shown here. Re-showing
-              // would jump to the special's first occurrence in the new
-              // sequence, so a Photos slide would advance to the next
-              // photo/video with no news in between (two videos
-              // back-to-back). The current slide keeps playing; the
-              // rebuilt sequence takes over at the next advance
+              // Refreshes while on a special (hasShown): do NOT re-show.
+              // Re-showing would jump to the special's first occurrence
+              // in the new sequence, so a Photos slide would advance
+              // to the next photo/video with no news in between (two
+              // videos back-to-back). The current slide keeps playing;
+              // the rebuilt sequence takes over at the next advance
               // (seqPos is modulo-wrapped by showSeq).
             }
             return;
