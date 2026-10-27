@@ -2700,10 +2700,54 @@
       try { vid.currentTime = 0; } catch (e) {}
       var p = null;
       try { p = vid.play(); } catch (e) {}
+      // After a long session the old WebView's media pipeline can stop
+      // decoding: the video sits frozen until the slide timer advances
+      // it. One element reset (drop src, reload, set src, play again)
+      // is the kick that can free a stuck decoder, so try it once
+      // before giving up on the item.
+      var resetTried = false;
+      var doReset = function () {
+        if (resetTried) return false;
+        resetTried = true;
+        try { vid.pause(); } catch (e) {}
+        try { vid.removeAttribute('src'); vid.load(); } catch (e) {}
+        vid.setAttribute('data-src', item.url);
+        vid.src = item.url;
+        try { vid.currentTime = 0; } catch (e) {}
+        var p2 = null;
+        try { p2 = vid.play(); } catch (e) {}
+        if (p2 && p2.catch) p2.catch(function () {});
+        return true;
+      };
       if (p && p.catch) p.catch(function () {
         if (token !== photoVideoToken || curKind !== 'P') return;
+        if (doReset()) return;
         if (photoErrTries < 3) { photoErrTries++; photoIdxMem = idx + 2; photoIdxSave(photoIdxMem); renderMedia(idx + 1); }
       });
+      // Watchdog: if playback makes no progress for ~10s (frozen on a
+      // frame, or stuck at 0 after startup buffering), reset once.
+      // Navigation, pause, or end cancels the chain via the guards;
+      // if the reset also stalls, the slide timer advances as before.
+      var lastCt = -1;
+      var stuck = 0;
+      var watch = function () {
+        if (token !== photoVideoToken || curKind !== 'P') return;
+        if (vid.paused || vid.ended) return;
+        var ct = vid.currentTime;
+        if (ct === lastCt) {
+          stuck++;
+          if (stuck >= 2) {
+            stuck = 0;
+            if (doReset()) { lastCt = -1; setTimeout(watch, 5000); }
+            return;
+          }
+        } else {
+          stuck = 0;
+        }
+        lastCt = ct;
+        setTimeout(watch, 5000);
+      };
+      setTimeout(watch, 5000);
       return;
     }
     if (vid) { try { vid.pause(); } catch (e) {} vid.style.display = 'none'; }
