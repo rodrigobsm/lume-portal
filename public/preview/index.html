@@ -2749,17 +2749,20 @@
         if (doReset()) return;
         if (photoErrTries < 3) { photoErrTries++; photoIdxMem = idx + 2; photoIdxSave(photoIdxMem); renderMedia(idx + 1); }
       });
-      // Watchdog: if playback makes no progress for ~10s (frozen on a
-      // frame, or stuck at 0 after startup buffering), reset once.
-      // Navigation, pause, or end cancels the chain via the guards;
-      // if the reset also stalls, the slide timer advances as before.
+      // Watchdog: if playback that already started makes no progress
+      // for ~10s (frozen on a frame), reset once. A video still at 0
+      // is just buffering — moov-at-end files on a slow connection
+      // can take a while to start, and resetting it would kill slow
+      // starters before they ever play. Navigation, pause, or end
+      // cancels the chain via the guards; if the reset also stalls,
+      // the slide timer advances as before.
       var lastCt = -1;
       var stuck = 0;
       var watch = function () {
         if (token !== photoVideoToken || curKind !== 'P') return;
         if (vid.paused || vid.ended) return;
         var ct = vid.currentTime;
-        if (ct === lastCt) {
+        if (ct > 0 && ct === lastCt) {
           stuck++;
           if (stuck >= 2) {
             stuck = 0;
