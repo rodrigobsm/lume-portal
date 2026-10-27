@@ -20,7 +20,7 @@ export async function onRequest(context) {
   if (!key) return jsonResponse({ ok: false, error: 'no_key' });
   var q = "'" + folder + "' in parents and (mimeType contains 'image/' or mimeType contains 'video/') and trashed = false";
   var api = 'https://www.googleapis.com/drive/v3/files?q=' + encodeURIComponent(q) +
-    '&orderBy=name&pageSize=100&fields=files(id,name,mimeType,videoMediaMetadata)&key=' + encodeURIComponent(key);
+    '&orderBy=name&pageSize=100&fields=files(id,name,mimeType,createdTime,videoMediaMetadata,imageMediaMetadata)&key=' + encodeURIComponent(key);
   var res;
   try {
     res = await fetch(api);
@@ -51,8 +51,21 @@ export async function onRequest(context) {
         id: f.id, name: f.name, kind: 'image',
         url: 'https://drive.google.com/thumbnail?id=' + f.id + '&sz=w1920'
       };
+      // EXIF capture time + GPS location, when the photo has them.
+      if (f.imageMediaMetadata) {
+        if (f.imageMediaMetadata.time) item.takenTime = f.imageMediaMetadata.time;
+        var loc = f.imageMediaMetadata.location;
+        if (loc && typeof loc.latitude === 'number' && typeof loc.longitude === 'number') {
+          item.lat = loc.latitude;
+          item.lon = loc.longitude;
+        }
+      }
       photos.push(item);
     }
+    // Upload time: fallback date when no capture time exists (videos
+    // and photos without EXIF time). Never shown as "taken on" — the
+    // overlay just shows the date.
+    if (f.createdTime) item.createdTime = f.createdTime;
     return item;
   });
   return jsonResponse({ ok: true, count: items.length, photos: photos, videos: videos, items: items });

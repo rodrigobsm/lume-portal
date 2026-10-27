@@ -191,6 +191,9 @@
   .photo-photo.kb-start { transform: scale(1); }
   .photo-photo.kb { transform: scale(1.12); transition: transform var(--slide-kb, 15s) linear; }
   .photo-video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; background: #000; display: none; }
+  .photo-meta { position: absolute; left: 3vw; bottom: 4vh; z-index: 3; background: rgba(0,0,0,.55); color: #fff; padding: .55em 1em; border-radius: .6em; font-size: 1.7vw; line-height: 1.45; display: none; max-width: 70vw; }
+  .photo-meta.on { display: block; }
+  .photo-meta .meta-loc { opacity: .85; }
   .fact-shade { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.45) 100%); }
   .fact-content { position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 12vh 6vw 6vw 6vw; }
   .fact-label { font-size: 1.8vw; font-weight: 700; letter-spacing: 0.25em; color: #f5b942; text-shadow: 0 1px 8px rgba(0,0,0,0.6); margin-bottom: 3vh; }
@@ -476,6 +479,7 @@
   <div class="slide photoslide" id="slidePhoto">
     <img class="photo-photo" alt="">
     <video class="photo-video" muted playsinline preload="auto"></video>
+    <div class="photo-meta" id="photoMeta"></div>
   </div>
   <div class="topbar">
     <div class="weather"></div>
@@ -2323,6 +2327,97 @@
   // Generation guard so ended/error handlers from a previous item
   // never act on the item currently showing.
   var photoVideoToken = 0;
+  // Metadata overlay (P screen): capture/upload date + reverse-geocoded
+  // city/state/country, only when the file actually has them. The date
+  // shows immediately; the place name arrives async and is cached per
+  // rounded coordinate, so each distinct place is looked up once.
+  var photoMetaId = null;
+  var geoCache = {};
+  function geoCacheLoad() {
+    try {
+      var s = JSON.parse(localStorage.getItem('portalNewsGeo') || 'null');
+      if (s && typeof s === 'object') geoCache = s;
+    } catch (e) {}
+  }
+  function geoCacheSave() {
+    try {
+      var ks = Object.keys(geoCache);
+      if (ks.length > 100) {
+        var cut = {};
+        ks.slice(-100).forEach(function (k) { cut[k] = geoCache[k]; });
+        geoCache = cut;
+      }
+      localStorage.setItem('portalNewsGeo', JSON.stringify(geoCache));
+    } catch (e) {}
+  }
+  geoCacheLoad();
+  function parsePhotoDate(s) {
+    if (!s) return null;
+    var d = new Date(s);
+    if (!isNaN(d.getTime())) return d;
+    // EXIF "YYYY:MM:DD HH:MM:SS"
+    var m = /^(\d{4}):(\d{2}):(\d{2})[ T](\d{2}):(\d{2}):(\d{2})/.exec(s);
+    if (m) {
+      d = new Date(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +m[6]);
+      if (!isNaN(d.getTime())) return d;
+    }
+    return null;
+  }
+  function formatPhotoDate(d) {
+    var lang = (lumeCfg && lumeCfg.language) || 'pt-BR';
+    var loc = lang === 'en-US' ? 'en-US' : 'pt-BR';
+    try {
+      var datePart = d.toLocaleDateString(loc, { day: 'numeric', month: 'short', year: 'numeric' });
+      var timePart = d.toLocaleTimeString(loc, { hour: 'numeric', minute: '2-digit' });
+      return timePart ? (datePart + ' · ' + timePart) : datePart;
+    } catch (e) {
+      return d.toDateString();
+    }
+  }
+  function reverseGeocode(lat, lon, cb) {
+    var key = lat.toFixed(3) + ',' + lon.toFixed(3);
+    if (geoCache[key] !== undefined) { cb(geoCache[key]); return; }
+    var lang = (lumeCfg && lumeCfg.language) || 'pt-BR';
+    var ll = lang === 'en-US' ? 'en' : 'pt';
+    var u = 'https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=' + encodeURIComponent(lat) + '&longitude=' + encodeURIComponent(lon) + '&localityLanguage=' + ll;
+    xhrGet(u, function (err, txt) {
+      var line = '';
+      if (!err) {
+        try {
+          var g = JSON.parse(txt);
+          var parts = [];
+          var city = g.city || g.locality || '';
+          if (city) parts.push(city);
+          if (g.principalSubdivision && g.principalSubdivision !== city) parts.push(g.principalSubdivision);
+          if (g.countryName) parts.push(g.countryName);
+          line = parts.join(', ');
+        } catch (e) {}
+      }
+      geoCache[key] = line;
+      geoCacheSave();
+      cb(line);
+    });
+  }
+  function renderPhotoMeta(item) {
+    var el = document.getElementById('photoMeta');
+    if (!el) return;
+    photoMetaId = item.id;
+    el.textContent = '';
+    el.className = el.className.replace(/\bon\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '');
+    var d = parsePhotoDate(item.takenTime) || parsePhotoDate(item.createdTime);
+    var dateLine = d ? formatPhotoDate(d) : '';
+    function paint(locLine) {
+      if (photoMetaId !== item.id || curKind !== 'P') return;
+      el.textContent = '';
+      if (dateLine) { var a = document.createElement('div'); a.textContent = dateLine; el.appendChild(a); }
+      if (locLine) { var b = document.createElement('div'); b.className = 'meta-loc'; b.textContent = locLine; el.appendChild(b); }
+      if (dateLine || locLine) { if (el.className.indexOf('on') === -1) el.className += ' on'; }
+    }
+    if (dateLine) paint('');
+    if (typeof item.lat === 'number' && typeof item.lon === 'number') {
+      reverseGeocode(item.lat, item.lon, function (locLine) { paint(locLine || ''); });
+    }
+  }
   function photoFolderId() {
     return (lumeCfg && lumeCfg.photosFolder) || '';
   }
@@ -2400,6 +2495,7 @@
   }
   function renderMedia(idx) {
     var item = photoList[idx % photoList.length];
+    renderPhotoMeta(item);
     var img = q('.photo-photo', photoSlide);
     var vid = q('.photo-video', photoSlide);
     if (item.kind === 'video' && vid) {

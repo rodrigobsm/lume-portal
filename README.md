@@ -72,9 +72,12 @@ items.
   (Drive thumbnail URL); videos play muted with a plain `<video>` until
   they end (60s cap), streamed through `functions/api/media.js` so the
   Drive API key never reaches the client — no Drive iframe or Drive UI.
-  The list is fetched server-side (`functions/api/photos.js`, Drive API
-  v3) and refreshed every 30 min; a failed or empty folder skips the
-  screen silently. The screen appears only when a folder is configured.
+  A bottom-left overlay shows the capture/upload date and, for photos
+  with GPS EXIF, the reverse-geocoded city/state/country (cached per
+  place; raw coordinates are never displayed). The list is fetched
+  server-side (`functions/api/photos.js`, Drive API v3) and refreshed
+  every 30 min; a failed or empty folder skips the screen silently. The
+  screen appears only when a folder is configured.
 
 **Slide duration** — a single duration for all screens (news + specials),
 configurable per device (5/10/15/20/25/30/60 s, default 15 s).
