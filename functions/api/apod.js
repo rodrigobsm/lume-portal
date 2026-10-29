@@ -57,8 +57,11 @@ export async function onRequest(context) {
 
   var cached = await cache.match(cacheKey);
   if (cached) return cached;
+  // Status 200 (não 502): no domínio customizado, a camada de proxy da
+  // Cloudflare substitui o corpo de uma resposta 502 pela página de
+  // erro genérica; com 200 o JSON chega intacto e o painel só olha ok.
   return new Response(JSON.stringify({ ok: false, error: 'APOD indisponível', detail: String(lastErr && lastErr.message || lastErr) }), {
-    status: 502,
+    status: 200,
     headers: { 'Content-Type': 'application/json; charset=utf-8' }
   });
 }
