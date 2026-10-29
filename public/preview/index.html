@@ -224,26 +224,6 @@
   .cd-tick-box { background: rgba(0,0,0,0.45); border: 1px solid rgba(245,185,66,0.4); border-radius: 1vw; padding: 1.5vh 2vw; min-width: 9vw; }
   .cd-tick-num { font-size: 3.6vw; font-weight: 800; color: #f5b942; text-shadow: 0 2px 12px rgba(0,0,0,0.7); }
   .cd-tick-lab { font-size: 1.4vw; font-weight: 700; letter-spacing: 0.2em; color: #fff; margin-top: 0.5vh; }
-  /* Split-flap (airport board) digit: dark card split in half. The old
-     top half falls away (rotateX to -90deg) revealing the new top,
-     then the new bottom half swings down (90deg to 0). Transform
-     only, so it stays cheap on the Portal GPU. */
-  .fd { position: relative; display: inline-block; width: 0.78em; height: 1em; margin: 0 0.04em; vertical-align: bottom; perspective: 3em; -webkit-perspective: 3em; font-variant-numeric: tabular-nums; }
-  .fd-half { position: absolute; left: 0; width: 100%; height: 50%; overflow: hidden; background: #0d0d12; }
-  .fd-half span { position: absolute; left: 0; width: 100%; text-align: center; line-height: 1em; font-weight: 800; color: #f5b942; text-shadow: none; }
-  .fd-top { top: 0; border-radius: 0.08em 0.08em 0 0; background: linear-gradient(#1c1c26, #0d0d12); }
-  .fd-bottom { bottom: 0; border-radius: 0 0 0.08em 0.08em; background: linear-gradient(#0d0d12, #050508); }
-  .fd-top span { top: 0; }
-  .fd-bottom span { top: -0.5em; }
-  .fd-ftop { top: 0; border-radius: 0.08em 0.08em 0 0; background: linear-gradient(#1c1c26, #0d0d12); transform-origin: 50% 100%; -webkit-transform-origin: 50% 100%; visibility: hidden; z-index: 3; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
-  .fd-fbot { bottom: 0; border-radius: 0 0 0.08em 0.08em; background: linear-gradient(#0d0d12, #050508); transform-origin: 50% 0%; -webkit-transform-origin: 50% 0%; transform: rotateX(90deg); -webkit-transform: rotateX(90deg); visibility: hidden; z-index: 2; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
-  .fd.anim .fd-ftop { visibility: visible; animation: fdFall 0.3s ease-in forwards; -webkit-animation: fdFall 0.3s ease-in forwards; }
-  .fd.anim .fd-fbot { visibility: visible; animation: fdRise 0.3s ease-out 0.3s forwards; -webkit-animation: fdRise 0.3s ease-out 0.3s forwards; }
-  @keyframes fdFall { from { transform: rotateX(0deg); } to { transform: rotateX(-90deg); } }
-  @keyframes fdRise { from { transform: rotateX(90deg); } to { transform: rotateX(0deg); } }
-  @-webkit-keyframes fdFall { from { -webkit-transform: rotateX(0deg); } to { -webkit-transform: rotateX(-90deg); } }
-  @-webkit-keyframes fdRise { from { -webkit-transform: rotateX(90deg); } to { -webkit-transform: rotateX(0deg); } }
-  .fd-seam { position: absolute; left: 0; right: 0; top: 50%; height: 2px; margin-top: -1px; background: rgba(0,0,0,0.7); z-index: 4; }
   .cd-sub { font-size: 2.6vw; font-weight: 700; color: #fff; margin-top: 3vh; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
   .cd-date { font-size: 2.4vw; color: #c8cdd2; margin-top: 1.5vh; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
   .nasaslide { background: #0a0a14; }
@@ -260,21 +240,21 @@
   .lotslide { background: #0a0a14; }
   .lot-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(160deg, #0a0a14 0%, #1a1430 55%, #050510 130%); }
   .lot-content { position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 10vh 5vw 4vw 5vw; }
-  .lot-label { font-size: 2.4vw; font-weight: 700; letter-spacing: 0.25em; color: #f5b942; text-shadow: 0 1px 8px rgba(0,0,0,0.6); margin-bottom: 1vh; }
-  .lot-logo-wrap { height: 7vh; display: flex; align-items: center; justify-content: center; margin-bottom: 1vh; }
+  .lot-label { font-size: 2.1vw; font-weight: 700; letter-spacing: 0.25em; color: #f5b942; text-shadow: 0 1px 8px rgba(0,0,0,0.6); margin-bottom: 1vh; }
+  .lot-logo-wrap { height: 6vh; display: flex; align-items: center; justify-content: center; margin-bottom: 1vh; }
   .lot-logo { max-width: 100%; max-height: 100%; object-fit: contain; }
-  .lot-sub { font-size: 1.8vw; font-weight: 700; letter-spacing: 0.25em; color: #fff; margin-bottom: 1vh; }
-  .lot-grid { display: flex; gap: 2.5vw; justify-content: center; width: 100%; margin-top: 2vh; }
-  .lot-card { flex: 1; max-width: 30vw; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 1.2vw; padding: 2vh 2vw; text-align: center; }
+  .lot-sub { font-size: 1.6vw; font-weight: 700; letter-spacing: 0.25em; color: #fff; margin-bottom: 1vh; }
+  .lot-grid { display: flex; gap: 2.5vw; justify-content: center; width: 100%; margin-top: 1.5vh; }
+  .lot-card { flex: 1; max-width: 30vw; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 1.2vw; padding: 1.8vh 2vw; text-align: center; }
   .lot-name { font-size: 2.2vw; font-weight: 700; letter-spacing: 0.12em; color: #f5b942; }
-  .lot-jackpot { font-size: 5vw; font-weight: 800; color: #fff; margin: 1.5vh 0 0.5vh 0; text-shadow: 0 2px 12px rgba(0,0,0,0.7); }
-  .lot-cash { font-size: 1.9vw; color: #c8cdd2; }
-  .lot-next { font-size: 2.1vw; color: #fff; margin-top: 1.5vh; }
+  .lot-jackpot { font-size: 4.2vw; font-weight: 800; color: #fff; margin: 1.5vh 0 0.5vh 0; text-shadow: 0 2px 12px rgba(0,0,0,0.7); }
+  .lot-cash { font-size: 1.7vw; color: #c8cdd2; }
+  .lot-next { font-size: 1.9vw; color: #fff; margin-top: 1.5vh; }
   .lot-balls { display: flex; gap: 0.6vw; justify-content: center; margin-top: 1.8vh; flex-wrap: wrap; }
-  .lot-ball { width: 4.6vw; height: 4.6vw; border-radius: 50%; background: #fff; color: #111; font-size: 2.3vw; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+  .lot-ball { width: 4.0vw; height: 4.0vw; border-radius: 50%; background: #fff; color: #111; font-size: 2.0vw; font-weight: 800; display: flex; align-items: center; justify-content: center; }
   .lot-ball.bonus { background: #f5b942; color: #111; }
-  .lot-latest { font-size: 1.8vw; color: #c8cdd2; margin-top: 1.5vh; }
-  .lot-source { font-size: 1.8vw; color: #c8cdd2; margin-top: 1.5vh; }
+  .lot-latest { font-size: 1.6vw; color: #c8cdd2; margin-top: 1.5vh; }
+  .lot-source { font-size: 1.6vw; color: #c8cdd2; margin-top: 1vh; }
   .photo-dots {
     display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
     background-image: radial-gradient(rgba(0,0,0,0.25) 1.2px, transparent 1.6px);
@@ -473,11 +453,11 @@
     .lot-grid { flex-direction: column; align-items: center; }
     .lot-card { max-width: 84vw; width: 84vw; }
     .lot-name { font-size: 4vw; }
-    .lot-jackpot { font-size: 9vw; }
-    .lot-ball { width: 8vw; height: 8vw; font-size: 4vw; }
-    .lot-next { font-size: 3.4vw; }
-    .lot-cash { font-size: 3vw; }
-    .lot-latest { font-size: 2.8vw; }
+    .lot-jackpot { font-size: 8vw; }
+    .lot-ball { width: 7vw; height: 7vw; font-size: 3.5vw; }
+    .lot-next { font-size: 3vw; }
+    .lot-cash { font-size: 2.8vw; }
+    .lot-latest { font-size: 2.6vw; }
     .chev { font-size: 8vw; }
   }
 </style>
@@ -999,6 +979,7 @@
   var fxFailed = false;
   var seq = [];
   var seqPos = 0;
+  var seqDir = 1;
   // True once any slide has been shown. Used to tell the first load
   // (which must render a slide, hiding the loading overlay) apart from
   // later catalog refreshes (which must not jump the current slide).
@@ -1678,10 +1659,12 @@
   }
   function nextSeq() {
     if (!seq.length) return;
+    seqDir = 1;
     showSeq(seqPos + 1);
   }
   function prevSeq() {
     if (!seq.length) return;
+    seqDir = -1;
     showSeq(seqPos - 1);
   }
   function deactivateAll() {
@@ -2571,52 +2554,6 @@
   function escHtml(v) {
     return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
-  // Split-flap digits: setFlapValue(el, val) keeps one .fd card per
-  // digit and flips only digits that changed (a rebuild happens only
-  // when the digit count changes). The 650ms settle timeout reads the
-  // digit's CURRENT value, so a late timer can never overwrite a newer
-  // flip. Called from the 1s countdown tick, but only while D is the
-  // active slide, so no animation runs on hidden slides.
-  function flapDigit(ch) {
-    var d = document.createElement('span');
-    d.className = 'fd';
-    d.setAttribute('data-cur', ch);
-    d.innerHTML = '<span class="fd-half fd-top"><span>' + ch + '</span></span>' +
-      '<span class="fd-half fd-bottom"><span>' + ch + '</span></span>' +
-      '<span class="fd-half fd-ftop"><span>' + ch + '</span></span>' +
-      '<span class="fd-half fd-fbot"><span>' + ch + '</span></span>' +
-      '<span class="fd-seam"></span>';
-    return d;
-  }
-  function setFlapValue(el, val) {
-    val = String(val);
-    var digits = el.querySelectorAll('.fd');
-    if (digits.length !== val.length) {
-      el.innerHTML = '';
-      for (var i = 0; i < val.length; i++) el.appendChild(flapDigit(val.charAt(i)));
-      return;
-    }
-    for (var j = 0; j < val.length; j++) {
-      var d = digits[j];
-      var cur = d.getAttribute('data-cur');
-      var nw = val.charAt(j);
-      if (cur === nw) continue;
-      d.setAttribute('data-cur', nw);
-      // Static top already shows the new digit (revealed as the old
-      // top flap falls); static bottom keeps the old digit until the
-      // new bottom lands, then it switches.
-      d.querySelector('.fd-top span').textContent = nw;
-      d.querySelector('.fd-ftop span').textContent = cur;
-      d.querySelector('.fd-fbot span').textContent = nw;
-      (function (dd) {
-        dd.className = dd.className.replace(/\banim\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '') + ' anim';
-        setTimeout(function () {
-          dd.querySelector('.fd-bottom span').textContent = dd.getAttribute('data-cur');
-          dd.className = dd.className.replace(/\banim\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '');
-        }, 650);
-      })(d);
-    }
-  }
   function renderCountdownSlide() {
     var el = cdSlide;
     var c = lumeCfg.countdown;
@@ -2635,22 +2572,15 @@
     q('.cd-date', el).textContent = dateStr;
     if (diffDays > 0) {
       num.style.fontSize = '';
-      setFlapValue(num, diffDays);
+      num.textContent = diffDays;
       unit.textContent = diffDays === 1 ? t('cdDay') : t('cdDays');
       var ms = target - now;
       var h = Math.floor(ms / 3600000) % 24;
       var m = Math.floor(ms / 60000) % 60;
       var sec = Math.floor(ms / 1000) % 60;
-      var boxes = tick.querySelectorAll('.cd-tick-box');
-      if (boxes.length !== 3) {
-        tick.innerHTML = '<div class="cd-tick-box"><div class="cd-tick-num"></div><div class="cd-tick-lab">' + t('cdHours') + '</div></div>' +
-          '<div class="cd-tick-box"><div class="cd-tick-num"></div><div class="cd-tick-lab">' + t('cdMins') + '</div></div>' +
-          '<div class="cd-tick-box"><div class="cd-tick-num"></div><div class="cd-tick-lab">' + t('cdSecs') + '</div></div>';
-        boxes = tick.querySelectorAll('.cd-tick-box');
-      }
-      setFlapValue(boxes[0].querySelector('.cd-tick-num'), h);
-      setFlapValue(boxes[1].querySelector('.cd-tick-num'), pad2(m));
-      setFlapValue(boxes[2].querySelector('.cd-tick-num'), pad2(sec));
+      tick.innerHTML = '<div class="cd-tick-box"><div class="cd-tick-num">' + pad2(h) + '</div><div class="cd-tick-lab">' + t('cdHours') + '</div></div>' +
+        '<div class="cd-tick-box"><div class="cd-tick-num">' + pad2(m) + '</div><div class="cd-tick-lab">' + t('cdMins') + '</div></div>' +
+        '<div class="cd-tick-box"><div class="cd-tick-num">' + pad2(sec) + '</div><div class="cd-tick-lab">' + t('cdSecs') + '</div></div>';
       sub.textContent = '';
     } else if (diffDays === 0) {
       num.style.fontSize = '6vw';
@@ -2667,7 +2597,7 @@
     }
   }
   function showCountdownSlide() {
-    if (!hasCountdown()) { if (seq.length > 1) nextSeq(); return; }
+    if (!hasCountdown()) { if (seq.length > 1) showSeq(seqPos + seqDir); return; }
     restoreHeadlines();
     curKind = 'D';
     var el = cdSlide;
@@ -2703,7 +2633,7 @@
     q('.nasa-credit', el).textContent = a.copyright ? '© ' + a.copyright : '';
   }
   function showNasaSlide() {
-    if (!apodData) { loadApod(); if (seq.length > 1) nextSeq(); return; }
+    if (!apodData) { loadApod(); if (seq.length > 1) showSeq(seqPos + seqDir); return; }
     restoreHeadlines();
     curKind = 'N';
     var el = nasaSlide;
@@ -2780,7 +2710,7 @@
     q('.lot-source', el).textContent = t('lotSource');
   }
   function showLotterySlide() {
-    if (!lotData) { loadLottery(); if (seq.length > 1) nextSeq(); return; }
+    if (!lotData) { loadLottery(); if (seq.length > 1) showSeq(seqPos + seqDir); return; }
     restoreHeadlines();
     curKind = 'L';
     var el = lotSlide;
