@@ -64,11 +64,14 @@ export function parseLotteryPage(html) {
 
 async function fetchGame(g) {
   try {
+    // 10s por jogo: uma página lenta não pode travar a função inteira
+    // (Promise.all espera por todos) nem estourar o limite do worker.
     var res = await fetch(g.url, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (compatible; LumePortal/1.0)',
         'Accept-Language': 'en-US,en;q=0.9'
-      }
+      },
+      signal: AbortSignal.timeout(10000)
     });
     if (!res.ok) return null;
     var html = await res.text();
