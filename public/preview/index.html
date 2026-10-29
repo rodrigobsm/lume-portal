@@ -208,6 +208,45 @@
   .fact-text { font-size: 4vw; line-height: 1.35; font-weight: 700; max-width: 82vw; text-shadow: 0 2px 16px rgba(0,0,0,0.7); animation: wxRise 0.8s ease both; }
   .fact-tag { font-size: 2vw; font-weight: 700; letter-spacing: 0.2em; color: #f5b942; margin-top: 3vh; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
   .fact-answer { font-size: 2.4vw; font-weight: 700; color: #f5b942; margin-top: 2.5vh; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
+  .cdslide { background: #0a0a14; }
+  .cd-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(160deg, #0a0a14 0%, #1a1430 55%, #050510 130%); }
+  .cd-photo { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transform-origin: center center; }
+  .cd-photo.kb-start { transform: scale(1); }
+  .cd-photo.kb { transform: scale(1.12); transition: transform var(--slide-kb, 15s) linear; }
+  .cd-shade { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.45) 100%); }
+  .cd-content { position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 12vh 6vw 6vw 6vw; }
+  .cd-label { font-size: 1.8vw; font-weight: 700; letter-spacing: 0.25em; color: #f5b942; text-shadow: 0 1px 8px rgba(0,0,0,0.6); margin-bottom: 2vh; }
+  .cd-title { font-size: 3.4vw; line-height: 1.25; font-weight: 700; max-width: 84vw; text-shadow: 0 2px 16px rgba(0,0,0,0.7); animation: wxRise 0.8s ease both; }
+  .cd-num { font-size: 11vw; line-height: 1; font-weight: 800; color: #f5b942; text-shadow: 0 2px 24px rgba(0,0,0,0.7); margin: 2vh 0 1vh 0; animation: wxRise 0.8s ease both; }
+  .cd-unit { font-size: 2.2vw; font-weight: 700; letter-spacing: 0.25em; color: #fff; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
+  .cd-sub { font-size: 2vw; font-weight: 700; color: #fff; margin-top: 3vh; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
+  .cd-date { font-size: 1.9vw; color: #c8cdd2; margin-top: 1.5vh; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
+  .nasaslide { background: #0a0a14; }
+  .nasa-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(160deg, #0a0a14 0%, #1a1430 55%, #050510 130%); }
+  .nasa-photo { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transform-origin: center center; }
+  .nasa-photo.kb-start { transform: scale(1); }
+  .nasa-photo.kb { transform: scale(1.12); transition: transform var(--slide-kb, 15s) linear; }
+  .nasa-shade { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.45) 100%); }
+  .nasa-content { position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; text-align: center; padding: 12vh 6vw 7vh 6vw; }
+  .nasa-label { font-size: 1.8vw; font-weight: 700; letter-spacing: 0.25em; color: #f5b942; text-shadow: 0 1px 8px rgba(0,0,0,0.6); margin-bottom: 2vh; }
+  .nasa-title { font-size: 3.6vw; line-height: 1.25; font-weight: 700; max-width: 84vw; text-shadow: 0 2px 16px rgba(0,0,0,0.7); animation: wxRise 0.8s ease both; }
+  .nasa-date { font-size: 1.9vw; color: #fff; margin-top: 2vh; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
+  .nasa-credit { font-size: 1.5vw; color: #c8cdd2; margin-top: 1vh; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
+  .lotslide { background: #0a0a14; }
+  .lot-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(160deg, #0a0a14 0%, #1a1430 55%, #050510 130%); }
+  .lot-content { position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 12vh 5vw 6vw 5vw; }
+  .lot-label { font-size: 1.8vw; font-weight: 700; letter-spacing: 0.25em; color: #f5b942; text-shadow: 0 1px 8px rgba(0,0,0,0.6); margin-bottom: 1vh; }
+  .lot-grid { display: flex; gap: 2.5vw; justify-content: center; width: 100%; margin-top: 3vh; }
+  .lot-card { flex: 1; max-width: 28vw; background: rgba(0,0,0,0.45); border: 1px solid rgba(245,185,66,0.35); border-radius: 1.2vw; padding: 2.5vh 1.5vw; text-align: center; }
+  .lot-name { font-size: 1.9vw; font-weight: 700; letter-spacing: 0.12em; color: #f5b942; }
+  .lot-jackpot { font-size: 3.6vw; font-weight: 800; color: #fff; margin: 1.5vh 0 0.5vh 0; text-shadow: 0 2px 12px rgba(0,0,0,0.7); }
+  .lot-cash { font-size: 1.5vw; color: #c8cdd2; }
+  .lot-next { font-size: 1.6vw; color: #fff; margin-top: 1.5vh; }
+  .lot-balls { display: flex; gap: 0.6vw; justify-content: center; margin-top: 1.8vh; flex-wrap: wrap; }
+  .lot-ball { width: 3.4vw; height: 3.4vw; border-radius: 50%; background: #fff; color: #111; font-size: 1.7vw; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+  .lot-ball.bonus { background: #f5b942; color: #111; }
+  .lot-latest { font-size: 1.4vw; color: #c8cdd2; margin-top: 1.5vh; }
+  .lot-source { font-size: 1.4vw; color: #c8cdd2; margin-top: 3vh; }
   .photo-dots {
     display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
     background-image: radial-gradient(rgba(0,0,0,0.25) 1.2px, transparent 1.6px);
@@ -393,6 +432,19 @@
     .fact-tag { font-size: 3.6vw; }
     .fact-label { font-size: 3.4vw; }
     .fact-answer { font-size: 4.2vw; }
+    .cd-num { font-size: 18vw; }
+    .cd-title { font-size: 6vw; }
+    .cd-label { font-size: 3.4vw; }
+    .cd-sub { font-size: 3.6vw; }
+    .cd-date { font-size: 3.2vw; }
+    .nasa-title { font-size: 6.5vw; }
+    .nasa-label { font-size: 3.4vw; }
+    .nasa-date { font-size: 3.2vw; }
+    .lot-grid { flex-direction: column; align-items: center; }
+    .lot-card { max-width: 84vw; width: 84vw; }
+    .lot-name { font-size: 3.4vw; }
+    .lot-jackpot { font-size: 7vw; }
+    .lot-ball { width: 6vw; height: 6vw; font-size: 3vw; }
     .chev { font-size: 8vw; }
   }
 </style>
@@ -504,6 +556,38 @@
       <div class="fact-answer"></div>
     </div>
   </div>
+  <div class="slide cdslide" id="slideCountdown">
+    <div class="cd-bg"></div>
+    <img class="cd-photo" alt="">
+    <div class="cd-shade"></div>
+    <div class="cd-content">
+      <div class="cd-label">CONTAGEM REGRESSIVA</div>
+      <div class="cd-title"></div>
+      <div class="cd-num"></div>
+      <div class="cd-unit"></div>
+      <div class="cd-sub"></div>
+      <div class="cd-date"></div>
+    </div>
+  </div>
+  <div class="slide nasaslide" id="slideNasa">
+    <div class="nasa-bg"></div>
+    <img class="nasa-photo" alt="">
+    <div class="nasa-shade"></div>
+    <div class="nasa-content">
+      <div class="nasa-label">FOTO DO DIA · NASA</div>
+      <div class="nasa-title"></div>
+      <div class="nasa-date"></div>
+      <div class="nasa-credit"></div>
+    </div>
+  </div>
+  <div class="slide lotslide" id="slideLottery">
+    <div class="lot-bg"></div>
+    <div class="lot-content">
+      <div class="lot-label">LOTERIA</div>
+      <div class="lot-grid"></div>
+      <div class="lot-source"></div>
+    </div>
+  </div>
   <div class="slide photoslide" id="slidePhoto">
     <img class="photo-photo" alt="">
     <video class="photo-video" muted playsinline preload="auto"></video>
@@ -584,7 +668,10 @@
       aqiRecVeryUnhealthy: 'Alerta de saúde: evite atividades ao ar livre.',
       aqiRecHazardous: 'Emergência: permaneça em ambientes fechados.',
       polLow: 'BAIXO', polModerate: 'MODERADO', polHigh: 'ALTO', polVeryHigh: 'MUITO ALTO',
-      catBrasil: 'Brasil', catMundo: 'Mundo', catEua: 'EUA', catAtlanta: 'Local', catTech: 'Tecnologia'
+      catBrasil: 'Brasil', catMundo: 'Mundo', catEua: 'EUA', catAtlanta: 'Local', catTech: 'Tecnologia',
+      cdLabel: 'CONTAGEM REGRESSIVA', cdDay: 'DIA', cdDays: 'DIAS', cdToday: 'É HOJE!', cdPassed: 'CHEGOU O DIA!',
+      nasaLabel: 'FOTO DO DIA · NASA',
+      lotLabel: 'LOTERIA', lotCashPrefix: 'À vista: ', lotNextPrefix: 'Próximo sorteio: ', lotLatestPrefix: 'Último: ', lotSource: 'Fonte: LotteryUSA'
     },
     'en-US': {
       today: 'TODAY', now: 'now', minAgo: '{n} min ago', hAgo: '{n} h ago', nowPill: 'NOW',
@@ -608,7 +695,10 @@
       aqiRecVeryUnhealthy: 'Health alert: avoid outdoor activities.',
       aqiRecHazardous: 'Emergency: stay indoors.',
       polLow: 'LOW', polModerate: 'MODERATE', polHigh: 'HIGH', polVeryHigh: 'VERY HIGH',
-      catBrasil: 'Brazil', catMundo: 'World', catEua: 'USA', catAtlanta: 'Atlanta', catTech: 'Tech'
+      catBrasil: 'Brazil', catMundo: 'World', catEua: 'USA', catAtlanta: 'Atlanta', catTech: 'Tech',
+      cdLabel: 'COUNTDOWN', cdDay: 'DAY', cdDays: 'DAYS', cdToday: 'TODAY!', cdPassed: 'THE DAY IS HERE!',
+      nasaLabel: 'NASA PHOTO OF THE DAY',
+      lotLabel: 'LOTTERY', lotCashPrefix: 'Cash value: ', lotNextPrefix: 'Next draw: ', lotLatestPrefix: 'Latest: ', lotSource: 'Source: LotteryUSA'
     }
   };
   function t(k) {
@@ -697,6 +787,9 @@
     set('.air-chart-title', t('airChartTitle'));
     set('.air-pollen-label', t('airPollenLabel'));
     set('.mkt-label', t('mktLabel'));
+    set('.cd-label', t('cdLabel'));
+    set('.nasa-label', t('nasaLabel'));
+    set('.lot-label', t('lotLabel'));
     set('#offline .msg', t('offlineMsg'));
   }
   function slideMs() {
@@ -884,6 +977,9 @@
   var mktSlide = document.getElementById('slideMkt');
   var factSlide = document.getElementById('slideFact');
   var photoSlide = document.getElementById('slidePhoto');
+  var cdSlide = document.getElementById('slideCountdown');
+  var nasaSlide = document.getElementById('slideNasa');
+  var lotSlide = document.getElementById('slideLottery');
   var airData = null;
   var airPollen = null;
   var mktData = null;
@@ -1478,7 +1574,7 @@
     days.innerHTML = html;
   }
   function buildSeq() {
-    var all = ['C', 'W', 'K', 'B', 'A', 'M', 'F', 'P'];
+    var all = ['C', 'W', 'K', 'B', 'A', 'M', 'F', 'P', 'D', 'N', 'L'];
     var order = all;
     if (lumeCfg && Array.isArray(lumeCfg.screenOrder) && lumeCfg.screenOrder.length) {
       order = [];
@@ -1491,6 +1587,8 @@
     }
     // Photos appear only when a Drive folder is configured.
     if (!photoFolderId()) specials = specials.filter(function (k) { return k !== 'P'; });
+    // Countdown appears only when an event (title + date) is configured.
+    if (!hasCountdown()) specials = specials.filter(function (k) { return k !== 'D'; });
     loadPhotos();
     seq = specials.slice();
     var si = 0;
@@ -1536,6 +1634,9 @@
     else if (s === 'A') { showAirSlide(); }
     else if (s === 'M') { showMktSlide(); }
     else if (s === 'F') { showFactSlide(); }
+    else if (s === 'D') { showCountdownSlide(); }
+    else if (s === 'N') { showNasaSlide(); }
+    else if (s === 'L') { showLotterySlide(); }
     else if (s === 'P') { showPhotoSlide(); }
     else { curNewsIdx = s; curKind = 'news'; showSlide(s); }
     preloadNextMedia();
@@ -1549,7 +1650,7 @@
     showSeq(seqPos - 1);
   }
   function deactivateAll() {
-    var all = [slides.A, slides.B, wxSlide, fxSlide, clockSlide, bibleSlide, airSlide, mktSlide, factSlide, photoSlide];
+    var all = [slides.A, slides.B, wxSlide, fxSlide, clockSlide, bibleSlide, airSlide, mktSlide, factSlide, photoSlide, cdSlide, nasaSlide, lotSlide];
     for (var i = 0; i < all.length; i++) {
       if (all[i]) all[i].className = all[i].className.replace(/\bactive\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '');
     }
@@ -2406,6 +2507,178 @@
     restartProgress(slideMs());
     resetRotate(slideMs());
   }
+  // ---- Countdown (D), NASA APOD (N), Lottery (L) ----
+  // D: one configured event (title + date + optional photo URL). The
+  // hero counts whole days to the event date; the sub-line ticks
+  // hours/min/sec to midnight of that date. N: NASA's photo of the
+  // day (still image on video days). L: Powerball + Mega Millions +
+  // Georgia Fantasy 5 jackpots, next draws and latest numbers.
+  // N and L skip silently when their fetch has never succeeded.
+  var CD_PHOTO = 'https://images.pexels.com/photos/3453030/pexels-photo-3453030.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1';
+  var apodData = null;
+  var apodAt = 0;
+  var lotData = null;
+  var lotAt = 0;
+  var APOD_REFRESH_MS = 60 * 60 * 1000;
+  var LOT_REFRESH_MS = 30 * 60 * 1000;
+  function hasCountdown() {
+    var c = lumeCfg && lumeCfg.countdown;
+    if (!c || !c.title || !c.date) return false;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(c.date)) return false;
+    var p = c.date.split('-');
+    var d = new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10));
+    return !isNaN(d.getTime()) && d.getFullYear() === parseInt(p[0], 10) && d.getMonth() === parseInt(p[1], 10) - 1 && d.getDate() === parseInt(p[2], 10);
+  }
+  function countdownTarget() {
+    var p = lumeCfg.countdown.date.split('-');
+    return new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10));
+  }
+  function escHtml(v) {
+    return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function renderCountdownSlide() {
+    var el = cdSlide;
+    var c = lumeCfg.countdown;
+    q('.cd-label', el).textContent = t('cdLabel');
+    q('.cd-title', el).textContent = c.title;
+    var img = q('.cd-photo', el);
+    var src = c.photo || CD_PHOTO;
+    if (img && img.getAttribute('src') !== src) img.src = src;
+    var target = countdownTarget();
+    var now = new Date();
+    var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    var diffDays = Math.round((target - today) / 86400000);
+    var num = q('.cd-num', el), unit = q('.cd-unit', el), sub = q('.cd-sub', el);
+    var dateStr = c.date;
+    try { dateStr = new Intl.DateTimeFormat(loc(), { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(target); } catch (e) {}
+    q('.cd-date', el).textContent = dateStr;
+    if (diffDays > 0) {
+      num.style.fontSize = '';
+      num.textContent = diffDays;
+      unit.textContent = diffDays === 1 ? t('cdDay') : t('cdDays');
+      var ms = target - now;
+      var h = Math.floor(ms / 3600000) % 24;
+      var m = Math.floor(ms / 60000) % 60;
+      var sec = Math.floor(ms / 1000) % 60;
+      sub.textContent = h + 'h ' + pad2(m) + 'min ' + pad2(sec) + 's';
+    } else if (diffDays === 0) {
+      num.style.fontSize = '6vw';
+      num.textContent = t('cdToday');
+      unit.textContent = '';
+      sub.textContent = '';
+    } else {
+      num.style.fontSize = '6vw';
+      num.textContent = t('cdPassed');
+      unit.textContent = '';
+      sub.textContent = isEN() ? (Math.abs(diffDays) + ' days ago') : ('Há ' + Math.abs(diffDays) + ' dias');
+    }
+  }
+  function showCountdownSlide() {
+    if (!hasCountdown()) { if (seq.length > 1) nextSeq(); return; }
+    restoreHeadlines();
+    curKind = 'D';
+    var el = cdSlide;
+    renderCountdownSlide();
+    kbOn(q('.cd-photo', el));
+    deactivateAll();
+    el.className = el.className.replace(/\bactive\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '') + ' active';
+    var tw = document.querySelector('.topbar .weather');
+    if (tw) tw.style.visibility = 'hidden';
+    restartProgress(slideMs());
+    resetRotate(slideMs());
+  }
+  function loadApod() {
+    if (apodData && Date.now() - apodAt < APOD_REFRESH_MS) return;
+    xhrGet('/api/apod', function (err, txt) {
+      if (err) return;
+      try { var j = JSON.parse(txt); if (j && j.ok && j.apod && j.apod.url) { apodData = j.apod; apodAt = Date.now(); } } catch (e) {}
+    });
+  }
+  function renderNasaSlide() {
+    var el = nasaSlide;
+    var a = apodData;
+    q('.nasa-label', el).textContent = t('nasaLabel');
+    q('.nasa-title', el).textContent = a.title;
+    var img = q('.nasa-photo', el);
+    if (img && img.getAttribute('src') !== a.url) img.src = a.url;
+    var ds = a.date || '';
+    try {
+      var p = a.date.split('-');
+      ds = new Intl.DateTimeFormat(loc(), { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10)));
+    } catch (e) {}
+    q('.nasa-date', el).textContent = ds;
+    q('.nasa-credit', el).textContent = a.copyright ? '© ' + a.copyright : '';
+  }
+  function showNasaSlide() {
+    if (!apodData) { loadApod(); if (seq.length > 1) nextSeq(); return; }
+    restoreHeadlines();
+    curKind = 'N';
+    var el = nasaSlide;
+    renderNasaSlide();
+    kbOn(q('.nasa-photo', el));
+    deactivateAll();
+    el.className = el.className.replace(/\bactive\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '') + ' active';
+    var tw = document.querySelector('.topbar .weather');
+    if (tw) tw.style.visibility = 'hidden';
+    restartProgress(slideMs());
+    resetRotate(slideMs());
+  }
+  function loadLottery() {
+    if (lotData && Date.now() - lotAt < LOT_REFRESH_MS) return;
+    xhrGet('/api/lottery', function (err, txt) {
+      if (err) return;
+      try { var j = JSON.parse(txt); if (j && j.ok && j.games && j.games.length) { lotData = j.games; lotAt = Date.now(); } } catch (e) {}
+    });
+  }
+  // LotteryUSA serves English draw strings; in PT mode translate the
+  // weekday/month tokens and 12h times so the card reads in Portuguese.
+  var DRAW_DAYS = { 'Monday': 'Segunda-feira', 'Tuesday': 'Terça-feira', 'Wednesday': 'Quarta-feira', 'Thursday': 'Quinta-feira', 'Friday': 'Sexta-feira', 'Saturday': 'Sábado', 'Sunday': 'Domingo' };
+  var DRAW_MONTHS = { 'Jan': 'jan', 'Feb': 'fev', 'Mar': 'mar', 'Apr': 'abr', 'May': 'mai', 'Jun': 'jun', 'Jul': 'jul', 'Aug': 'ago', 'Sep': 'set', 'Oct': 'out', 'Nov': 'nov', 'Dec': 'dez' };
+  function fmtDrawText(str) {
+    if (!str) return '';
+    if (isEN()) return str;
+    var out = str.replace(/Today/g, 'Hoje').replace(/\bat\b/g, 'às');
+    Object.keys(DRAW_DAYS).forEach(function (d) { out = out.split(d).join(DRAW_DAYS[d]); });
+    Object.keys(DRAW_MONTHS).forEach(function (m) { out = out.replace(new RegExp('\\b' + m + '\\b', 'g'), DRAW_MONTHS[m]); });
+    out = out.replace(/(\d{1,2}):(\d{2})\s*(am|pm)/gi, function (mm, h, mi, ap) {
+      var hh = parseInt(h, 10);
+      if (ap.toLowerCase() === 'pm' && hh !== 12) hh += 12;
+      if (ap.toLowerCase() === 'am' && hh === 12) hh = 0;
+      return hh + 'h' + mi;
+    });
+    return out;
+  }
+  function renderLotterySlide() {
+    var el = lotSlide;
+    q('.lot-label', el).textContent = t('lotLabel');
+    var grid = q('.lot-grid', el);
+    var html = '';
+    lotData.forEach(function (g) {
+      html += '<div class="lot-card"><div class="lot-name">' + escHtml(g.name) + '</div>' +
+        '<div class="lot-jackpot">' + escHtml(g.jackpot) + '</div>' +
+        (g.cash ? '<div class="lot-cash">' + escHtml(t('lotCashPrefix')) + escHtml(g.cash) + '</div>' : '') +
+        '<div class="lot-next">' + escHtml(t('lotNextPrefix')) + escHtml(fmtDrawText(g.nextDraw)) + '</div>' +
+        '<div class="lot-balls">' + g.balls.map(function (b) { return '<span class="lot-ball">' + escHtml(b) + '</span>'; }).join('') +
+        (g.bonus ? '<span class="lot-ball bonus">' + escHtml(g.bonus) + '</span>' : '') + '</div>' +
+        (g.latestDate ? '<div class="lot-latest">' + escHtml(t('lotLatestPrefix')) + escHtml(fmtDrawText(g.latestDate)) + '</div>' : '') +
+        '</div>';
+    });
+    grid.innerHTML = html;
+    q('.lot-source', el).textContent = t('lotSource');
+  }
+  function showLotterySlide() {
+    if (!lotData) { loadLottery(); if (seq.length > 1) nextSeq(); return; }
+    restoreHeadlines();
+    curKind = 'L';
+    var el = lotSlide;
+    renderLotterySlide();
+    deactivateAll();
+    el.className = el.className.replace(/\bactive\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '') + ' active';
+    var tw = document.querySelector('.topbar .weather');
+    if (tw) tw.style.visibility = 'hidden';
+    restartProgress(slideMs());
+    resetRotate(slideMs());
+  }
   // ---- Personal photos (P): one item per appearance, in filename
   // order, looping. Photos are shown directly with a plain <img>
   // (Drive thumbnail URL); videos play muted with a plain <video>
@@ -2857,6 +3130,11 @@
   setInterval(loadAlerts, REFRESH_MS);
   loadFx();
   setInterval(loadFx, FX_REFRESH_MS);
+  loadApod();
+  setInterval(loadApod, APOD_REFRESH_MS);
+  loadLottery();
+  setInterval(loadLottery, LOT_REFRESH_MS);
+  setInterval(function () { if (curKind === 'D') renderCountdownSlide(); }, 1000);
   loadNews();
   setInterval(loadNews, REFRESH_MS);
   }

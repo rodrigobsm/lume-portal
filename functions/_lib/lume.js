@@ -10,7 +10,7 @@ export var FEED_IDS = [
   'g1-tecnologia'
 ];
 
-export var SCREEN_KEYS = ['C', 'W', 'K', 'B', 'A', 'M', 'F', 'P'];
+export var SCREEN_KEYS = ['C', 'W', 'K', 'B', 'A', 'M', 'F', 'P', 'D', 'N', 'L'];
 
 export var FEED_CATEGORIES = ['brasil', 'mundo', 'tech', 'eua', 'atlanta'];
 
@@ -54,6 +54,20 @@ export function normalizeConfig(input) {
   var npb = parseInt(src.newsPerBlock, 10);
   cfg.newsPerBlock = (npb >= 1 && npb <= 8) ? npb : 4;
   cfg.photosFolder = driveFolderId(src.photosFolder);
+  // Countdown event: needs a title and a real YYYY-MM-DD date; an
+  // optional photo URL (http/https) overrides the default background.
+  // Anything incomplete normalizes to null (no countdown screen).
+  var cd = (src.countdown && typeof src.countdown === 'object') ? src.countdown : {};
+  var cdTitle = str(cd.title, 80).trim();
+  var cdDate = (typeof cd.date === 'string') ? cd.date.trim() : '';
+  var cdOk = /^\d{4}-\d{2}-\d{2}$/.test(cdDate);
+  if (cdOk) {
+    var pp = cdDate.split('-');
+    var dd = new Date(parseInt(pp[0], 10), parseInt(pp[1], 10) - 1, parseInt(pp[2], 10));
+    cdOk = !isNaN(dd.getTime()) && dd.getFullYear() === parseInt(pp[0], 10) && dd.getMonth() === parseInt(pp[1], 10) - 1 && dd.getDate() === parseInt(pp[2], 10);
+  }
+  var cdPhoto = (typeof cd.photo === 'string' && /^https?:\/\//i.test(cd.photo.trim())) ? cd.photo.trim().slice(0, 500) : '';
+  cfg.countdown = (cdTitle && cdOk) ? { title: cdTitle, date: cdDate, photo: cdPhoto } : null;
   var screens = {};
   var ssrc = (src.screens && typeof src.screens === 'object') ? src.screens : {};
   SCREEN_KEYS.forEach(function (k) { screens[k] = ssrc[k] !== false; });

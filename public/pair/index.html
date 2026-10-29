@@ -157,6 +157,16 @@
         <div><span class="msg" id="photosCheckMsg"></span></div>
       </div>
     </div>
+    <div class="card">
+      <h2>Countdown (optional)</h2>
+      <label for="cdTitle">Event title</label>
+      <input type="text" id="cdTitle" placeholder="e.g. Trip to Brazil" autocomplete="off">
+      <label for="cdDate">Event date</label>
+      <input type="date" id="cdDate">
+      <label for="cdPhoto">Background photo URL (optional)</label>
+      <input type="text" id="cdPhoto" placeholder="https://… (leave blank for the default photo)" autocomplete="off">
+      <p class="hint">Set a title and a date to add the Countdown screen to the rotation. Leave the title or date blank to turn it off. The photo is optional — without one, the dashboard uses a default travel photo.</p>
+    </div>
   </div>
 
   <div class="panel" id="panel-weather" role="tabpanel" hidden>
@@ -183,7 +193,7 @@
   <div class="panel" id="panel-screens" role="tabpanel" hidden>
     <div class="card">
       <h2>Screens</h2>
-      <p class="hint">Choose which special screens appear, and drag rows (or use the arrows) to set their rotation order. Photos appears only when a Drive folder is set on the Device tab.</p>
+      <p class="hint">Choose which special screens appear, and drag rows (or use the arrows) to set their rotation order. Photos appears only when a Drive folder is set on the Device tab. Countdown appears only when an event is set on the Device tab.</p>
       <div id="screenList"></div>
       <label for="newsPerBlock">News in a row</label>
       <select id="newsPerBlock">
@@ -240,8 +250,8 @@
     ['g1-tecnologia', 'G1 — Technology']
   ];
   var CATS = [['brasil', 'Brazil'], ['mundo', 'World'], ['tech', 'Tech'], ['eua', 'USA'], ['atlanta', 'Atlanta']];
-  var SCREENS = [['C', 'Currency'], ['W', 'Weather'], ['K', 'World Clock'], ['B', 'Bible'], ['A', 'Air Quality'], ['M', 'Markets'], ['F', 'Fun Facts'], ['P', 'Photos']];
-  var SCREEN_KEYS = ['C', 'W', 'K', 'B', 'A', 'M', 'F', 'P'];
+  var SCREENS = [['C', 'Currency'], ['W', 'Weather'], ['K', 'World Clock'], ['B', 'Bible'], ['A', 'Air Quality'], ['M', 'Markets'], ['F', 'Fun Facts'], ['P', 'Photos'], ['D', 'Countdown'], ['N', 'NASA Photo'], ['L', 'Lottery']];
+  var SCREEN_KEYS = ['C', 'W', 'K', 'B', 'A', 'M', 'F', 'P', 'D', 'N', 'L'];
   var ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
   var DEFAULT_CLOCK = [
     { name: 'Atlanta', timezone: 'America/New_York' },
@@ -540,6 +550,9 @@
       screenOrder = ord;
     }
     $('photosFolder').value = cfg.photosFolder ? 'https://drive.google.com/drive/folders/' + cfg.photosFolder : '';
+    $('cdTitle').value = (cfg.countdown && cfg.countdown.title) || '';
+    $('cdDate').value = (cfg.countdown && cfg.countdown.date) || '';
+    $('cdPhoto').value = (cfg.countdown && cfg.countdown.photo) || '';
     renderScreens();
     if (Array.isArray(cfg.worldClock) && cfg.worldClock.length) {
       var wc = [];
@@ -583,6 +596,7 @@
       screens: screens,
       screenOrder: screenOrder.slice(),
       photosFolder: extractDriveFolderId($('photosFolder').value),
+      countdown: { title: $('cdTitle').value.trim(), date: $('cdDate').value, photo: $('cdPhoto').value.trim() },
       worldClock: wc,
       feeds: { enabled: enabled, custom: custom }
     };
