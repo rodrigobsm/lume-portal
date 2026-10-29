@@ -239,13 +239,13 @@
   .nasa-credit { font-size: 1.5vw; color: #c8cdd2; margin-top: 1vh; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
   .lotslide { background: #0a0a14; }
   .lot-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(160deg, #0a0a14 0%, #1a1430 55%, #050510 130%); }
-  .lot-content { position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 12vh 5vw 6vw 5vw; }
+  .lot-content { position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 10vh 5vw 4vw 5vw; }
   .lot-label { font-size: 2.4vw; font-weight: 700; letter-spacing: 0.25em; color: #f5b942; text-shadow: 0 1px 8px rgba(0,0,0,0.6); margin-bottom: 1vh; }
-  .lot-logo-wrap { height: 9vh; display: flex; align-items: center; justify-content: center; margin-bottom: 1vh; }
+  .lot-logo-wrap { height: 7vh; display: flex; align-items: center; justify-content: center; margin-bottom: 1vh; }
   .lot-logo { max-width: 100%; max-height: 100%; object-fit: contain; }
   .lot-sub { font-size: 1.8vw; font-weight: 700; letter-spacing: 0.25em; color: #fff; margin-bottom: 1vh; }
-  .lot-grid { display: flex; gap: 2.5vw; justify-content: center; width: 100%; margin-top: 3vh; }
-  .lot-card { flex: 1; max-width: 30vw; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 1.2vw; padding: 3vh 2vw; text-align: center; }
+  .lot-grid { display: flex; gap: 2.5vw; justify-content: center; width: 100%; margin-top: 2vh; }
+  .lot-card { flex: 1; max-width: 30vw; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 1.2vw; padding: 2vh 2vw; text-align: center; }
   .lot-name { font-size: 2.2vw; font-weight: 700; letter-spacing: 0.12em; color: #f5b942; }
   .lot-jackpot { font-size: 5vw; font-weight: 800; color: #fff; margin: 1.5vh 0 0.5vh 0; text-shadow: 0 2px 12px rgba(0,0,0,0.7); }
   .lot-cash { font-size: 1.9vw; color: #c8cdd2; }
@@ -254,7 +254,7 @@
   .lot-ball { width: 4.6vw; height: 4.6vw; border-radius: 50%; background: #fff; color: #111; font-size: 2.3vw; font-weight: 800; display: flex; align-items: center; justify-content: center; }
   .lot-ball.bonus { background: #f5b942; color: #111; }
   .lot-latest { font-size: 1.8vw; color: #c8cdd2; margin-top: 1.5vh; }
-  .lot-source { font-size: 1.8vw; color: #c8cdd2; margin-top: 3vh; }
+  .lot-source { font-size: 1.8vw; color: #c8cdd2; margin-top: 1.5vh; }
   .photo-dots {
     display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
     background-image: radial-gradient(rgba(0,0,0,0.25) 1.2px, transparent 1.6px);
@@ -3174,6 +3174,10 @@
   setInterval(loadApod, APOD_REFRESH_MS);
   loadLottery();
   setInterval(loadLottery, LOT_REFRESH_MS);
+  // Preload lottery logos + countdown default photo at boot, so the
+  // L and D slides never show blank image areas on first appearance.
+  Object.keys(LOT_LOGOS).forEach(function (k) { var im = new Image(); im.src = LOT_LOGOS[k]; });
+  (function () { var im = new Image(); im.src = CD_PHOTO; })();
   setInterval(function () { if (curKind === 'D') renderCountdownSlide(); }, 1000);
   loadNews();
   setInterval(loadNews, REFRESH_MS);
