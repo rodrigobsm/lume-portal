@@ -224,6 +224,26 @@
   .cd-tick-box { background: rgba(0,0,0,0.45); border: 1px solid rgba(245,185,66,0.4); border-radius: 1vw; padding: 1.5vh 2vw; min-width: 9vw; }
   .cd-tick-num { font-size: 3.6vw; font-weight: 800; color: #f5b942; text-shadow: 0 2px 12px rgba(0,0,0,0.7); }
   .cd-tick-lab { font-size: 1.4vw; font-weight: 700; letter-spacing: 0.2em; color: #fff; margin-top: 0.5vh; }
+  /* Split-flap (airport board) digit: dark card split in half. The old
+     top half falls away (rotateX to -90deg) revealing the new top,
+     then the new bottom half swings down (90deg to 0). Transform
+     only, so it stays cheap on the Portal GPU. */
+  .fd { position: relative; display: inline-block; width: 0.78em; height: 1em; margin: 0 0.04em; vertical-align: bottom; perspective: 3em; -webkit-perspective: 3em; font-variant-numeric: tabular-nums; }
+  .fd-half { position: absolute; left: 0; width: 100%; height: 50%; overflow: hidden; background: #0d0d12; }
+  .fd-half span { position: absolute; left: 0; width: 100%; text-align: center; line-height: 1em; font-weight: 800; color: #f5b942; text-shadow: none; }
+  .fd-top { top: 0; border-radius: 0.08em 0.08em 0 0; background: linear-gradient(#1c1c26, #0d0d12); }
+  .fd-bottom { bottom: 0; border-radius: 0 0 0.08em 0.08em; background: linear-gradient(#0d0d12, #050508); }
+  .fd-top span { top: 0; }
+  .fd-bottom span { top: -0.5em; }
+  .fd-ftop { top: 0; border-radius: 0.08em 0.08em 0 0; background: linear-gradient(#1c1c26, #0d0d12); transform-origin: 50% 100%; -webkit-transform-origin: 50% 100%; visibility: hidden; z-index: 3; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+  .fd-fbot { bottom: 0; border-radius: 0 0 0.08em 0.08em; background: linear-gradient(#0d0d12, #050508); transform-origin: 50% 0%; -webkit-transform-origin: 50% 0%; transform: rotateX(90deg); -webkit-transform: rotateX(90deg); visibility: hidden; z-index: 2; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+  .fd.anim .fd-ftop { visibility: visible; animation: fdFall 0.3s ease-in forwards; -webkit-animation: fdFall 0.3s ease-in forwards; }
+  .fd.anim .fd-fbot { visibility: visible; animation: fdRise 0.3s ease-out 0.3s forwards; -webkit-animation: fdRise 0.3s ease-out 0.3s forwards; }
+  @keyframes fdFall { from { transform: rotateX(0deg); } to { transform: rotateX(-90deg); } }
+  @keyframes fdRise { from { transform: rotateX(90deg); } to { transform: rotateX(0deg); } }
+  @-webkit-keyframes fdFall { from { -webkit-transform: rotateX(0deg); } to { -webkit-transform: rotateX(-90deg); } }
+  @-webkit-keyframes fdRise { from { -webkit-transform: rotateX(90deg); } to { -webkit-transform: rotateX(0deg); } }
+  .fd-seam { position: absolute; left: 0; right: 0; top: 50%; height: 2px; margin-top: -1px; background: rgba(0,0,0,0.7); z-index: 4; }
   .cd-sub { font-size: 2.6vw; font-weight: 700; color: #fff; margin-top: 3vh; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
   .cd-date { font-size: 2.4vw; color: #c8cdd2; margin-top: 1.5vh; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
   .nasaslide { background: #0a0a14; }
@@ -2551,6 +2571,52 @@
   function escHtml(v) {
     return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
+  // Split-flap digits: setFlapValue(el, val) keeps one .fd card per
+  // digit and flips only digits that changed (a rebuild happens only
+  // when the digit count changes). The 650ms settle timeout reads the
+  // digit's CURRENT value, so a late timer can never overwrite a newer
+  // flip. Called from the 1s countdown tick, but only while D is the
+  // active slide, so no animation runs on hidden slides.
+  function flapDigit(ch) {
+    var d = document.createElement('span');
+    d.className = 'fd';
+    d.setAttribute('data-cur', ch);
+    d.innerHTML = '<span class="fd-half fd-top"><span>' + ch + '</span></span>' +
+      '<span class="fd-half fd-bottom"><span>' + ch + '</span></span>' +
+      '<span class="fd-half fd-ftop"><span>' + ch + '</span></span>' +
+      '<span class="fd-half fd-fbot"><span>' + ch + '</span></span>' +
+      '<span class="fd-seam"></span>';
+    return d;
+  }
+  function setFlapValue(el, val) {
+    val = String(val);
+    var digits = el.querySelectorAll('.fd');
+    if (digits.length !== val.length) {
+      el.innerHTML = '';
+      for (var i = 0; i < val.length; i++) el.appendChild(flapDigit(val.charAt(i)));
+      return;
+    }
+    for (var j = 0; j < val.length; j++) {
+      var d = digits[j];
+      var cur = d.getAttribute('data-cur');
+      var nw = val.charAt(j);
+      if (cur === nw) continue;
+      d.setAttribute('data-cur', nw);
+      // Static top already shows the new digit (revealed as the old
+      // top flap falls); static bottom keeps the old digit until the
+      // new bottom lands, then it switches.
+      d.querySelector('.fd-top span').textContent = nw;
+      d.querySelector('.fd-ftop span').textContent = cur;
+      d.querySelector('.fd-fbot span').textContent = nw;
+      (function (dd) {
+        dd.className = dd.className.replace(/\banim\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '') + ' anim';
+        setTimeout(function () {
+          dd.querySelector('.fd-bottom span').textContent = dd.getAttribute('data-cur');
+          dd.className = dd.className.replace(/\banim\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '');
+        }, 650);
+      })(d);
+    }
+  }
   function renderCountdownSlide() {
     var el = cdSlide;
     var c = lumeCfg.countdown;
@@ -2569,15 +2635,22 @@
     q('.cd-date', el).textContent = dateStr;
     if (diffDays > 0) {
       num.style.fontSize = '';
-      num.textContent = diffDays;
+      setFlapValue(num, diffDays);
       unit.textContent = diffDays === 1 ? t('cdDay') : t('cdDays');
       var ms = target - now;
       var h = Math.floor(ms / 3600000) % 24;
       var m = Math.floor(ms / 60000) % 60;
       var sec = Math.floor(ms / 1000) % 60;
-      tick.innerHTML = '<div class="cd-tick-box"><div class="cd-tick-num">' + h + '</div><div class="cd-tick-lab">' + t('cdHours') + '</div></div>' +
-        '<div class="cd-tick-box"><div class="cd-tick-num">' + pad2(m) + '</div><div class="cd-tick-lab">' + t('cdMins') + '</div></div>' +
-        '<div class="cd-tick-box"><div class="cd-tick-num">' + pad2(sec) + '</div><div class="cd-tick-lab">' + t('cdSecs') + '</div></div>';
+      var boxes = tick.querySelectorAll('.cd-tick-box');
+      if (boxes.length !== 3) {
+        tick.innerHTML = '<div class="cd-tick-box"><div class="cd-tick-num"></div><div class="cd-tick-lab">' + t('cdHours') + '</div></div>' +
+          '<div class="cd-tick-box"><div class="cd-tick-num"></div><div class="cd-tick-lab">' + t('cdMins') + '</div></div>' +
+          '<div class="cd-tick-box"><div class="cd-tick-num"></div><div class="cd-tick-lab">' + t('cdSecs') + '</div></div>';
+        boxes = tick.querySelectorAll('.cd-tick-box');
+      }
+      setFlapValue(boxes[0].querySelector('.cd-tick-num'), h);
+      setFlapValue(boxes[1].querySelector('.cd-tick-num'), pad2(m));
+      setFlapValue(boxes[2].querySelector('.cd-tick-num'), pad2(sec));
       sub.textContent = '';
     } else if (diffDays === 0) {
       num.style.fontSize = '6vw';
