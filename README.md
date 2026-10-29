@@ -39,9 +39,9 @@ preferring items from the last 48 h with an image. The catalog refreshes
 every 10 min, with a `localStorage` cache and an offline screen (never a
 blank screen).
 
-**Special screens** — sequence `C, W, K, B, A, M, F, P`: the opening
-block shows all 8 in sequence; afterwards, one special after every 4 news
-items.
+**Special screens** — sequence `C, W, K, B, A, M, F, P, D, N, L`:
+the opening block shows all 11 in sequence; afterwards, one special
+after every `newsPerBlock` news items (default 4).
 
 - **C — Currency**: US$ 1 = R$ X in large type, EUR/GBP/JPY per US$ 1,
   BTC/ETH/SOL/BNB/XRP/DOGE in US$ with 24 h change; sources: ECB/Frankfurter
@@ -74,13 +74,26 @@ items.
   Drive API key never reaches the client — no Drive iframe or Drive UI.
   A bottom-left overlay shows the capture/upload date and, for photos
   with GPS EXIF, the reverse-geocoded city/state/country (cached per
-  place; raw coordinates are never displayed). The topbar weather stays
-  visible on this screen (like news/Bible), and the next video is
+  place; raw coordinates are never displayed). The topbar weather is hidden on this screen (like the other specials), and the next video is
   preloaded in the background while other slides show, so playback
   starts without a buffering stall. The list is fetched
   server-side (`functions/api/photos.js`, Drive API v3) and refreshed
   every 30 min; a failed or empty folder skips the screen silently. The
   screen appears only when a folder is configured.
+- **D — Countdown**: a big day counter to a configured event (title +
+  date + optional photo, set on `/pair/`), with hours/minutes/seconds
+  ticking below. The screen appears only when a title and a real date
+  are configured; clearing either removes it.
+- **N — NASA photo**: a daily space photo from NASA's Image Library
+  (keyless). The day of the year deterministically picks the photo
+  (theme rotates nebula/galaxy/star), so the same date always shows
+  the same photo. This replaced NASA's APOD API, which now returns a
+  "NASA Science" placeholder for every date.
+- **L — Lottery**: Powerball and Mega Millions (US) plus Georgia
+  Fantasy 5, with official logos and brand colors, current estimated
+  jackpots, cash values, next draw dates, and the latest drawn balls.
+  Data is scraped from LotteryUSA (there is no official free API);
+  the panel keeps the last good data if a scrape fails.
 
 **Slide duration** — a single duration for all screens (news + specials),
 configurable per device (5/10/15/20/25/30/60 s, default 15 s).
@@ -148,6 +161,7 @@ app may cache the old name):
 | v1.3 | WebView scroll/zoom lock (no bars, no overscroll) |
 | v1.4 | Gesture-level drag lock (dragging no longer moves content) |
 | v1.5 | Pairing screen redesign: full setup URL as text + on-device QR code, color-coded status, responsive layout |
+| v1.6 | Reload on resume: returning to the app reloads the dashboard when paired, so a new config applies without restarting the app |
 
 The app source lives in `android/` in this repo (see
 [`android/README.md`](android/README.md)). Manual build (Gradle does not
@@ -176,13 +190,16 @@ preview).
 - `clockFormat`: `12h` | `24h`; `tempUnit`: `C` | `F`
 - `slideDuration`: 5/10/15/20/25/30/60 (any other value normalizes to 15)
 - `newsPerBlock`: news slides in a row before a special screen, 1–8 (any other value normalizes to 4)
-- `screens`: `{C, W, K, B, A, M, F, P}` (booleans)
+- `screens`: `{C, W, K, B, A, M, F, P, D, N, L}` (booleans)
 - `screenOrder`: order of the specials (e.g.
-  `["C","W","K","B","A","M","F","P"]`; without it, the default order;
+  `["C","W","K","B","A","M","F","P","D","N","L"]`; without it, the default order;
   unknown codes are ignored and missing ones go to the end)
 - `photosFolder`: a Google Drive folder ID, or a full folder link (the
   ID is extracted). Empty = no Photos screen. The folder must be shared
   as "Anyone with the link can view".
+- `countdown`: `{title, date, photo}` for the Countdown screen (title up
+  to 80 chars, a real `YYYY-MM-DD` date, optional photo URL). Missing
+  title or an invalid date = no Countdown screen.
 - `worldClock`: up to 5 `{name, timezone}` for the world clock (without
   it, the 5 default cities: Atlanta, Los Angeles, Brasília, London, Tokyo)
 - `feeds`: `{enabled: [...known ids, max 30], custom: [{name, url,
@@ -192,7 +209,8 @@ preview).
 The `/pair/` page is mobile-first, with tabs (Device, Weather, Screens,
 World clock, Feeds), city search with autocomplete (Open-Meteo Geocoding,
 no key), slide order with drag-and-drop (or arrows, on phones), and custom
-RSS feeds with no fixed row limit. It accepts `?code=XXXXXX` in the URL:
+RSS feeds with no fixed row limit. The Device tab holds the optional
+Photos folder and the Countdown event (title, date, photo). It accepts `?code=XXXXXX` in the URL:
 it opens the config ready to edit — that is the flow of the QR code shown
 on the app's pairing screen. The code is saved in the `lumePairCode`
 cookie (1 year): without `?code=`, the page opens pre-filled and loads the
@@ -228,6 +246,9 @@ only lets the server list public folders. Without it, `/api/photos`
 answers `{ok:false, error:'no_key'}` and the dashboard skips the Photos
 screen. Self-hosters set their own key.
 
+The NASA screen needs no key (NASA Image Library is keyless), and
+neither does the lottery screen (public scrape).
+
 Contributors do not need a Cloudflare account or token: develop locally
 and send a pull request (see [CONTRIBUTING.md](CONTRIBUTING.md)).
 
@@ -260,6 +281,7 @@ open('/tmp/dash.js','w').write(max(blocks, key=len))
 - `functions/api/photos.js` — Drive folder listing for the Photos screen
 - `functions/api/media.js` — video streaming proxy for the Photos screen
 - `functions/api/og.js`, `alerts.js`, `markets.js`, `pollen.js` — support APIs
+- `functions/api/apod.js` — daily space photo from the NASA Image Library (deterministic by day of year, no key); `lottery.js` — Powerball/Mega Millions/Fantasy 5 jackpots scraped from LotteryUSA
 - `functions/api/lume/config.js`, `pair.js` — pairing and config
 - `functions/_lib/aggregate.js`, `lume.js` — aggregation and validation
 - `functions/index.js` — 302 redirect `/?code=` → `/preview/?code=`
@@ -296,6 +318,14 @@ marketing traffic from device traffic, filter by path/host in GA. See
   skipped; listing needs the
   server-side Drive API key (see Deployment). Anyone with the folder link
   can view the photos, and anyone near the Portal can see them on screen.
+- **Lottery**: no official free API — jackpots are scraped from
+  LotteryUSA pages, so a site redesign can break parsing; the panel
+  keeps the last good data and the function serves a stale cache on
+  failure.
+- **NASA photo**: not the official Astronomy Picture of the Day —
+  APOD's API now returns a placeholder for every date, so the screen
+  shows a deterministic daily pick from NASA's Image Library instead
+  (same NASA photos, different selection).
 - **Config applies on the next dashboard load only** (see above).
 - **Third-party feeds and APIs can break without notice** (rate limits,
   discontinued feeds, changed formats). The dashboard degrades to
