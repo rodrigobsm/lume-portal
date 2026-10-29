@@ -2612,7 +2612,7 @@
   }
   function loadApod() {
     if (apodData && Date.now() - apodAt < APOD_REFRESH_MS) return;
-    xhrGet('/api/apod', function (err, txt) {
+    xhrGet('/api/apod?v=2', function (err, txt) {
       if (err) return;
       try { var j = JSON.parse(txt); if (j && j.ok && j.apod && j.apod.url) { apodData = j.apod; apodAt = Date.now(); } } catch (e) {}
     });
