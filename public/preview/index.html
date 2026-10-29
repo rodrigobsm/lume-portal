@@ -215,12 +215,17 @@
   .cd-photo.kb { transform: scale(1.12); transition: transform var(--slide-kb, 15s) linear; }
   .cd-shade { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.45) 100%); }
   .cd-content { position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 12vh 6vw 6vw 6vw; }
-  .cd-label { font-size: 1.8vw; font-weight: 700; letter-spacing: 0.25em; color: #f5b942; text-shadow: 0 1px 8px rgba(0,0,0,0.6); margin-bottom: 2vh; }
-  .cd-title { font-size: 3.4vw; line-height: 1.25; font-weight: 700; max-width: 84vw; text-shadow: 0 2px 16px rgba(0,0,0,0.7); animation: wxRise 0.8s ease both; }
-  .cd-num { font-size: 11vw; line-height: 1; font-weight: 800; color: #f5b942; text-shadow: 0 2px 24px rgba(0,0,0,0.7); margin: 2vh 0 1vh 0; animation: wxRise 0.8s ease both; }
-  .cd-unit { font-size: 2.2vw; font-weight: 700; letter-spacing: 0.25em; color: #fff; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
-  .cd-sub { font-size: 2vw; font-weight: 700; color: #fff; margin-top: 3vh; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
-  .cd-date { font-size: 1.9vw; color: #c8cdd2; margin-top: 1.5vh; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
+  .cd-label { font-size: 2.4vw; font-weight: 700; letter-spacing: 0.25em; color: #f5b942; text-shadow: 0 1px 8px rgba(0,0,0,0.6); margin-bottom: 2vh; }
+  .cd-title { font-size: 4.4vw; line-height: 1.25; font-weight: 700; max-width: 84vw; text-shadow: 0 2px 16px rgba(0,0,0,0.7); animation: wxRise 0.8s ease both; }
+  .cd-num { font-size: 15vw; line-height: 1; font-weight: 800; color: #f5b942; text-shadow: 0 2px 24px rgba(0,0,0,0.7); margin: 2vh 0 1vh 0; animation: wxRise 0.8s ease both; }
+  .cd-unit { font-size: 2.8vw; font-weight: 700; letter-spacing: 0.25em; color: #fff; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
+  .cd-glow { position: absolute; left: 50%; top: 50%; width: 92vw; height: 78vh; transform: translate(-50%, -50%); background: radial-gradient(closest-side, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.25) 55%, transparent 72%); z-index: 1; }
+  .cd-tick { display: flex; gap: 1.5vw; justify-content: center; margin-top: 3vh; }
+  .cd-tick-box { background: rgba(0,0,0,0.45); border: 1px solid rgba(245,185,66,0.4); border-radius: 1vw; padding: 1.5vh 2vw; min-width: 9vw; }
+  .cd-tick-num { font-size: 3.6vw; font-weight: 800; color: #f5b942; text-shadow: 0 2px 12px rgba(0,0,0,0.7); }
+  .cd-tick-lab { font-size: 1.4vw; font-weight: 700; letter-spacing: 0.2em; color: #fff; margin-top: 0.5vh; }
+  .cd-sub { font-size: 2.6vw; font-weight: 700; color: #fff; margin-top: 3vh; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
+  .cd-date { font-size: 2.4vw; color: #c8cdd2; margin-top: 1.5vh; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
   .nasaslide { background: #0a0a14; }
   .nasa-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(160deg, #0a0a14 0%, #1a1430 55%, #050510 130%); }
   .nasa-photo { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transform-origin: center center; }
@@ -235,18 +240,21 @@
   .lotslide { background: #0a0a14; }
   .lot-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(160deg, #0a0a14 0%, #1a1430 55%, #050510 130%); }
   .lot-content { position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 12vh 5vw 6vw 5vw; }
-  .lot-label { font-size: 1.8vw; font-weight: 700; letter-spacing: 0.25em; color: #f5b942; text-shadow: 0 1px 8px rgba(0,0,0,0.6); margin-bottom: 1vh; }
+  .lot-label { font-size: 2.4vw; font-weight: 700; letter-spacing: 0.25em; color: #f5b942; text-shadow: 0 1px 8px rgba(0,0,0,0.6); margin-bottom: 1vh; }
+  .lot-logo-wrap { height: 9vh; display: flex; align-items: center; justify-content: center; margin-bottom: 1vh; }
+  .lot-logo { max-width: 100%; max-height: 100%; object-fit: contain; }
+  .lot-sub { font-size: 1.8vw; font-weight: 700; letter-spacing: 0.25em; color: #fff; margin-bottom: 1vh; }
   .lot-grid { display: flex; gap: 2.5vw; justify-content: center; width: 100%; margin-top: 3vh; }
-  .lot-card { flex: 1; max-width: 28vw; background: rgba(0,0,0,0.45); border: 1px solid rgba(245,185,66,0.35); border-radius: 1.2vw; padding: 2.5vh 1.5vw; text-align: center; }
-  .lot-name { font-size: 1.9vw; font-weight: 700; letter-spacing: 0.12em; color: #f5b942; }
-  .lot-jackpot { font-size: 3.6vw; font-weight: 800; color: #fff; margin: 1.5vh 0 0.5vh 0; text-shadow: 0 2px 12px rgba(0,0,0,0.7); }
-  .lot-cash { font-size: 1.5vw; color: #c8cdd2; }
-  .lot-next { font-size: 1.6vw; color: #fff; margin-top: 1.5vh; }
+  .lot-card { flex: 1; max-width: 30vw; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 1.2vw; padding: 3vh 2vw; text-align: center; }
+  .lot-name { font-size: 2.2vw; font-weight: 700; letter-spacing: 0.12em; color: #f5b942; }
+  .lot-jackpot { font-size: 5vw; font-weight: 800; color: #fff; margin: 1.5vh 0 0.5vh 0; text-shadow: 0 2px 12px rgba(0,0,0,0.7); }
+  .lot-cash { font-size: 1.9vw; color: #c8cdd2; }
+  .lot-next { font-size: 2.1vw; color: #fff; margin-top: 1.5vh; }
   .lot-balls { display: flex; gap: 0.6vw; justify-content: center; margin-top: 1.8vh; flex-wrap: wrap; }
-  .lot-ball { width: 3.4vw; height: 3.4vw; border-radius: 50%; background: #fff; color: #111; font-size: 1.7vw; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+  .lot-ball { width: 4.6vw; height: 4.6vw; border-radius: 50%; background: #fff; color: #111; font-size: 2.3vw; font-weight: 800; display: flex; align-items: center; justify-content: center; }
   .lot-ball.bonus { background: #f5b942; color: #111; }
-  .lot-latest { font-size: 1.4vw; color: #c8cdd2; margin-top: 1.5vh; }
-  .lot-source { font-size: 1.4vw; color: #c8cdd2; margin-top: 3vh; }
+  .lot-latest { font-size: 1.8vw; color: #c8cdd2; margin-top: 1.5vh; }
+  .lot-source { font-size: 1.8vw; color: #c8cdd2; margin-top: 3vh; }
   .photo-dots {
     display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
     background-image: radial-gradient(rgba(0,0,0,0.25) 1.2px, transparent 1.6px);
@@ -432,19 +440,24 @@
     .fact-tag { font-size: 3.6vw; }
     .fact-label { font-size: 3.4vw; }
     .fact-answer { font-size: 4.2vw; }
-    .cd-num { font-size: 18vw; }
-    .cd-title { font-size: 6vw; }
-    .cd-label { font-size: 3.4vw; }
-    .cd-sub { font-size: 3.6vw; }
-    .cd-date { font-size: 3.2vw; }
+    .cd-num { font-size: 24vw; }
+    .cd-title { font-size: 7vw; }
+    .cd-label { font-size: 4vw; }
+    .cd-sub { font-size: 4.2vw; }
+    .cd-date { font-size: 3.8vw; }
+    .cd-tick-num { font-size: 6vw; }
+    .cd-tick-lab { font-size: 2.4vw; }
     .nasa-title { font-size: 6.5vw; }
     .nasa-label { font-size: 3.4vw; }
     .nasa-date { font-size: 3.2vw; }
     .lot-grid { flex-direction: column; align-items: center; }
     .lot-card { max-width: 84vw; width: 84vw; }
-    .lot-name { font-size: 3.4vw; }
-    .lot-jackpot { font-size: 7vw; }
-    .lot-ball { width: 6vw; height: 6vw; font-size: 3vw; }
+    .lot-name { font-size: 4vw; }
+    .lot-jackpot { font-size: 9vw; }
+    .lot-ball { width: 8vw; height: 8vw; font-size: 4vw; }
+    .lot-next { font-size: 3.4vw; }
+    .lot-cash { font-size: 3vw; }
+    .lot-latest { font-size: 2.8vw; }
     .chev { font-size: 8vw; }
   }
 </style>
@@ -560,11 +573,13 @@
     <div class="cd-bg"></div>
     <img class="cd-photo" alt="">
     <div class="cd-shade"></div>
+    <div class="cd-glow"></div>
     <div class="cd-content">
       <div class="cd-label">CONTAGEM REGRESSIVA</div>
       <div class="cd-title"></div>
       <div class="cd-num"></div>
       <div class="cd-unit"></div>
+      <div class="cd-tick"></div>
       <div class="cd-sub"></div>
       <div class="cd-date"></div>
     </div>
@@ -669,7 +684,7 @@
       aqiRecHazardous: 'Emergência: permaneça em ambientes fechados.',
       polLow: 'BAIXO', polModerate: 'MODERADO', polHigh: 'ALTO', polVeryHigh: 'MUITO ALTO',
       catBrasil: 'Brasil', catMundo: 'Mundo', catEua: 'EUA', catAtlanta: 'Local', catTech: 'Tecnologia',
-      cdLabel: 'CONTAGEM REGRESSIVA', cdDay: 'DIA', cdDays: 'DIAS', cdToday: 'É HOJE!', cdPassed: 'CHEGOU O DIA!',
+      cdLabel: 'CONTAGEM REGRESSIVA', cdDay: 'DIA', cdDays: 'DIAS', cdToday: 'É HOJE!', cdPassed: 'CHEGOU O DIA!', cdHours: 'HORAS', cdMins: 'MIN', cdSecs: 'SEG',
       nasaLabel: 'FOTO DO DIA · NASA',
       lotLabel: 'LOTERIA', lotCashPrefix: 'À vista: ', lotNextPrefix: 'Próximo sorteio: ', lotLatestPrefix: 'Último: ', lotSource: 'Fonte: LotteryUSA'
     },
@@ -696,7 +711,7 @@
       aqiRecHazardous: 'Emergency: stay indoors.',
       polLow: 'LOW', polModerate: 'MODERATE', polHigh: 'HIGH', polVeryHigh: 'VERY HIGH',
       catBrasil: 'Brazil', catMundo: 'World', catEua: 'USA', catAtlanta: 'Atlanta', catTech: 'Tech',
-      cdLabel: 'COUNTDOWN', cdDay: 'DAY', cdDays: 'DAYS', cdToday: 'TODAY!', cdPassed: 'THE DAY IS HERE!',
+      cdLabel: 'COUNTDOWN', cdDay: 'DAY', cdDays: 'DAYS', cdToday: 'TODAY!', cdPassed: 'THE DAY IS HERE!', cdHours: 'HOURS', cdMins: 'MIN', cdSecs: 'SEC',
       nasaLabel: 'NASA PHOTO OF THE DAY',
       lotLabel: 'LOTTERY', lotCashPrefix: 'Cash value: ', lotNextPrefix: 'Next draw: ', lotLatestPrefix: 'Latest: ', lotSource: 'Source: LotteryUSA'
     }
@@ -2548,7 +2563,7 @@
     var now = new Date();
     var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     var diffDays = Math.round((target - today) / 86400000);
-    var num = q('.cd-num', el), unit = q('.cd-unit', el), sub = q('.cd-sub', el);
+    var num = q('.cd-num', el), unit = q('.cd-unit', el), tick = q('.cd-tick', el), sub = q('.cd-sub', el);
     var dateStr = c.date;
     try { dateStr = new Intl.DateTimeFormat(loc(), { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(target); } catch (e) {}
     q('.cd-date', el).textContent = dateStr;
@@ -2560,16 +2575,21 @@
       var h = Math.floor(ms / 3600000) % 24;
       var m = Math.floor(ms / 60000) % 60;
       var sec = Math.floor(ms / 1000) % 60;
-      sub.textContent = h + 'h ' + pad2(m) + 'min ' + pad2(sec) + 's';
+      tick.innerHTML = '<div class="cd-tick-box"><div class="cd-tick-num">' + h + '</div><div class="cd-tick-lab">' + t('cdHours') + '</div></div>' +
+        '<div class="cd-tick-box"><div class="cd-tick-num">' + pad2(m) + '</div><div class="cd-tick-lab">' + t('cdMins') + '</div></div>' +
+        '<div class="cd-tick-box"><div class="cd-tick-num">' + pad2(sec) + '</div><div class="cd-tick-lab">' + t('cdSecs') + '</div></div>';
+      sub.textContent = '';
     } else if (diffDays === 0) {
       num.style.fontSize = '6vw';
       num.textContent = t('cdToday');
       unit.textContent = '';
+      tick.innerHTML = '';
       sub.textContent = '';
     } else {
       num.style.fontSize = '6vw';
       num.textContent = t('cdPassed');
       unit.textContent = '';
+      tick.innerHTML = '';
       sub.textContent = isEN() ? (Math.abs(diffDays) + ' days ago') : ('Há ' + Math.abs(diffDays) + ' dias');
     }
   }
@@ -2648,18 +2668,38 @@
     });
     return out;
   }
+  // Official logos (hotlinked from each lottery's own site; if one
+  // ever fails to load, the card falls back to the game name text).
+  var LOT_LOGOS = {
+    powerball: 'https://cdn.powerball.com/v01/images/game/powerball-logo-600.webp',
+    mega: 'https://www.megamillions.com/GLC-Megamillions/media/images/logos/logo_MM_233x110.png',
+    fantasy5: 'https://www.galottery.com/content/dam/portal/images/ga-lottery.png'
+  };
+  var LOT_COLORS = { powerball: '#e4002b', mega: '#ffcc00', fantasy5: '#00843d' };
+  var LOT_BONUS_TEXT = { powerball: '#fff', mega: '#111', fantasy5: '#111' };
+  function lotLogoFallback(img) {
+    img.style.display = 'none';
+    var n = img.parentNode.nextElementSibling;
+    if (n) n.style.display = 'block';
+  }
   function renderLotterySlide() {
     var el = lotSlide;
     q('.lot-label', el).textContent = t('lotLabel');
     var grid = q('.lot-grid', el);
     var html = '';
     lotData.forEach(function (g) {
-      html += '<div class="lot-card"><div class="lot-name">' + escHtml(g.name) + '</div>' +
+      var color = LOT_COLORS[g.id] || '#f5b942';
+      var logo = LOT_LOGOS[g.id] || '';
+      var head = logo
+        ? '<div class="lot-logo-wrap"><img class="lot-logo" src="' + escHtml(logo) + '" alt="' + escHtml(g.name) + '" onerror="lotLogoFallback(this)"></div><div class="lot-name" style="display:none">' + escHtml(g.name) + '</div>'
+        : '<div class="lot-name">' + escHtml(g.name) + '</div>';
+      html += '<div class="lot-card" style="border-top:0.5vw solid ' + color + '">' + head +
+        (g.id === 'fantasy5' ? '<div class="lot-sub">FANTASY 5</div>' : '') +
         '<div class="lot-jackpot">' + escHtml(g.jackpot) + '</div>' +
         (g.cash ? '<div class="lot-cash">' + escHtml(t('lotCashPrefix')) + escHtml(g.cash) + '</div>' : '') +
         '<div class="lot-next">' + escHtml(t('lotNextPrefix')) + escHtml(fmtDrawText(g.nextDraw)) + '</div>' +
         '<div class="lot-balls">' + g.balls.map(function (b) { return '<span class="lot-ball">' + escHtml(b) + '</span>'; }).join('') +
-        (g.bonus ? '<span class="lot-ball bonus">' + escHtml(g.bonus) + '</span>' : '') + '</div>' +
+        (g.bonus ? '<span class="lot-ball" style="background:' + color + ';color:' + (LOT_BONUS_TEXT[g.id] || '#111') + '">' + escHtml(g.bonus) + '</span>' : '') + '</div>' +
         (g.latestDate ? '<div class="lot-latest">' + escHtml(t('lotLatestPrefix')) + escHtml(fmtDrawText(g.latestDate)) + '</div>' : '') +
         '</div>';
     });
