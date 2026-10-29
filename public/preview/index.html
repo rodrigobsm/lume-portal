@@ -2008,7 +2008,18 @@
     for (var i = 0; i < day.length; i++) vals.push(day[i].v);
     var min = Math.min.apply(null, vals), max = Math.max.apply(null, vals);
     if (max === min) max = min + 1;
-    var w = 100, h = 36, pad = 2;
+    // Render in the box's real pixel size so the scaling is uniform.
+    // The old fixed 100x36 viewBox with preserveAspectRatio="none"
+    // stretched non-uniformly into a box ~14x wider than tall, which
+    // turned the current-hour dot into a wide oval (and made the line
+    // stroke uneven). With a matching aspect, default meet fills the
+    // box exactly and every circle stays round.
+    var svgBox = q('.air-chart-svg', el);
+    var w = svgBox ? svgBox.clientWidth : 0;
+    var h = svgBox ? svgBox.clientHeight : 0;
+    if (!w) w = box.clientWidth || 940;
+    if (!h) h = Math.round(w * 65 / 940);
+    var pad = Math.max(3, Math.round(h * 0.06));
     var pts = [];
     for (var j = 0; j < day.length; j++) {
       var x = (day[j].h / 23) * w;
@@ -2016,18 +2027,21 @@
       pts.push(x.toFixed(1) + ',' + y.toFixed(1));
     }
     var area = pts.join(' ') + ' ' + w + ',' + h + ' 0,' + h;
-    var svg = '<svg viewBox="0 0 100 36" preserveAspectRatio="none"><polygon points="' + area + '" fill="rgba(245,185,66,0.25)"/><polyline points="' + pts.join(' ') + '" fill="none" stroke="#f5b942" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>';
+    var svg = '<svg viewBox="0 0 ' + w + ' ' + h + '"><polygon points="' + area + '" fill="rgba(245,185,66,0.25)"/><polyline points="' + pts.join(' ') + '" fill="none" stroke="#f5b942" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>';
     if (airData.hour >= 0) {
       var cur = null;
       for (var k = 0; k < day.length; k++) { if (day[k].h === airData.hour) cur = day[k]; }
       if (cur) {
         var cx = (cur.h / 23) * w;
         var cy = h - pad - ((cur.v - min) / (max - min)) * (h - pad * 2);
-        svg += '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="2.6" fill="#fff" stroke="#f5b942" stroke-width="1.2"/>';
+        // Keep the dot fully inside the chart at the day edges.
+        cx = Math.max(12, Math.min(w - 12, cx));
+        cy = Math.max(11, Math.min(h - 11, cy));
+        svg += '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="10" fill="none" stroke="#f5b942" stroke-opacity="0.35" stroke-width="1.5"/>';
+        svg += '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="6" fill="#fff" stroke="#f5b942" stroke-width="2.5"/>';
       }
     }
     svg += '</svg>';
-    var svgBox = q('.air-chart-svg', el);
     if (svgBox) svgBox.innerHTML = svg;
     var hours = q('.air-chart-hours', el);
     if (hours) hours.innerHTML = '<span>0h</span><span>6h</span><span>12h</span><span>18h</span><span>23h</span>';
