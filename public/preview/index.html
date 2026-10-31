@@ -285,6 +285,7 @@
   .lau-hero { margin-top: 1.5vh; }
   .lau-mission { font-size: 4.2vw; font-weight: 800; line-height: 1.1; text-shadow: 0 2px 16px rgba(0,0,0,0.7); }
   .lau-meta { font-size: 2vw; color: #e8eaed; margin-top: 1vh; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
+  .lau-date { font-size: 2vw; color: #e8eaed; margin-top: 1vh; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
   .lau-status { display: inline-block; font-size: 1.6vw; font-weight: 800; letter-spacing: 0.15em; border-radius: 0.5vw; padding: 0.4vh 1vw; margin-top: 1.5vh; }
   .lau-status.go { background: #1d7a3a; color: #fff; }
   .lau-status.tbd { background: rgba(255,255,255,0.2); color: #fff; }
@@ -293,7 +294,7 @@
   .lau-list { margin-top: 2.5vh; display: flex; flex-direction: column; gap: 0.8vh; }
   .lau-group { font-size: 1.6vw; font-weight: 800; letter-spacing: 0.2em; color: #f5b942; margin-top: 1vh; }
   .lau-row { display: flex; align-items: center; gap: 1.5vw; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 1vw; padding: 0.8vh 2vw; }
-  .lau-time { width: 13vw; flex-shrink: 0; font-size: 1.8vw; font-weight: 700; color: #fff; white-space: nowrap; }
+  .lau-time { width: 18vw; flex-shrink: 0; font-size: 1.8vw; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .lau-row-mission { flex: 1; min-width: 0; font-size: 1.9vw; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .lau-row-site { font-size: 1.6vw; color: #c8cdd2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 26vw; }
   .lau-usa { flex-shrink: 0; font-size: 1.4vw; font-weight: 800; letter-spacing: 0.1em; color: #f5b942; border: 1px solid rgba(245,185,66,0.6); border-radius: 0.5vw; padding: 0.3vh 0.8vw; }
@@ -306,9 +307,10 @@
     .spo-league { font-size: 2.0vw; width: 20vw; }
     .lau-mission { font-size: 7vw; }
     .lau-meta { font-size: 3.4vw; }
+    .lau-date { font-size: 3.4vw; }
     .lau-status { font-size: 2.6vw; }
     .lau-group { font-size: 2.8vw; }
-    .lau-time { width: 20vw; font-size: 3vw; }
+    .lau-time { width: 30vw; font-size: 3vw; }
     .lau-row-mission { font-size: 3.2vw; }
     .lau-row-site { font-size: 2.6vw; max-width: 30vw; }
   }
@@ -696,6 +698,7 @@
       <div class="lau-hero">
         <div class="lau-mission"></div>
         <div class="lau-meta"></div>
+        <div class="lau-date"></div>
         <div class="lau-status"></div>
         <div class="cd-tick lau-tick"></div>
       </div>
@@ -3113,7 +3116,7 @@
             image: l.image || null,
             isUS: loc.country_code === 'USA'
           };
-        }).filter(function (x) { return !!x; }).sort(function (a, b) { return new Date(a.net) - new Date(b.net); });
+        }).filter(function (x) { return !!x; }).sort(function (a, b) { return new Date(a.net) - new Date(b.net); }).filter(function (x) { return new Date(x.net).getTime() > Date.now(); });
         if (list.length) { lauData = list; lauAt = Date.now(); }
         else { lauFailAt = Date.now(); }
       } catch (e) { lauFailAt = Date.now(); }
@@ -3155,9 +3158,10 @@
     var meta = [];
     if (hero.rocket) meta.push(hero.rocket);
     if (hero.provider) meta.push(hero.provider);
-    var pad = [hero.padName, hero.padLocation, hero.country].filter(function (x) { return !!x; }).join(', ');
+    var pad = [hero.padName, hero.padLocation].filter(function (x) { return !!x; }).join(', ');
     if (pad) meta.push(pad);
     q('.lau-meta', el).textContent = meta.join(' · ');
+    q('.lau-date', el).textContent = lauFmtDay(hd) + ' · ' + lauFmtTime(hd);
     var st = q('.lau-status', el);
     var stText = hero.status === 'go' ? t('lauGo') : (hero.status === 'tbd' ? t('lauTbd') : (hero.statusName || ''));
     st.textContent = stText;
