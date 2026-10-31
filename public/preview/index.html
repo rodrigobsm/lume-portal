@@ -3079,14 +3079,44 @@
   var lauAt = 0;
   var LAU_REFRESH_MS = 60 * 60 * 1000;
   var LAU_MAX_ROWS = 6;
+  // Launches come straight from the Portal's browser, not from our
+  // edge: LL2's free limit (15 req/hour) is per IP, so a shared edge
+  // IP throttles while each home device has its own quota — and our
+  // 1 req/hour fits easily. On any failure (incl. CORS), back off
+  // 15 min instead of hammering on every slide visit.
+  var lauFailAt = 0;
   function loadLaunches() {
     if (lauData && Date.now() - lauAt < LAU_REFRESH_MS) return;
-    xhrGet('/api/launches', function (err, txt) {
-      if (err) return;
+    if (lauFailAt && Date.now() - lauFailAt < 15 * 60 * 1000) return;
+    xhrGet('https://ll.thespacedevs.com/2.2.0/launch/upcoming/?limit=30', function (err, txt) {
+      if (err) { lauFailAt = Date.now(); return; }
       try {
         var j = JSON.parse(txt);
-        if (j && j.ok && j.launches) { lauData = j.launches; lauAt = Date.now(); }
-      } catch (e) {}
+        var list = (j.results || []).map(function (l) {
+          if (!l || !l.net) return null;
+          var pad = l.pad || {};
+          var loc = pad.location || {};
+          var status = l.status || {};
+          var abbrev = (status.abbrev || '').toLowerCase();
+          var rocket = (l.rocket && l.rocket.configuration) || {};
+          return {
+            name: l.name || '',
+            mission: (l.mission && l.mission.name) || '',
+            rocket: rocket.name || '',
+            provider: (l.launch_service_provider && l.launch_service_provider.name) || '',
+            padName: pad.name || '',
+            padLocation: loc.name || '',
+            country: loc.country_code || '',
+            net: l.net,
+            status: abbrev === 'go' ? 'go' : (abbrev === 'tbd' ? 'tbd' : 'other'),
+            statusName: status.name || '',
+            image: l.image || null,
+            isUS: loc.country_code === 'USA'
+          };
+        }).filter(function (x) { return !!x; }).sort(function (a, b) { return new Date(a.net) - new Date(b.net); });
+        if (list.length) { lauData = list; lauAt = Date.now(); }
+        else { lauFailAt = Date.now(); }
+      } catch (e) { lauFailAt = Date.now(); }
     });
   }
   function lauDayKey(d) { return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
