@@ -10,7 +10,13 @@ export var FEED_IDS = [
   'g1-tecnologia'
 ];
 
-export var SCREEN_KEYS = ['C', 'W', 'K', 'B', 'A', 'M', 'F', 'P', 'D', 'N', 'L'];
+export var SCREEN_KEYS = ['C', 'W', 'K', 'B', 'A', 'M', 'F', 'P', 'D', 'N', 'L', 'S'];
+
+// Sports leagues offered on /pair/ (id -> ESPN sport/league path lives
+// in functions/api/sports.js). Defaults mirror the project's US + Brazil
+// audience; an empty leagues list hides the Sports screen.
+export var SPORT_LEAGUES = ['nfl', 'nba', 'mlb', 'nhl', 'mls', 'bra', 'epl', 'laliga'];
+export var SPORT_DEFAULT_LEAGUES = ['nfl', 'nba', 'mlb', 'bra'];
 
 export var FEED_CATEGORIES = ['brasil', 'mundo', 'tech', 'eua', 'atlanta'];
 
@@ -68,6 +74,23 @@ export function normalizeConfig(input) {
   }
   var cdPhoto = (typeof cd.photo === 'string' && /^https?:\/\//i.test(cd.photo.trim())) ? cd.photo.trim().slice(0, 500) : '';
   cfg.countdown = (cdTitle && cdOk) ? { title: cdTitle, date: cdDate, photo: cdPhoto } : null;
+  // Sports: leagues the user wants (absent = defaults; present but
+  // empty = hide the Sports screen). Favorite team: {league, abbr,
+  // name} or null; the panel highlights that team's games.
+  var spsrc = (src.sports && typeof src.sports === 'object') ? src.sports : null;
+  var leagues = (spsrc && Array.isArray(spsrc.leagues))
+    ? spsrc.leagues.filter(function (id) { return SPORT_LEAGUES.indexOf(id) !== -1; }).slice(0, 8)
+    : SPORT_DEFAULT_LEAGUES.slice();
+  var fav = null;
+  if (spsrc && spsrc.favorite && typeof spsrc.favorite === 'object') {
+    var fLeague = spsrc.favorite.league;
+    var fAbbr = (typeof spsrc.favorite.abbr === 'string') ? spsrc.favorite.abbr.trim().toUpperCase() : '';
+    var fName = str(spsrc.favorite.name, 80).trim();
+    if (SPORT_LEAGUES.indexOf(fLeague) !== -1 && /^[A-Z0-9]{2,5}$/.test(fAbbr)) {
+      fav = { league: fLeague, abbr: fAbbr, name: fName };
+    }
+  }
+  cfg.sports = { leagues: leagues, favorite: fav };
   var screens = {};
   var ssrc = (src.screens && typeof src.screens === 'object') ? src.screens : {};
   SCREEN_KEYS.forEach(function (k) { screens[k] = ssrc[k] !== false; });

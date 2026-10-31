@@ -248,6 +248,29 @@
   .lot-card { flex: 1; max-width: 30vw; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 1.2vw; padding: 1.8vh 2vw; text-align: center; }
   .lot-name { font-size: 2.2vw; font-weight: 700; letter-spacing: 0.12em; color: #f5b942; }
   .lot-jackpot { font-size: 4.2vw; font-weight: 800; color: #fff; margin: 1.5vh 0 0.5vh 0; text-shadow: 0 2px 12px rgba(0,0,0,0.7); }
+  .sports-slide { background: #0a0a14; }
+  .spo-content { position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 9vh 5vw 4vw 5vw; }
+  .spo-label { font-size: 2.1vw; font-weight: 700; letter-spacing: 0.25em; color: #f5b942; text-shadow: 0 1px 8px rgba(0,0,0,0.6); margin-bottom: 2vh; }
+  .spo-list { width: 100%; max-width: 88vw; display: flex; flex-direction: column; gap: 1.2vh; }
+  .spo-row { display: flex; align-items: center; gap: 1.5vw; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 1vw; padding: 1.2vh 2vw; }
+  .spo-row.fav { border-color: #f5b942; box-shadow: 0 0 0 1px #f5b942 inset; }
+  .spo-league { width: 7vw; font-size: 1.5vw; font-weight: 700; letter-spacing: 0.15em; color: #9aa3b2; text-align: center; flex-shrink: 0; }
+  .spo-team { flex: 1; display: flex; align-items: center; gap: 1vw; font-size: 2vw; font-weight: 700; color: #fff; min-width: 0; }
+  .spo-team.home { justify-content: flex-end; text-align: right; }
+  .spo-team.home img { order: 2; }
+  .spo-logo { height: 4.2vw; width: 4.2vw; object-fit: contain; flex-shrink: 0; }
+  .spo-score { font-size: 2.6vw; font-weight: 800; color: #fff; min-width: 4.5vw; text-align: center; }
+  .spo-vs { font-size: 1.4vw; color: #9aa3b2; }
+  .spo-status { width: 14vw; text-align: right; font-size: 1.6vw; color: #d7dde8; flex-shrink: 0; }
+  .spo-live { display: inline-block; background: #e4002b; color: #fff; font-size: 1.4vw; font-weight: 800; letter-spacing: 0.15em; border-radius: 0.5vw; padding: 0.4vh 0.8vw; margin-right: 0.8vw; }
+  .spo-source { margin-top: 2vh; font-size: 1.6vw; color: #9aa3b2; }
+  @media (orientation: portrait) {
+    .spo-logo { height: 7vw; width: 7vw; }
+    .spo-team { font-size: 3.4vw; }
+    .spo-score { font-size: 4.4vw; }
+    .spo-status { font-size: 2.6vw; width: 22vw; }
+    .spo-league { font-size: 2.4vw; width: 11vw; }
+  }
   .lot-cash { font-size: 1.7vw; color: #c8cdd2; }
   .lot-next { font-size: 1.9vw; color: #fff; margin-top: 1.5vh; }
   .lot-balls { display: flex; gap: 0.6vw; justify-content: center; margin-top: 1.8vh; flex-wrap: wrap; }
@@ -603,6 +626,13 @@
       <div class="lot-source"></div>
     </div>
   </div>
+  <div class="slide sports-slide" id="slideSports">
+    <div class="spo-content">
+      <div class="spo-label">ESPORTES</div>
+      <div class="spo-list"></div>
+      <div class="spo-source"></div>
+    </div>
+  </div>
   <div class="slide photoslide" id="slidePhoto">
     <img class="photo-photo" alt="">
     <video class="photo-video" muted playsinline preload="auto"></video>
@@ -686,7 +716,8 @@
       catBrasil: 'Brasil', catMundo: 'Mundo', catEua: 'EUA', catAtlanta: 'Local', catTech: 'Tecnologia',
       cdLabel: 'CONTAGEM REGRESSIVA', cdDay: 'DIA', cdDays: 'DIAS', cdToday: 'É HOJE!', cdPassed: 'CHEGOU O DIA!', cdHours: 'HORAS', cdMins: 'MIN', cdSecs: 'SEG',
       nasaLabel: 'FOTO DO DIA · NASA',
-      lotLabel: 'LOTERIA', lotCashPrefix: 'À vista: ', lotNextPrefix: 'Próximo sorteio: ', lotLatestPrefix: 'Último: ', lotSource: 'Fonte: LotteryUSA'
+      lotLabel: 'LOTERIA', lotCashPrefix: 'À vista: ', lotNextPrefix: 'Próximo sorteio: ', lotLatestPrefix: 'Último: ', lotSource: 'Fonte: LotteryUSA',
+      spoLabel: 'ESPORTES', spoLive: 'AO VIVO', spoFinal: 'FINAL', spoSource: 'Fonte: ESPN'
     },
     'en-US': {
       today: 'TODAY', now: 'now', minAgo: '{n} min ago', hAgo: '{n} h ago', nowPill: 'NOW',
@@ -713,7 +744,8 @@
       catBrasil: 'Brazil', catMundo: 'World', catEua: 'USA', catAtlanta: 'Atlanta', catTech: 'Tech',
       cdLabel: 'COUNTDOWN', cdDay: 'DAY', cdDays: 'DAYS', cdToday: 'TODAY!', cdPassed: 'THE DAY IS HERE!', cdHours: 'HOURS', cdMins: 'MIN', cdSecs: 'SEC',
       nasaLabel: 'NASA PHOTO OF THE DAY',
-      lotLabel: 'LOTTERY', lotCashPrefix: 'Cash value: ', lotNextPrefix: 'Next draw: ', lotLatestPrefix: 'Latest: ', lotSource: 'Source: LotteryUSA'
+      lotLabel: 'LOTTERY', lotCashPrefix: 'Cash value: ', lotNextPrefix: 'Next draw: ', lotLatestPrefix: 'Latest: ', lotSource: 'Source: LotteryUSA',
+      spoLabel: 'SPORTS', spoLive: 'LIVE', spoFinal: 'FINAL', spoSource: 'Source: ESPN'
     }
   };
   function t(k) {
@@ -996,6 +1028,7 @@
   var cdSlide = document.getElementById('slideCountdown');
   var nasaSlide = document.getElementById('slideNasa');
   var lotSlide = document.getElementById('slideLottery');
+  var spoSlide = document.getElementById('slideSports');
   var airData = null;
   var airPollen = null;
   var mktData = null;
@@ -1590,7 +1623,7 @@
     days.innerHTML = html;
   }
   function buildSeq() {
-    var all = ['C', 'W', 'K', 'B', 'A', 'M', 'F', 'P', 'D', 'N', 'L'];
+    var all = ['C', 'W', 'K', 'B', 'A', 'M', 'F', 'P', 'D', 'N', 'L', 'S'];
     var order = all;
     if (lumeCfg && Array.isArray(lumeCfg.screenOrder) && lumeCfg.screenOrder.length) {
       order = [];
@@ -1605,6 +1638,8 @@
     if (!photoFolderId()) specials = specials.filter(function (k) { return k !== 'P'; });
     // Countdown appears only when an event (title + date) is configured.
     if (!hasCountdown()) specials = specials.filter(function (k) { return k !== 'D'; });
+    // Sports appears only when at least one league is selected.
+    if (!spoLeagues().length) specials = specials.filter(function (k) { return k !== 'S'; });
     loadPhotos();
     seq = specials.slice();
     var si = 0;
@@ -1653,6 +1688,7 @@
     else if (s === 'D') { showCountdownSlide(); }
     else if (s === 'N') { showNasaSlide(); }
     else if (s === 'L') { showLotterySlide(); }
+    else if (s === 'S') { showSportsSlide(); }
     else if (s === 'P') { showPhotoSlide(); }
     else { curNewsIdx = s; curKind = 'news'; showSlide(s); }
     preloadNextMedia();
@@ -1668,7 +1704,7 @@
     showSeq(seqPos - 1);
   }
   function deactivateAll() {
-    var all = [slides.A, slides.B, wxSlide, fxSlide, clockSlide, bibleSlide, airSlide, mktSlide, factSlide, photoSlide, cdSlide, nasaSlide, lotSlide];
+    var all = [slides.A, slides.B, wxSlide, fxSlide, clockSlide, bibleSlide, airSlide, mktSlide, factSlide, photoSlide, cdSlide, nasaSlide, lotSlide, spoSlide];
     for (var i = 0; i < all.length; i++) {
       if (all[i]) all[i].className = all[i].className.replace(/\bactive\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '');
     }
@@ -2756,6 +2792,109 @@
     restartProgress(slideMs());
     resetRotate(slideMs());
   }
+  // ---- Sports (S): scores from ESPN (no key) for the leagues the user
+  // picked on /pair/. Flat list, max 8 rows: the favorite team's game
+  // first, then live games, then upcoming, then finals. No games at all
+  // -> the screen is skipped silently (same pattern as NASA/Lottery).
+  var spoData = null;
+  var spoAt = 0;
+  var SPO_REFRESH_MS = 10 * 60 * 1000;
+  var SPO_DEFAULT_LEAGUES = ['nfl', 'nba', 'mlb', 'bra'];
+  var SPO_MAX_ROWS = 8;
+  function spoLeagues() {
+    if (lumeCfg && lumeCfg.sports && Array.isArray(lumeCfg.sports.leagues)) return lumeCfg.sports.leagues;
+    return SPO_DEFAULT_LEAGUES.slice();
+  }
+  function spoFavorite() {
+    if (lumeCfg && lumeCfg.sports && lumeCfg.sports.favorite) return lumeCfg.sports.favorite;
+    return null;
+  }
+  function loadSports() {
+    var leagues = spoLeagues();
+    if (!leagues.length) return;
+    if (spoData && Date.now() - spoAt < SPO_REFRESH_MS) return;
+    xhrGet('/api/sports?leagues=' + encodeURIComponent(leagues.join(',')), function (err, txt) {
+      if (err) return;
+      try {
+        var j = JSON.parse(txt);
+        if (j && j.ok && j.leagues) {
+          var total = 0;
+          j.leagues.forEach(function (l) { total += (l.games || []).length; });
+          if (total > 0) { spoData = j.leagues; spoAt = Date.now(); }
+        }
+      } catch (e) {}
+    });
+  }
+  function spoStatusText(g) {
+    if (g.state === 'in') return g.shortDetail || g.detail || '';
+    if (g.state === 'post') return t('spoFinal');
+    // Upcoming: format the ISO date in the dashboard language.
+    if (g.date) {
+      try {
+        var d = new Date(g.date);
+        if (!isNaN(d.getTime())) {
+          var days = isEN() ? ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] : ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+          var hh = d.getHours(), mm = d.getMinutes();
+          if (isEN()) {
+            var ap = hh >= 12 ? 'PM' : 'AM';
+            var h12 = hh % 12; if (h12 === 0) h12 = 12;
+            return days[d.getDay()] + ' ' + h12 + ':' + (mm < 10 ? '0' : '') + mm + ' ' + ap;
+          }
+          return days[d.getDay()] + ' ' + hh + 'h' + (mm < 10 ? '0' : '') + mm;
+        }
+      } catch (e) {}
+    }
+    return g.detail || '';
+  }
+  function renderSportsSlide() {
+    var el = spoSlide;
+    q('.spo-label', el).textContent = t('spoLabel');
+    var fav = spoFavorite();
+    var rows = [];
+    spoData.forEach(function (l) {
+      (l.games || []).forEach(function (g) {
+        var isFav = !!(fav && g.league === fav.league && (g.home.abbr === fav.abbr || g.away.abbr === fav.abbr));
+        var rank = isFav ? 0 : (g.state === 'in' ? 1 : (g.state === 'pre' ? 2 : 3));
+        rows.push({ g: g, league: l.name, fav: isFav, rank: rank });
+      });
+    });
+    rows.sort(function (a, b) { return a.rank - b.rank; });
+    rows = rows.slice(0, SPO_MAX_ROWS);
+    function teamHtml(tm, cls) {
+      return '<div class="spo-team ' + cls + '">' +
+        (tm.logo ? '<img class="spo-logo" src="' + escHtml(tm.logo) + '" alt="' + escHtml(tm.abbr) + '">' : '') +
+        '<span>' + escHtml(tm.abbr) + '</span></div>';
+    }
+    var html = '';
+    rows.forEach(function (r) {
+      var g = r.g;
+      var live = g.state === 'in' ? '<span class="spo-live">' + escHtml(t('spoLive')) + '</span>' : '';
+      html += '<div class="spo-row' + (r.fav ? ' fav' : '') + '">' +
+        '<div class="spo-league">' + (r.fav ? '★ ' : '') + escHtml(r.league) + '</div>' +
+        teamHtml(g.away, 'away') +
+        '<div class="spo-score">' + escHtml(g.away.score) + '</div>' +
+        '<div class="spo-vs">×</div>' +
+        '<div class="spo-score">' + escHtml(g.home.score) + '</div>' +
+        teamHtml(g.home, 'home') +
+        '<div class="spo-status">' + live + escHtml(spoStatusText(g)) + '</div>' +
+        '</div>';
+    });
+    q('.spo-list', el).innerHTML = html;
+    q('.spo-source', el).textContent = t('spoSource');
+  }
+  function showSportsSlide() {
+    if (!spoData) { loadSports(); if (seq.length > 1) showSeq(seqPos + seqDir); return; }
+    restoreHeadlines();
+    curKind = 'S';
+    var el = spoSlide;
+    renderSportsSlide();
+    deactivateAll();
+    el.className = el.className.replace(/\bactive\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '') + ' active';
+    var tw = document.querySelector('.topbar .weather');
+    if (tw) tw.style.visibility = 'hidden';
+    restartProgress(slideMs());
+    resetRotate(slideMs());
+  }
   // ---- Personal photos (P): one item per appearance, in filename
   // order, looping. Photos are shown directly with a plain <img>
   // (Drive thumbnail URL); videos play muted with a plain <video>
@@ -3211,6 +3350,8 @@
   setInterval(loadApod, APOD_REFRESH_MS);
   loadLottery();
   setInterval(loadLottery, LOT_REFRESH_MS);
+  loadSports();
+  setInterval(loadSports, SPO_REFRESH_MS);
   // Preload lottery logos + countdown default photo at boot, so the
   // L and D slides never show blank image areas on first appearance.
   Object.keys(LOT_LOGOS).forEach(function (k) { var im = new Image(); im.src = LOT_LOGOS[k]; });

@@ -167,6 +167,17 @@
       <input type="text" id="cdPhoto" placeholder="https://… (leave blank for the default photo)" autocomplete="off">
       <p class="hint">Set a title and a date to add the Countdown screen to the rotation. Leave the title or date blank to turn it off. The photo is optional — without one, the dashboard uses a default travel photo.</p>
     </div>
+    <div class="card">
+      <h2>Sports (optional)</h2>
+      <label>Leagues to show</label>
+      <div id="spoLeagues"></div>
+      <label for="spoFavLeague">Favorite team (optional)</label>
+      <div class="row">
+        <div><select id="spoFavLeague"></select></div>
+        <div><select id="spoFavTeam"></select></div>
+      </div>
+      <p class="hint">Checked leagues appear on the Sports screen (scores from ESPN, no account needed). A favorite team gets a gold highlight and its game shown first. Leave all leagues unchecked to hide the screen.</p>
+    </div>
   </div>
 
   <div class="panel" id="panel-weather" role="tabpanel" hidden>
@@ -193,7 +204,7 @@
   <div class="panel" id="panel-screens" role="tabpanel" hidden>
     <div class="card">
       <h2>Screens</h2>
-      <p class="hint">Choose which special screens appear, and drag rows (or use the arrows) to set their rotation order. Photos appears only when a Drive folder is set on the Device tab. Countdown appears only when an event is set on the Device tab.</p>
+      <p class="hint">Choose which special screens appear, and drag rows (or use the arrows) to set their rotation order. Photos appears only when a Drive folder is set on the Device tab. Countdown appears only when an event is set on the Device tab. Sports appears only when at least one league is checked on the Device tab.</p>
       <div id="screenList"></div>
       <label for="newsPerBlock">News in a row</label>
       <select id="newsPerBlock">
@@ -250,8 +261,8 @@
     ['g1-tecnologia', 'G1 — Technology']
   ];
   var CATS = [['brasil', 'Brazil'], ['mundo', 'World'], ['tech', 'Tech'], ['eua', 'USA'], ['atlanta', 'Atlanta']];
-  var SCREENS = [['C', 'Currency'], ['W', 'Weather'], ['K', 'World Clock'], ['B', 'Bible'], ['A', 'Air Quality'], ['M', 'Markets'], ['F', 'Fun Facts'], ['P', 'Photos'], ['D', 'Countdown'], ['N', 'NASA Photo'], ['L', 'Lottery']];
-  var SCREEN_KEYS = ['C', 'W', 'K', 'B', 'A', 'M', 'F', 'P', 'D', 'N', 'L'];
+  var SCREENS = [['C', 'Currency'], ['W', 'Weather'], ['K', 'World Clock'], ['B', 'Bible'], ['A', 'Air Quality'], ['M', 'Markets'], ['F', 'Fun Facts'], ['P', 'Photos'], ['D', 'Countdown'], ['N', 'NASA Photo'], ['L', 'Lottery'], ['S', 'Sports']];
+  var SCREEN_KEYS = ['C', 'W', 'K', 'B', 'A', 'M', 'F', 'P', 'D', 'N', 'L', 'S'];
   var ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
   var DEFAULT_CLOCK = [
     { name: 'Atlanta', timezone: 'America/New_York' },
@@ -395,6 +406,56 @@
     renderScreens();
   }
   renderScreens();
+
+  // ---- Sports: leagues + favorite team ----
+  var SPORTS = [['nfl', 'NFL'], ['nba', 'NBA'], ['mlb', 'MLB'], ['nhl', 'NHL'], ['mls', 'MLS'], ['bra', 'Brasileirão'], ['epl', 'Premier League'], ['laliga', 'La Liga']];
+  var spoLeagueState = {};
+  SPORTS.forEach(function (sp) { spoLeagueState[sp[0]] = (['nfl', 'nba', 'mlb', 'bra'].indexOf(sp[0]) !== -1); });
+  function renderSpoLeagues() {
+    var wrap = $('spoLeagues');
+    wrap.innerHTML = '';
+    SPORTS.forEach(function (sp) {
+      var div = document.createElement('div');
+      div.className = 'check';
+      div.innerHTML = '<input type="checkbox" id="spo-' + sp[0] + '"' + (spoLeagueState[sp[0]] ? ' checked' : '') + '><label for="spo-' + sp[0] + '" style="margin:0;">' + sp[1] + '</label>';
+      div.querySelector('input').addEventListener('change', function (e) { spoLeagueState[sp[0]] = e.target.checked; });
+      wrap.appendChild(div);
+    });
+    var favSel = $('spoFavLeague');
+    if (!favSel.options.length) {
+      var none = document.createElement('option');
+      none.value = ''; none.textContent = 'No favorite team';
+      favSel.appendChild(none);
+      SPORTS.forEach(function (sp) {
+        var o = document.createElement('option');
+        o.value = sp[0]; o.textContent = sp[1];
+        favSel.appendChild(o);
+      });
+    }
+  }
+  function loadSpoTeams(league, selectAbbr) {
+    var teamSel = $('spoFavTeam');
+    teamSel.innerHTML = '';
+    var none = document.createElement('option');
+    none.value = ''; none.textContent = 'No favorite team';
+    teamSel.appendChild(none);
+    if (!league) return;
+    teamSel.disabled = true;
+    fetch('/api/sports?teams=' + encodeURIComponent(league)).then(function (r) { return r.json(); }).then(function (d) {
+      teamSel.disabled = false;
+      if (d && d.ok && d.teams) {
+        d.teams.forEach(function (tm) {
+          var o = document.createElement('option');
+          o.value = tm.abbr; o.textContent = tm.name;
+          teamSel.appendChild(o);
+        });
+        if (selectAbbr) teamSel.value = selectAbbr;
+      }
+    }).catch(function () { teamSel.disabled = false; });
+  }
+  $('spoFavLeague').addEventListener('change', function () { loadSpoTeams(this.value, null); });
+  renderSpoLeagues();
+  loadSpoTeams('', null);
 
   // ---- World clock slots ----
   var worldClock = DEFAULT_CLOCK.map(function (c) { return { name: c.name, timezone: c.timezone }; });
@@ -553,6 +614,19 @@
     $('cdTitle').value = (cfg.countdown && cfg.countdown.title) || '';
     $('cdDate').value = (cfg.countdown && cfg.countdown.date) || '';
     $('cdPhoto').value = (cfg.countdown && cfg.countdown.photo) || '';
+    if (cfg.sports && Array.isArray(cfg.sports.leagues)) {
+      var onL = {};
+      cfg.sports.leagues.forEach(function (id) { onL[id] = true; });
+      SPORTS.forEach(function (sp) { spoLeagueState[sp[0]] = !!onL[sp[0]]; });
+    }
+    renderSpoLeagues();
+    if (cfg.sports && cfg.sports.favorite && cfg.sports.favorite.league) {
+      $('spoFavLeague').value = cfg.sports.favorite.league;
+      loadSpoTeams(cfg.sports.favorite.league, cfg.sports.favorite.abbr);
+    } else {
+      $('spoFavLeague').value = '';
+      loadSpoTeams('', null);
+    }
     renderScreens();
     if (Array.isArray(cfg.worldClock) && cfg.worldClock.length) {
       var wc = [];
@@ -577,6 +651,19 @@
     }
   }
 
+  function collectSports() {
+    var leagues = SPORTS.filter(function (sp) { return !!spoLeagueState[sp[0]]; }).map(function (sp) { return sp[0]; });
+    var fl = $('spoFavLeague').value;
+    var teamSel = $('spoFavTeam');
+    var abbr = teamSel.value;
+    var fav = null;
+    if (fl && abbr) {
+      var opt = teamSel.options[teamSel.selectedIndex];
+      fav = { league: fl, abbr: abbr, name: opt ? opt.text : abbr };
+    }
+    return { leagues: leagues, favorite: fav };
+  }
+
   function collectConfig() {
     harvestCustom();
     var enabled = FEEDS.filter(function (f) { return $('feed-' + f[0]).checked; }).map(function (f) { return f[0]; });
@@ -597,6 +684,7 @@
       screenOrder: screenOrder.slice(),
       photosFolder: extractDriveFolderId($('photosFolder').value),
       countdown: { title: $('cdTitle').value.trim(), date: $('cdDate').value, photo: $('cdPhoto').value.trim() },
+      sports: collectSports(),
       worldClock: wc,
       feeds: { enabled: enabled, custom: custom }
     };
