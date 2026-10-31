@@ -3091,32 +3091,17 @@
   function loadLaunches() {
     if (lauData && Date.now() - lauAt < LAU_REFRESH_MS) return;
     if (lauFailAt && Date.now() - lauFailAt < 15 * 60 * 1000) return;
-    xhrGet('https://ll.thespacedevs.com/2.2.0/launch/upcoming/?limit=30', function (err, txt) {
+    // Launches via our own edge (same-origin): the Portal reaches our
+    // domain fine, while direct LL2 calls from its old WebView proved
+    // unreliable (shared-IP throttle). The edge caches 1h and serves the
+    // last good snapshot when LL2 throttles; the panel still drops
+    // launches that already flew (LL2 upcoming includes the last 24h).
+    xhrGet('/api/launches', function (err, txt) {
       if (err) { lauFailAt = Date.now(); return; }
       try {
         var j = JSON.parse(txt);
-        var list = (j.results || []).map(function (l) {
-          if (!l || !l.net) return null;
-          var pad = l.pad || {};
-          var loc = pad.location || {};
-          var status = l.status || {};
-          var abbrev = (status.abbrev || '').toLowerCase();
-          var rocket = (l.rocket && l.rocket.configuration) || {};
-          return {
-            name: l.name || '',
-            mission: (l.mission && l.mission.name) || '',
-            rocket: rocket.name || '',
-            provider: (l.launch_service_provider && l.launch_service_provider.name) || '',
-            padName: pad.name || '',
-            padLocation: loc.name || '',
-            country: loc.country_code || '',
-            net: l.net,
-            status: abbrev === 'go' ? 'go' : (abbrev === 'tbd' ? 'tbd' : 'other'),
-            statusName: status.name || '',
-            image: l.image || null,
-            isUS: loc.country_code === 'USA'
-          };
-        }).filter(function (x) { return !!x; }).sort(function (a, b) { return new Date(a.net) - new Date(b.net); }).filter(function (x) { return new Date(x.net).getTime() > Date.now(); });
+        if (!j || !j.ok || !Array.isArray(j.launches)) { lauFailAt = Date.now(); return; }
+        var list = j.launches.filter(function (x) { return !!x && x.net && new Date(x.net).getTime() > Date.now(); });
         if (list.length) { lauData = list; lauAt = Date.now(); }
         else { lauFailAt = Date.now(); }
       } catch (e) { lauFailAt = Date.now(); }
