@@ -276,12 +276,41 @@
   .spo-status { width: 14vw; text-align: right; font-size: 1.6vw; color: #d7dde8; flex-shrink: 0; white-space: nowrap; overflow: hidden; }
   .spo-live { display: inline-block; background: #e4002b; color: #fff; font-size: 1.4vw; font-weight: 800; letter-spacing: 0.15em; border-radius: 0.5vw; padding: 0.4vh 0.8vw; margin-right: 0.8vw; }
   .spo-source { margin-top: 1.5vh; font-size: 1.6vw; color: #9aa3b2; }
+  .lau-slide { background: #050510; }
+  .lau-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(160deg, #050510 0%, #101830 55%, #050510 130%); }
+  .lau-photo { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+  .lau-shade { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 45%, rgba(0,0,0,0.45) 100%); }
+  .lau-content { position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 2; display: flex; flex-direction: column; padding: 16vh 5vw 3vw 5vw; overflow: hidden; }
+  .lau-label { font-size: 2.1vw; font-weight: 700; letter-spacing: 0.25em; color: #f5b942; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
+  .lau-hero { margin-top: 1.5vh; }
+  .lau-mission { font-size: 4.2vw; font-weight: 800; line-height: 1.1; text-shadow: 0 2px 16px rgba(0,0,0,0.7); }
+  .lau-meta { font-size: 2vw; color: #e8eaed; margin-top: 1vh; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
+  .lau-status { display: inline-block; font-size: 1.6vw; font-weight: 800; letter-spacing: 0.15em; border-radius: 0.5vw; padding: 0.4vh 1vw; margin-top: 1.5vh; }
+  .lau-status.go { background: #1d7a3a; color: #fff; }
+  .lau-status.tbd { background: rgba(255,255,255,0.2); color: #fff; }
+  .lau-status.other { background: rgba(255,255,255,0.2); color: #fff; }
+  .lau-tick { justify-content: flex-start; margin-top: 2vh; }
+  .lau-list { margin-top: 2.5vh; display: flex; flex-direction: column; gap: 0.8vh; }
+  .lau-group { font-size: 1.6vw; font-weight: 800; letter-spacing: 0.2em; color: #f5b942; margin-top: 1vh; }
+  .lau-row { display: flex; align-items: center; gap: 1.5vw; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 1vw; padding: 0.8vh 2vw; }
+  .lau-time { width: 13vw; flex-shrink: 0; font-size: 1.8vw; font-weight: 700; color: #fff; white-space: nowrap; }
+  .lau-row-mission { flex: 1; min-width: 0; font-size: 1.9vw; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lau-row-site { font-size: 1.6vw; color: #c8cdd2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 26vw; }
+  .lau-usa { flex-shrink: 0; font-size: 1.4vw; font-weight: 800; letter-spacing: 0.1em; color: #f5b942; border: 1px solid rgba(245,185,66,0.6); border-radius: 0.5vw; padding: 0.3vh 0.8vw; }
+  .lau-source { margin-top: auto; padding-top: 1.5vh; font-size: 1.6vw; color: #9aa3b2; }
   @media (orientation: portrait) {
     .spo-logo { height: 7vw; width: 7vw; }
     .spo-team { font-size: 3.4vw; }
     .spo-score { font-size: 4.4vw; }
     .spo-status { font-size: 2.6vw; width: 22vw; }
     .spo-league { font-size: 2.0vw; width: 20vw; }
+    .lau-mission { font-size: 7vw; }
+    .lau-meta { font-size: 3.4vw; }
+    .lau-status { font-size: 2.6vw; }
+    .lau-group { font-size: 2.8vw; }
+    .lau-time { width: 20vw; font-size: 3vw; }
+    .lau-row-mission { font-size: 3.2vw; }
+    .lau-row-site { font-size: 2.6vw; max-width: 30vw; }
   }
   .lot-cash { font-size: 1.7vw; color: #c8cdd2; }
   .lot-next { font-size: 1.9vw; color: #fff; margin-top: 1.5vh; }
@@ -658,6 +687,22 @@
       <div class="spo-source"></div>
     </div>
   </div>
+  <div class="slide lau-slide" id="slideLaunch">
+    <div class="lau-bg"></div>
+    <img class="lau-photo" alt="">
+    <div class="lau-shade"></div>
+    <div class="lau-content">
+      <div class="lau-label"></div>
+      <div class="lau-hero">
+        <div class="lau-mission"></div>
+        <div class="lau-meta"></div>
+        <div class="lau-status"></div>
+        <div class="cd-tick lau-tick"></div>
+      </div>
+      <div class="lau-list"></div>
+      <div class="lau-source"></div>
+    </div>
+  </div>
   <div class="slide photoslide" id="slidePhoto">
     <img class="photo-photo" alt="">
     <video class="photo-video" muted playsinline preload="auto"></video>
@@ -743,7 +788,8 @@
       nasaLabel: 'FOTO DO DIA · NASA',
       precipTitle: 'CHUVA · PRÓXIMAS 24H', precipTotal: 'Total 24h:', precipPeak: 'Pico:', precipAt: 'às', precipNone: 'Sem chuva nas próximas 24h',
       lotLabel: 'LOTERIA', lotCashPrefix: 'À vista: ', lotNextPrefix: 'Próximo sorteio: ', lotLatestPrefix: 'Último: ', lotSource: 'Fonte: LotteryUSA',
-      spoLabel: 'ESPORTES', spoLive: 'AO VIVO', spoFinal: 'FINAL', spoSource: 'Fonte: ESPN'
+      spoLabel: 'ESPORTES', spoLive: 'AO VIVO', spoFinal: 'FINAL', spoSource: 'Fonte: ESPN',
+      lauLabel: 'LANÇAMENTOS', lauToday: 'HOJE', lauTomorrow: 'AMANHÃ', lauWeek: 'PRÓXIMA SEMANA', lauGo: 'Confirmado', lauTbd: 'Data provisória', lauSource: 'Fonte: The Space Devs'
     },
     'en-US': {
       today: 'TODAY', now: 'now', minAgo: '{n} min ago', hAgo: '{n} h ago', nowPill: 'NOW',
@@ -772,7 +818,8 @@
       nasaLabel: 'NASA PHOTO OF THE DAY',
       precipTitle: 'RAIN · NEXT 24H', precipTotal: '24h total:', precipPeak: 'Peak:', precipAt: 'at', precipNone: 'No rain in the next 24 hours',
       lotLabel: 'LOTTERY', lotCashPrefix: 'Cash value: ', lotNextPrefix: 'Next draw: ', lotLatestPrefix: 'Latest: ', lotSource: 'Source: LotteryUSA',
-      spoLabel: 'SPORTS', spoLive: 'LIVE', spoFinal: 'FINAL', spoSource: 'Source: ESPN'
+      spoLabel: 'SPORTS', spoLive: 'LIVE', spoFinal: 'FINAL', spoSource: 'Source: ESPN',
+      lauLabel: 'LAUNCHES', lauToday: 'TODAY', lauTomorrow: 'TOMORROW', lauWeek: 'THIS WEEK', lauGo: 'Confirmed', lauTbd: 'Date TBD', lauSource: 'Source: The Space Devs'
     }
   };
   function t(k) {
@@ -1056,6 +1103,7 @@
   var nasaSlide = document.getElementById('slideNasa');
   var lotSlide = document.getElementById('slideLottery');
   var spoSlide = document.getElementById('slideSports');
+  var lauSlide = document.getElementById('slideLaunch');
   var airData = null;
   var airPollen = null;
   var mktData = null;
@@ -1707,7 +1755,7 @@
     days.innerHTML = html;
   }
   function buildSeq() {
-    var all = ['C', 'W', 'K', 'B', 'A', 'M', 'F', 'P', 'D', 'N', 'L', 'S'];
+    var all = ['C', 'W', 'K', 'B', 'A', 'M', 'F', 'P', 'D', 'N', 'L', 'S', 'R'];
     var order = all;
     if (lumeCfg && Array.isArray(lumeCfg.screenOrder) && lumeCfg.screenOrder.length) {
       order = [];
@@ -1773,6 +1821,7 @@
     else if (s === 'N') { showNasaSlide(); }
     else if (s === 'L') { showLotterySlide(); }
     else if (s === 'S') { showSportsSlide(); }
+    else if (s === 'R') { showLaunchSlide(); }
     else if (s === 'P') { showPhotoSlide(); }
     else { curNewsIdx = s; curKind = 'news'; showSlide(s); }
     preloadNextMedia();
@@ -1788,7 +1837,7 @@
     showSeq(seqPos - 1);
   }
   function deactivateAll() {
-    var all = [slides.A, slides.B, wxSlide, fxSlide, clockSlide, bibleSlide, airSlide, mktSlide, factSlide, photoSlide, cdSlide, nasaSlide, lotSlide, spoSlide];
+    var all = [slides.A, slides.B, wxSlide, fxSlide, clockSlide, bibleSlide, airSlide, mktSlide, factSlide, photoSlide, cdSlide, nasaSlide, lotSlide, spoSlide, lauSlide];
     for (var i = 0; i < all.length; i++) {
       if (all[i]) all[i].className = all[i].className.replace(/\bactive\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '');
     }
@@ -2999,6 +3048,140 @@
     restartProgress(slideMs());
     resetRotate(slideMs());
   }
+  // ---- Space launches (R): next launches worldwide from The Space
+  // Devs, hero always the next US launch (fallback: next launch
+  // overall), list grouped by local day for the next 7 days.
+  var lauData = null;
+  var lauAt = 0;
+  var LAU_REFRESH_MS = 60 * 60 * 1000;
+  var LAU_MAX_ROWS = 6;
+  function loadLaunches() {
+    if (lauData && Date.now() - lauAt < LAU_REFRESH_MS) return;
+    xhrGet('/api/launches', function (err, txt) {
+      if (err) return;
+      try {
+        var j = JSON.parse(txt);
+        if (j && j.ok && j.launches) { lauData = j.launches; lauAt = Date.now(); }
+      } catch (e) {}
+    });
+  }
+  function lauDayKey(d) { return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
+  function lauFmtTime(d) {
+    var hh = d.getHours(), mm = d.getMinutes();
+    if (isEN()) {
+      var ap = hh >= 12 ? ' PM' : ' AM';
+      var h12 = hh % 12; if (h12 === 0) h12 = 12;
+      return h12 + ':' + (mm < 10 ? '0' : '') + mm + ap;
+    }
+    return hh + 'h' + (mm < 10 ? '0' : '') + mm;
+  }
+  function lauFmtDay(d) {
+    var days = isEN() ? ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'] : ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
+    var months = isEN() ? ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'] : ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
+    return days[d.getDay()] + ' ' + d.getDate() + ' ' + months[d.getMonth()];
+  }
+  function renderLaunchSlide() {
+    var el = lauSlide;
+    if (!el) return;
+    q('.lau-label', el).textContent = t('lauLabel');
+    if (!lauData || !lauData.length) return;
+    var hero = null;
+    for (var i = 0; i < lauData.length; i++) { if (lauData[i].isUS) { hero = lauData[i]; break; } }
+    if (!hero) hero = lauData[0];
+    var img = q('.lau-photo', el);
+    if (img) {
+      if (hero.image) {
+        img.style.display = '';
+        img.onerror = function () { img.style.display = 'none'; };
+        if (img.getAttribute('data-src') !== hero.image) { img.src = hero.image; img.setAttribute('data-src', hero.image); }
+      } else { img.style.display = 'none'; img.removeAttribute('data-src'); }
+    }
+    q('.lau-mission', el).textContent = hero.name || hero.mission || '';
+    var hd = new Date(hero.net);
+    var meta = [];
+    if (hero.rocket) meta.push(hero.rocket);
+    if (hero.provider) meta.push(hero.provider);
+    var pad = [hero.padName, hero.padLocation, hero.country].filter(function (x) { return !!x; }).join(', ');
+    if (pad) meta.push(pad);
+    q('.lau-meta', el).textContent = meta.join(' · ');
+    var st = q('.lau-status', el);
+    var stText = hero.status === 'go' ? t('lauGo') : (hero.status === 'tbd' ? t('lauTbd') : (hero.statusName || ''));
+    st.textContent = stText;
+    st.className = 'lau-status ' + (hero.status === 'go' ? 'go' : (hero.status === 'tbd' ? 'tbd' : 'other'));
+    st.style.display = stText ? '' : 'none';
+    var tick = q('.cd-tick.lau-tick', el);
+    var diff = hd.getTime() - Date.now();
+    if (tick) {
+      if (diff > 0) {
+        var dd = Math.floor(diff / 86400000);
+        var hh = Math.floor(diff / 3600000) % 24;
+        var mm = Math.floor(diff / 60000) % 60;
+        var ss = Math.floor(diff / 1000) % 60;
+        tick.innerHTML = '<div class="cd-tick-box"><div class="cd-tick-num">' + dd + '</div><div class="cd-tick-lab">' + (dd === 1 ? t('cdDay') : t('cdDays')) + '</div></div>' +
+          '<div class="cd-tick-box"><div class="cd-tick-num">' + (hh < 10 ? '0' : '') + hh + '</div><div class="cd-tick-lab">' + t('cdHours') + '</div></div>' +
+          '<div class="cd-tick-box"><div class="cd-tick-num">' + (mm < 10 ? '0' : '') + mm + '</div><div class="cd-tick-lab">' + t('cdMins') + '</div></div>' +
+          '<div class="cd-tick-box"><div class="cd-tick-num">' + (ss < 10 ? '0' : '') + ss + '</div><div class="cd-tick-lab">' + t('cdSecs') + '</div></div>';
+      } else { tick.innerHTML = ''; }
+    }
+    // List: launches within 7 days, excluding the hero, grouped by
+    // local day — today, tomorrow, rest of the week — US first in
+    // each day, capped at 6 rows.
+    var now = Date.now();
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    var tomorrow = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+    var groups = [[], [], []];
+    lauData.forEach(function (l) {
+      if (l === hero) return;
+      var d = new Date(l.net);
+      if (isNaN(d.getTime()) || d.getTime() < now || d.getTime() > now + 7 * 86400000) return;
+      var key = lauDayKey(d);
+      if (key === lauDayKey(today)) groups[0].push(l);
+      else if (key === lauDayKey(tomorrow)) groups[1].push(l);
+      else groups[2].push(l);
+    });
+    groups.forEach(function (g) {
+      g.sort(function (a, b) {
+        if (a.isUS !== b.isUS) return a.isUS ? -1 : 1;
+        return new Date(a.net) - new Date(b.net);
+      });
+    });
+    var titles = [t('lauToday'), t('lauTomorrow'), t('lauWeek')];
+    var html = '';
+    var rows = 0;
+    for (var gi = 0; gi < 3 && rows < LAU_MAX_ROWS; gi++) {
+      var g = groups[gi];
+      if (!g.length) continue;
+      html += '<div class="lau-group">' + escHtml(titles[gi]) + '</div>';
+      for (var ri = 0; ri < g.length && rows < LAU_MAX_ROWS; ri++) {
+        var l = g[ri];
+        var ld = new Date(l.net);
+        var time = gi === 2 ? lauFmtDay(ld) + ' · ' + lauFmtTime(ld) : lauFmtTime(ld);
+        var site = [l.padName, l.padLocation].filter(function (x) { return !!x; }).join(', ');
+        html += '<div class="lau-row">' +
+          '<div class="lau-time">' + escHtml(time) + '</div>' +
+          '<div class="lau-row-mission">' + escHtml(l.name || l.mission || '') + '</div>' +
+          '<div class="lau-row-site">' + escHtml(site) + '</div>' +
+          (l.isUS ? '<div class="lau-usa">USA</div>' : '') +
+          '</div>';
+        rows++;
+      }
+    }
+    q('.lau-list', el).innerHTML = html;
+    q('.lau-source', el).textContent = t('lauSource');
+  }
+  function showLaunchSlide() {
+    if (!lauData || !lauData.length) { loadLaunches(); if (seq.length > 1) showSeq(seqPos + seqDir); return; }
+    restoreHeadlines();
+    curKind = 'R';
+    var el = lauSlide;
+    renderLaunchSlide();
+    deactivateAll();
+    el.className = el.className.replace(/\bactive\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '') + ' active';
+    var tw = document.querySelector('.topbar .weather');
+    if (tw) tw.style.visibility = 'hidden';
+    restartProgress(slideMs());
+    resetRotate(slideMs());
+  }
   // ---- Personal photos (P): one item per appearance, in filename
   // order, looping. Photos are shown directly with a plain <img>
   // (Drive thumbnail URL); videos play muted with a plain <video>
@@ -3456,11 +3639,13 @@
   setInterval(loadLottery, LOT_REFRESH_MS);
   loadSports();
   setInterval(loadSports, SPO_REFRESH_MS);
+  loadLaunches();
+  setInterval(loadLaunches, LAU_REFRESH_MS);
   // Preload lottery logos + countdown default photo at boot, so the
   // L and D slides never show blank image areas on first appearance.
   Object.keys(LOT_LOGOS).forEach(function (k) { var im = new Image(); im.src = LOT_LOGOS[k]; });
   (function () { var im = new Image(); im.src = CD_PHOTO; })();
-  setInterval(function () { if (curKind === 'D') renderCountdownSlide(); }, 1000);
+  setInterval(function () { if (curKind === 'D') renderCountdownSlide(); if (curKind === 'R') renderLaunchSlide(); }, 1000);
   loadNews();
   setInterval(loadNews, REFRESH_MS);
   }
