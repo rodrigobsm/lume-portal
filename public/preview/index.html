@@ -2850,16 +2850,32 @@
     var el = spoSlide;
     q('.spo-label', el).textContent = t('spoLabel');
     var fav = spoFavorite();
-    var rows = [];
-    spoData.forEach(function (l) {
-      (l.games || []).forEach(function (g) {
+    // Round-robin across leagues so one league with many games (e.g. 14
+    // NFL Sunday games) cannot crowd the others out of the 8 rows: the
+    // favorite game first, then one best game per league in turn.
+    var favRow = null;
+    var perLeague = spoData.map(function (l) {
+      var list = (l.games || []).map(function (g) {
         var isFav = !!(fav && g.league === fav.league && (g.home.abbr === fav.abbr || g.away.abbr === fav.abbr));
         var rank = isFav ? 0 : (g.state === 'in' ? 1 : (g.state === 'pre' ? 2 : 3));
-        rows.push({ g: g, league: l.name, fav: isFav, rank: rank });
+        return { g: g, league: l.name, fav: isFav, rank: rank };
       });
+      list.sort(function (a, b) { return a.rank - b.rank; });
+      return list;
     });
-    rows.sort(function (a, b) { return a.rank - b.rank; });
-    rows = rows.slice(0, SPO_MAX_ROWS);
+    perLeague.forEach(function (list) {
+      if (list.length && list[0].fav && !favRow) { favRow = list.shift(); }
+    });
+    var rows = favRow ? [favRow] : [];
+    var taking = true;
+    while (rows.length < SPO_MAX_ROWS && taking) {
+      taking = false;
+      perLeague.forEach(function (list) {
+        if (rows.length >= SPO_MAX_ROWS || !list.length) return;
+        rows.push(list.shift());
+        taking = true;
+      });
+    }
     function teamHtml(tm, cls) {
       return '<div class="spo-team ' + cls + '">' +
         (tm.logo ? '<img class="spo-logo" src="' + escHtml(tm.logo) + '" alt="' + escHtml(tm.abbr) + '">' : '') +
