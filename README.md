@@ -94,6 +94,16 @@ after every `newsPerBlock` news items (default 4).
   jackpots, cash values, next draw dates, and the latest drawn balls.
   Data is scraped from LotteryUSA (there is no official free API);
   the panel keeps the last good data if a scrape fails.
+- **S — Sports**: live scores and upcoming games from ESPN (no key,
+  no account) for the leagues the user checks on `/pair/` (NFL, NBA,
+  MLB, NHL, MLS, Brasileirão, Premier League, La Liga; defaults NFL,
+  NBA, MLB, Brasileirão). Up to 8 games: the favorite team's game
+  first with a gold highlight (league + team picked on `/pair/`),
+  then live games, upcoming, and finals, one game per league in
+  turn so no single league crowds the others out. Upcoming games
+  show no score (only the time); the screen is skipped when the
+  selected leagues have no games, and unchecking every league hides
+  it.
 
 **Slide duration** — a single duration for all screens (news + specials),
 configurable per device (5/10/15/20/25/30/60 s, default 15 s).
@@ -192,7 +202,7 @@ preview).
 - `newsPerBlock`: news slides in a row before a special screen, 1–8 (any other value normalizes to 4)
 - `screens`: `{C, W, K, B, A, M, F, P, D, N, L}` (booleans)
 - `screenOrder`: order of the specials (e.g.
-  `["C","W","K","B","A","M","F","P","D","N","L"]`; without it, the default order;
+  `["C","W","K","B","A","M","F","P","D","N","L","S"]`; without it, the default order;
   unknown codes are ignored and missing ones go to the end)
 - `photosFolder`: a Google Drive folder ID, or a full folder link (the
   ID is extracted). Empty = no Photos screen. The folder must be shared
@@ -200,6 +210,11 @@ preview).
 - `countdown`: `{title, date, photo}` for the Countdown screen (title up
   to 80 chars, a real `YYYY-MM-DD` date, optional photo URL). Missing
   title or an invalid date = no Countdown screen.
+- `sports`: `{leagues: [...], favorite: {league, abbr, name} | null}`
+  for the Sports screen (leagues: any of
+  `nfl|nba|mlb|nhl|mls|bra|epl|laliga`, defaults `nfl|nba|mlb|bra`;
+  empty leagues = no Sports screen; favorite: one team from one
+  league, shown first with a gold highlight).
 - `worldClock`: up to 5 `{name, timezone}` for the world clock (without
   it, the 5 default cities: Atlanta, Los Angeles, Brasília, London, Tokyo)
 - `feeds`: `{enabled: [...known ids, max 30], custom: [{name, url,
@@ -247,7 +262,8 @@ answers `{ok:false, error:'no_key'}` and the dashboard skips the Photos
 screen. Self-hosters set their own key.
 
 The NASA screen needs no key (NASA Image Library is keyless), and
-neither does the lottery screen (public scrape).
+neither does the lottery screen (public scrape). The Sports screen
+needs no key either (ESPN's public scoreboard API).
 
 Contributors do not need a Cloudflare account or token: develop locally
 and send a pull request (see [CONTRIBUTING.md](CONTRIBUTING.md)).
@@ -281,7 +297,7 @@ open('/tmp/dash.js','w').write(max(blocks, key=len))
 - `functions/api/photos.js` — Drive folder listing for the Photos screen
 - `functions/api/media.js` — video streaming proxy for the Photos screen
 - `functions/api/og.js`, `alerts.js`, `markets.js`, `pollen.js` — support APIs
-- `functions/api/apod.js` — daily space photo from the NASA Image Library (deterministic by day of year, no key); `lottery.js` — Powerball/Mega Millions/Fantasy 5 jackpots scraped from LotteryUSA
+- `functions/api/apod.js` — daily space photo from the NASA Image Library (deterministic by day of year, no key); `lottery.js` — Powerball/Mega Millions/Fantasy 5 jackpots scraped from LotteryUSA; `sports.js` — ESPN scores for the selected leagues + team lists for the `/pair/` favorite-team picker (no key)
 - `functions/api/lume/config.js`, `pair.js` — pairing and config
 - `functions/_lib/aggregate.js`, `lume.js` — aggregation and validation
 - `functions/index.js` — 302 redirect `/?code=` → `/preview/?code=`
@@ -326,6 +342,9 @@ marketing traffic from device traffic, filter by path/host in GA. See
   APOD's API now returns a placeholder for every date, so the screen
   shows a deterministic daily pick from NASA's Image Library instead
   (same NASA photos, different selection).
+- **Sports**: ESPN's scoreboard API is public but unofficial — its
+  shape can change without notice; the panel skips the screen when
+  no selected league has games.
 - **Config applies on the next dashboard load only** (see above).
 - **Third-party feeds and APIs can break without notice** (rate limits,
   discontinued feeds, changed formats). The dashboard degrades to
