@@ -58,7 +58,19 @@
   .wx-shade { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.45) 45%, rgba(0,0,0,0.35) 100%); }
   .wx-content { position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 2; display: flex; flex-direction: column; justify-content: space-between; padding: 15vh 3vw 3vw 3vw; }
   .wx-label { font-size: 1.8vw; font-weight: 700; letter-spacing: 0.25em; color: #f5b942; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
-  .wx-now { margin-top: 2vh; }
+  .wx-now { margin-top: 2vh; display: flex; gap: 3vw; align-items: flex-start; }
+  .wx-now-left { flex: 1; min-width: 0; }
+  .wx-precip { width: 38vw; flex-shrink: 0; background: rgba(0,0,0,0.35); border-radius: 1vw; padding: 1.2vw 1.5vw; }
+  .wx-precip-title { font-size: 1.6vw; font-weight: 700; letter-spacing: 0.2em; color: #f5b942; text-shadow: 0 1px 8px rgba(0,0,0,0.6); margin-bottom: 1vh; }
+  .wx-pvals, .wx-phours { display: flex; gap: 0.3vw; }
+  .wx-pvals span, .wx-phours span { flex: 1; text-align: center; }
+  .wx-pvals { font-size: 1.2vw; font-weight: 700; color: #fff; height: 2vh; text-shadow: 0 1px 6px rgba(0,0,0,0.6); }
+  .wx-pfills { display: flex; gap: 0.3vw; align-items: flex-end; height: 13vh; margin: 0.5vh 0; }
+  .wx-pfill { flex: 1; background: #4aa3e8; border-radius: 0.3vw 0.3vw 0 0; min-height: 0; }
+  .wx-pfill.peak { background: #f5b942; }
+  .wx-phours { font-size: 1.2vw; color: #c8cdd2; }
+  .wx-precip-sum { font-size: 1.7vw; color: #e8eaed; margin-top: 1vh; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
+  .wx-precip-none { font-size: 2vw; color: #e8eaed; padding: 4vh 0; text-align: center; }
   .wx-big { display: flex; align-items: center; gap: 1.5vw; }
   .wx-big .wic { display: inline-flex; }
   .wx-big .wic svg { width: 11vw; height: 11vw; min-width: 70px; min-height: 70px; }
@@ -420,6 +432,12 @@
     .wx-cond { font-size: 6vw; }
     .wx-big .wic svg { width: 18vw; height: 18vw; }
     .wx-details { font-size: 4vw; }
+    .wx-now { flex-direction: column; }
+    .wx-precip { width: 100%; }
+    .wx-precip-title { font-size: 2.8vw; }
+    .wx-pvals, .wx-phours { font-size: 2.2vw; }
+    .wx-precip-sum { font-size: 3vw; }
+    .wx-precip-none { font-size: 3.6vw; }
     .wx-label { font-size: 3.4vw; }
     .wx-day .dname { font-size: 3.6vw; }
     .wx-day .dmax { font-size: 4.8vw; }
@@ -511,9 +529,16 @@
       <div>
         <div class="wx-label">PREVISÃO DO TEMPO</div>
         <div class="wx-now">
-          <div class="wx-big"><span class="wic"></span><span class="wx-temp"></span></div>
-          <div class="wx-cond"></div>
-          <div class="wx-details"></div>
+          <div class="wx-now-left">
+            <div class="wx-big"><span class="wic"></span><span class="wx-temp"></span></div>
+            <div class="wx-cond"></div>
+            <div class="wx-details"></div>
+          </div>
+          <div class="wx-precip">
+            <div class="wx-precip-title"></div>
+            <div class="wx-precip-body"></div>
+            <div class="wx-precip-sum"></div>
+          </div>
         </div>
       </div>
       <div class="wx-days"></div>
@@ -672,7 +697,7 @@
   var NEWS_URL = '/api/news';
   var wxLat = 34.0658;
   var wxLon = -84.6769;
-  function weatherUrl() { return 'https://api.open-meteo.com/v1/forecast?latitude=' + wxLat + '&longitude=' + wxLon + '&current=temperature_2m,weather_code,apparent_temperature,relative_humidity_2m,wind_speed_10m,is_day&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max,sunrise,sunset&timezone=America%2FNew_York&temperature_unit=celsius&wind_speed_unit=mph'; }
+  function weatherUrl() { return 'https://api.open-meteo.com/v1/forecast?latitude=' + wxLat + '&longitude=' + wxLon + '&current=temperature_2m,weather_code,apparent_temperature,relative_humidity_2m,wind_speed_10m,is_day&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max,sunrise,sunset&timezone=America%2FNew_York&temperature_unit=celsius&wind_speed_unit=mph&hourly=precipitation'; }
   // Lume Portal: config por aparelho (?code=XXXXXX). Sem código ou com
   // código inválido, nada abaixo existe: o painel usa os padrões de sempre.
   var lumeCode = (function () {
@@ -716,6 +741,7 @@
       catBrasil: 'Brasil', catMundo: 'Mundo', catEua: 'EUA', catAtlanta: 'Local', catTech: 'Tecnologia',
       cdLabel: 'CONTAGEM REGRESSIVA', cdDay: 'DIA', cdDays: 'DIAS', cdToday: 'É HOJE!', cdPassed: 'CHEGOU O DIA!', cdHours: 'HORAS', cdMins: 'MIN', cdSecs: 'SEG',
       nasaLabel: 'FOTO DO DIA · NASA',
+      precipTitle: 'CHUVA · PRÓXIMAS 24H', precipTotal: 'Total 24h:', precipPeak: 'Pico:', precipAt: 'às', precipNone: 'Sem chuva nas próximas 24h',
       lotLabel: 'LOTERIA', lotCashPrefix: 'À vista: ', lotNextPrefix: 'Próximo sorteio: ', lotLatestPrefix: 'Último: ', lotSource: 'Fonte: LotteryUSA',
       spoLabel: 'ESPORTES', spoLive: 'AO VIVO', spoFinal: 'FINAL', spoSource: 'Fonte: ESPN'
     },
@@ -744,6 +770,7 @@
       catBrasil: 'Brazil', catMundo: 'World', catEua: 'USA', catAtlanta: 'Atlanta', catTech: 'Tech',
       cdLabel: 'COUNTDOWN', cdDay: 'DAY', cdDays: 'DAYS', cdToday: 'TODAY!', cdPassed: 'THE DAY IS HERE!', cdHours: 'HOURS', cdMins: 'MIN', cdSecs: 'SEC',
       nasaLabel: 'NASA PHOTO OF THE DAY',
+      precipTitle: 'RAIN · NEXT 24H', precipTotal: '24h total:', precipPeak: 'Peak:', precipAt: 'at', precipNone: 'No rain in the next 24 hours',
       lotLabel: 'LOTTERY', lotCashPrefix: 'Cash value: ', lotNextPrefix: 'Next draw: ', lotLatestPrefix: 'Latest: ', lotSource: 'Source: LotteryUSA',
       spoLabel: 'SPORTS', spoLive: 'LIVE', spoFinal: 'FINAL', spoSource: 'Source: ESPN'
     }
@@ -1167,7 +1194,7 @@
       try {
         var j = JSON.parse(txt);
         var c = j.current;
-        weatherData = { current: c, daily: j.daily };
+        weatherData = { current: c, daily: j.daily, hourly: j.hourly };
         weatherFailed = false;
         var temp = tempVal(c.temperature_2m);
         var html = '<span class="top"><span class="wic">' + iconSVG(c.weather_code) + '</span><span class="temp">' + temp + tempSuffix() + '</span></span><span class="cond">' + weatherLabel(c.weather_code) + '</span>';
@@ -1574,6 +1601,59 @@
       return new Intl.DateTimeFormat(loc(), { timeZone: 'America/New_York', weekday: 'short' }).format(dt).replace(/\./g, '').toUpperCase();
     } catch (e) { return ''; }
   }
+  // ---- 24h precipitation chart on the weather slide: hourly mm bars
+  // for the next 24 hours, right of the big temperature. Open-Meteo
+  // hourly times are America/New_York local strings, parsed as local
+  // time (same assumption as the rest of the weather slide).
+  function fmtChartHour(hh) {
+    if (isEN()) {
+      var ap = hh >= 12 ? ' PM' : ' AM';
+      var h12 = hh % 12; if (h12 === 0) h12 = 12;
+      return h12 + ap;
+    }
+    return hh + 'h';
+  }
+  function renderPrecipChart(el) {
+    var title = q('.wx-precip-title', el);
+    var body = q('.wx-precip-body', el);
+    var sum = q('.wx-precip-sum', el);
+    if (!body || !sum) return;
+    var h = weatherData && weatherData.hourly;
+    if (!h || !h.time || !h.precipitation || h.time.length !== h.precipitation.length) { if (title) title.textContent = ''; body.innerHTML = ''; sum.textContent = ''; return; }
+    var now = Date.now();
+    var start = -1;
+    for (var i = 0; i < h.time.length; i++) {
+      var dt = new Date(h.time[i]);
+      if (!isNaN(dt.getTime()) && dt.getTime() >= now - 3600000) { start = i; break; }
+    }
+    if (start === -1) { if (title) title.textContent = ''; body.innerHTML = ''; sum.textContent = ''; return; }
+    if (title) title.textContent = t('precipTitle');
+    var vals = [];
+    for (var j = 0; j < 24 && start + j < h.time.length; j++) {
+      var v = parseFloat(h.precipitation[start + j]);
+      vals.push({ time: h.time[start + j], mm: isNaN(v) ? 0 : v });
+    }
+    var total = 0, peak = 0, peakIdx = 0;
+    vals.forEach(function (o, idx) { total += o.mm; if (o.mm > peak) { peak = o.mm; peakIdx = idx; } });
+    if (total <= 0) {
+      body.innerHTML = '<div class="wx-precip-none">' + escHtml(t('precipNone')) + '</div>';
+      sum.textContent = '';
+      return;
+    }
+    function fmtMm(v) { return (Math.round(v * 10) / 10).toString(); }
+    var vHtml = '', fHtml = '', hHtml = '';
+    vals.forEach(function (o, idx) {
+      var hh = parseInt(o.time.slice(11, 13), 10);
+      vHtml += '<span>' + (o.mm >= 1 ? escHtml(fmtMm(o.mm)) : '') + '</span>';
+      var pct = peak > 0 ? (o.mm / peak * 100) : 0;
+      if (o.mm > 0 && pct < 4) pct = 4;
+      fHtml += '<div class="wx-pfill' + (idx === peakIdx ? ' peak' : '') + '" style="height:' + pct.toFixed(1) + '%"></div>';
+      hHtml += '<span>' + (idx % 3 === 0 ? escHtml(fmtChartHour(hh)) : '') + '</span>';
+    });
+    body.innerHTML = '<div class="wx-pvals">' + vHtml + '</div><div class="wx-pfills">' + fHtml + '</div><div class="wx-phours">' + hHtml + '</div>';
+    var peakHour = parseInt(vals[peakIdx].time.slice(11, 13), 10);
+    sum.textContent = t('precipTotal') + ' ' + total.toFixed(1) + ' mm · ' + t('precipPeak') + ' ' + fmtMm(peak) + ' mm ' + t('precipAt') + ' ' + fmtChartHour(peakHour);
+  }
   function renderWeatherSlide() {
     var el = wxSlide;
     if (!el) return;
@@ -1589,6 +1669,9 @@
       wic.innerHTML = '';
       det.textContent = '';
       days.innerHTML = '';
+      var pt = q('.wx-precip-title', el); if (pt) pt.textContent = '';
+      var pb = q('.wx-precip-body', el); if (pb) pb.innerHTML = '';
+      var ps = q('.wx-precip-sum', el); if (ps) ps.textContent = '';
       return;
     }
     var c = weatherData.current;
@@ -1611,6 +1694,7 @@
     if (d && d.sunrise && d.sunrise[0]) parts.push(t('sunrise') + ' ' + fmtHour(d.sunrise[0]));
     if (d && d.sunset && d.sunset[0]) parts.push(t('sunset') + ' ' + fmtHour(d.sunset[0]));
     det.textContent = parts.join(' · ');
+    renderPrecipChart(el);
     var html = '';
     if (d && d.time) {
       var n = Math.min(7, d.time.length);
