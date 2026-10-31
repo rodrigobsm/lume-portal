@@ -2885,12 +2885,16 @@
     rows.forEach(function (r) {
       var g = r.g;
       var live = g.state === 'in' ? '<span class="spo-live">' + escHtml(t('spoLive')) + '</span>' : '';
+      // Upcoming games have no score yet — ESPN returns 0, which reads
+      // as missing data, so show no score (the status column has the time).
+      var aScore = g.state === 'pre' ? '' : g.away.score;
+      var hScore = g.state === 'pre' ? '' : g.home.score;
       html += '<div class="spo-row' + (r.fav ? ' fav' : '') + '">' +
         '<div class="spo-league">' + (r.fav ? '★ ' : '') + escHtml(r.league) + '</div>' +
         teamHtml(g.away, 'away') +
-        '<div class="spo-score">' + escHtml(g.away.score) + '</div>' +
+        '<div class="spo-score">' + escHtml(aScore) + '</div>' +
         '<div class="spo-vs">×</div>' +
-        '<div class="spo-score">' + escHtml(g.home.score) + '</div>' +
+        '<div class="spo-score">' + escHtml(hScore) + '</div>' +
         teamHtml(g.home, 'home') +
         '<div class="spo-status">' + live + escHtml(spoStatusText(g)) + '</div>' +
         '</div>';
