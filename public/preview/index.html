@@ -1879,6 +1879,18 @@
     restartProgress(slideMs());
     resetRotate(slideMs());
   }
+  // Crossfade gate (stale-frame fix): news slides alternate between two
+  // elements (A/B), so the incoming element still holds the photo from
+  // two items ago. Browsers keep painting the OLD <img> bitmap until
+  // the NEW src has loaded — after hours of running, the Portal evicts
+  // cached/decoded photos under memory pressure, so the new photo takes
+  // longer and the stale frame becomes visible mid-fade, then pops to
+  // the new photo when it arrives. Fix: only start the fade once the
+  // new photo is loaded (or errored, or 2s have passed, so a slow photo
+  // never stalls the rotation). A newer navigation cancels a pending
+  // activation via the token; the fast path (cached photo) activates
+  // immediately, exactly as before.
+  var slideShowToken = 0;
   function showSlide(i) {
     restoreHeadlines();
     curNewsIdx = i;
@@ -1886,19 +1898,41 @@
     var next = current === 'A' ? 'B' : 'A';
     var el = slides[next];
     renderSlide(el, items[i], i, items.length);
-    applyKenBurns(el);
-    deactivateAll();
-    el.className = el.className.replace(/\bactive\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '') + ' active';
-    current = next;
-    var tw = document.querySelector('.topbar .weather');
-    if (tw) tw.style.visibility = '';
-    var newsMs = slideMs();
-    restartProgress(newsMs);
-    preloadNext();
-    resetRotate(newsMs);
-    fitHeadline();
-    startTyping();
-    upgradeImage(items[i]);
+    var img = q('.photo-img', el);
+    var token = ++slideShowToken;
+    var done = false;
+    var timer = null;
+    function activate() {
+      if (done || token !== slideShowToken) return;
+      done = true;
+      if (timer) clearTimeout(timer);
+      applyKenBurns(el);
+      deactivateAll();
+      el.className = el.className.replace(/\bactive\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '') + ' active';
+      current = next;
+      var tw = document.querySelector('.topbar .weather');
+      if (tw) tw.style.visibility = '';
+      var newsMs = slideMs();
+      restartProgress(newsMs);
+      preloadNext();
+      resetRotate(newsMs);
+      fitHeadline();
+      startTyping();
+      upgradeImage(items[i]);
+    }
+    if (!items[i].image) {
+      activate();
+    } else if (img.complete && img.naturalWidth > 0) {
+      activate();
+    } else {
+      // Chain renderSlide's handlers (low-res detection, no-photo)
+      // instead of replacing them.
+      var prevOnload = img.onload;
+      var prevOnerror = img.onerror;
+      timer = setTimeout(activate, 2000);
+      img.onload = function () { if (prevOnload) prevOnload(); activate(); };
+      img.onerror = function () { if (prevOnerror) prevOnerror(); activate(); };
+    }
   }
 
   var clockCitiesCache = null;
