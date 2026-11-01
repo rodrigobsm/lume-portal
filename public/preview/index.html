@@ -3309,10 +3309,11 @@
     var el = goeSlide;
     if (!el || !goeFrames.length) return;
     var fr = goeFrames[goeIdx % goeFrames.length];
+    var latest = goeFrames[goeFrames.length - 1];
     var img = q('.goe-photo', el);
     if (img && img.getAttribute('src') !== fr.url) img.src = fr.url;
     q('.goe-label', el).textContent = t('goeLabel');
-    q('.goe-meta', el).textContent = t('goeLatest') + ': ' + lauFmtTime(fr.t);
+    q('.goe-meta', el).textContent = t('goeLatest') + ': ' + lauFmtTime(latest.t);
     q('.goe-source', el).textContent = t('goeSource');
     var nx = goeFrames[(goeIdx + 1) % goeFrames.length];
     if (nx) { var pre = new Image(); pre.src = nx.url; }
