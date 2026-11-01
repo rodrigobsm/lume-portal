@@ -104,6 +104,15 @@ after every `newsPerBlock` news items (default 4).
   show no score (only the time); the screen is skipped when the
   selected leagues have no games, and unchecking every league hides
   it.
+- **R — Launches**: upcoming rocket launches worldwide from The Space
+  Devs (Launch Library 2, no key). The hero is always the next US
+  launch (fallback: next launch overall) with a live countdown, launch
+  site and local date/time; below it, launches today, tomorrow and in
+  the next week, US launches first each day. The panel fetches through
+  an edge function cached for 1 hour (the free tier is rate-limited
+  per IP, and the function serves its last good snapshot when the
+  source is throttled); the screen is skipped when no launch data is
+  available.
 
 **Slide duration** — a single duration for all screens (news + specials),
 configurable per device (5/10/15/20/25/30/60 s, default 15 s).
@@ -297,7 +306,7 @@ open('/tmp/dash.js','w').write(max(blocks, key=len))
 - `functions/api/photos.js` — Drive folder listing for the Photos screen
 - `functions/api/media.js` — video streaming proxy for the Photos screen
 - `functions/api/og.js`, `alerts.js`, `markets.js`, `pollen.js` — support APIs
-- `functions/api/apod.js` — daily space photo from the NASA Image Library (deterministic by day of year, no key); `lottery.js` — Powerball/Mega Millions/Fantasy 5 jackpots scraped from LotteryUSA; `sports.js` — ESPN scores for the selected leagues + team lists for the `/pair/` favorite-team picker (no key)
+- `functions/api/apod.js` — daily space photo from the NASA Image Library (deterministic by day of year, no key); `lottery.js` — Powerball/Mega Millions/Fantasy 5 jackpots scraped from LotteryUSA; `sports.js` — ESPN scores for the selected leagues + team lists for the `/pair/` favorite-team picker (no key); `launches.js` — upcoming launches from Launch Library 2 through a 1-hour edge cache with stale fallback (no key)
 - `functions/api/lume/config.js`, `pair.js` — pairing and config
 - `functions/_lib/aggregate.js`, `lume.js` — aggregation and validation
 - `functions/index.js` — 302 redirect `/?code=` → `/preview/?code=`
@@ -345,6 +354,10 @@ marketing traffic from device traffic, filter by path/host in GA. See
 - **Sports**: ESPN's scoreboard API is public but unofficial — its
   shape can change without notice; the panel skips the screen when
   no selected league has games.
+- **Launches**: Launch Library 2's free tier is rate-limited per shared
+  IP — the edge function caches for 1 hour and serves its last good
+  snapshot when throttled, so the screen can stay hidden until the
+  window opens; the panel retries on its own.
 - **Config applies on the next dashboard load only** (see above).
 - **Third-party feeds and APIs can break without notice** (rate limits,
   discontinued feeds, changed formats). The dashboard degrades to
