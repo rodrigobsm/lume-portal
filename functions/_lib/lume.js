@@ -10,7 +10,7 @@ export var FEED_IDS = [
   'g1-tecnologia'
 ];
 
-export var SCREEN_KEYS = ['C', 'W', 'K', 'B', 'A', 'M', 'F', 'P', 'D', 'N', 'L', 'S', 'R'];
+export var SCREEN_KEYS = ['C', 'W', 'K', 'B', 'A', 'M', 'F', 'P', 'D', 'N', 'L', 'S', 'R', 'G'];
 
 // Sports leagues offered on /pair/ (id -> ESPN sport/league path lives
 // in functions/api/sports.js). Defaults mirror the project's US + Brazil

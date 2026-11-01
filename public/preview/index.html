@@ -299,6 +299,12 @@
   .lau-row-site { font-size: 1.6vw; color: #c8cdd2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 26vw; }
   .lau-usa { flex-shrink: 0; font-size: 1.4vw; font-weight: 800; letter-spacing: 0.1em; color: #f5b942; border: 1px solid rgba(245,185,66,0.6); border-radius: 0.5vw; padding: 0.3vh 0.8vw; }
   .lau-source { margin-top: auto; padding-top: 1.5vh; font-size: 1.6vw; color: #9aa3b2; }
+  .goe-slide { background: #050510; }
+  .goe-photo { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+  .goe-caption { position: absolute; left: 5vw; bottom: 3vw; z-index: 2; text-shadow: 0 1px 8px rgba(0,0,0,0.7); }
+  .goe-label { font-size: 2.1vw; font-weight: 700; letter-spacing: 0.25em; color: #f5b942; }
+  .goe-meta { font-size: 1.8vw; color: #e8eaed; margin-top: 0.8vh; }
+  .goe-source { font-size: 1.6vw; color: #9aa3b2; margin-top: 0.5vh; }
   @media (orientation: portrait) {
     .spo-logo { height: 7vw; width: 7vw; }
     .spo-team { font-size: 3.4vw; }
@@ -313,6 +319,9 @@
     .lau-time { width: 30vw; font-size: 3vw; }
     .lau-row-mission { font-size: 3.2vw; }
     .lau-row-site { font-size: 2.6vw; max-width: 30vw; }
+    .goe-label { font-size: 3.4vw; }
+    .goe-meta { font-size: 2.8vw; }
+    .goe-source { font-size: 2.4vw; }
   }
   .lot-cash { font-size: 1.7vw; color: #c8cdd2; }
   .lot-next { font-size: 1.9vw; color: #fff; margin-top: 1.5vh; }
@@ -706,6 +715,14 @@
       <div class="lau-source"></div>
     </div>
   </div>
+  <div class="slide goe-slide" id="slideGoes">
+    <img class="goe-photo" alt="">
+    <div class="goe-caption">
+      <div class="goe-label"></div>
+      <div class="goe-meta"></div>
+      <div class="goe-source"></div>
+    </div>
+  </div>
   <div class="slide photoslide" id="slidePhoto">
     <img class="photo-photo" alt="">
     <video class="photo-video" muted playsinline preload="auto"></video>
@@ -792,7 +809,8 @@
       precipTitle: 'CHUVA · PRÓXIMAS 24H', precipTotal: 'Total 24h:', precipPeak: 'Pico:', precipBetween: 'entre', precipAnd: 'e', precipNone: 'Sem chuva nas próximas 24h',
       lotLabel: 'LOTERIA', lotCashPrefix: 'À vista: ', lotNextPrefix: 'Próximo sorteio: ', lotLatestPrefix: 'Último: ', lotSource: 'Fonte: LotteryUSA',
       spoLabel: 'ESPORTES', spoLive: 'AO VIVO', spoFinal: 'FINAL', spoSource: 'Fonte: ESPN',
-      lauLabel: 'LANÇAMENTOS', lauToday: 'HOJE', lauTomorrow: 'AMANHÃ', lauWeek: 'PRÓXIMA SEMANA', lauGo: 'Confirmado', lauTbd: 'Data provisória', lauSource: 'Fonte: The Space Devs'
+      lauLabel: 'LANÇAMENTOS', lauToday: 'HOJE', lauTomorrow: 'AMANHÃ', lauWeek: 'PRÓXIMA SEMANA', lauGo: 'Confirmado', lauTbd: 'Data provisória', lauSource: 'Fonte: The Space Devs',
+      goeLabel: 'SATÉLITE GOES', goeLatest: 'Última imagem', goeSource: 'Fonte: NOAA / CIRA'
     },
     'en-US': {
       today: 'TODAY', now: 'now', minAgo: '{n} min ago', hAgo: '{n} h ago', nowPill: 'NOW',
@@ -822,7 +840,8 @@
       precipTitle: 'RAIN · NEXT 24H', precipTotal: '24h total:', precipPeak: 'Peak:', precipBetween: 'between', precipAnd: 'and', precipNone: 'No rain in the next 24 hours',
       lotLabel: 'LOTTERY', lotCashPrefix: 'Cash value: ', lotNextPrefix: 'Next draw: ', lotLatestPrefix: 'Latest: ', lotSource: 'Source: LotteryUSA',
       spoLabel: 'SPORTS', spoLive: 'LIVE', spoFinal: 'FINAL', spoSource: 'Source: ESPN',
-      lauLabel: 'LAUNCHES', lauToday: 'TODAY', lauTomorrow: 'TOMORROW', lauWeek: 'THIS WEEK', lauGo: 'Confirmed', lauTbd: 'Date TBD', lauSource: 'Source: The Space Devs'
+      lauLabel: 'LAUNCHES', lauToday: 'TODAY', lauTomorrow: 'TOMORROW', lauWeek: 'THIS WEEK', lauGo: 'Confirmed', lauTbd: 'Date TBD', lauSource: 'Source: The Space Devs',
+      goeLabel: 'GOES SATELLITE', goeLatest: 'Latest image', goeSource: 'Source: NOAA / CIRA'
     }
   };
   function t(k) {
@@ -1107,6 +1126,7 @@
   var lotSlide = document.getElementById('slideLottery');
   var spoSlide = document.getElementById('slideSports');
   var lauSlide = document.getElementById('slideLaunch');
+  var goeSlide = document.getElementById('slideGoes');
   var airData = null;
   var airPollen = null;
   var mktData = null;
@@ -1782,7 +1802,7 @@
     days.innerHTML = html;
   }
   function buildSeq() {
-    var all = ['C', 'W', 'K', 'B', 'A', 'M', 'F', 'P', 'D', 'N', 'L', 'S', 'R'];
+    var all = ['C', 'W', 'K', 'B', 'A', 'M', 'F', 'P', 'D', 'N', 'L', 'S', 'R', 'G'];
     var order = all;
     if (lumeCfg && Array.isArray(lumeCfg.screenOrder) && lumeCfg.screenOrder.length) {
       order = [];
@@ -1849,6 +1869,7 @@
     else if (s === 'L') { showLotterySlide(); }
     else if (s === 'S') { showSportsSlide(); }
     else if (s === 'R') { showLaunchSlide(); }
+    else if (s === 'G') { showGoesSlide(); }
     else if (s === 'P') { showPhotoSlide(); }
     else { curNewsIdx = s; curKind = 'news'; showSlide(s); }
     preloadNextMedia();
@@ -1864,7 +1885,8 @@
     showSeq(seqPos - 1);
   }
   function deactivateAll() {
-    var all = [slides.A, slides.B, wxSlide, fxSlide, clockSlide, bibleSlide, airSlide, mktSlide, factSlide, photoSlide, cdSlide, nasaSlide, lotSlide, spoSlide, lauSlide];
+    if (goeTimer) { clearInterval(goeTimer); goeTimer = null; }
+    var all = [slides.A, slides.B, wxSlide, fxSlide, clockSlide, bibleSlide, airSlide, mktSlide, factSlide, photoSlide, cdSlide, nasaSlide, lotSlide, spoSlide, lauSlide, goeSlide];
     for (var i = 0; i < all.length; i++) {
       if (all[i]) all[i].className = all[i].className.replace(/\bactive\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '');
     }
@@ -3225,6 +3247,105 @@
     restartProgress(slideMs());
     resetRotate(slideMs());
   }
+  // ---- GOES satellite (G): animated Southeast-sector GeoColor loop
+  // from NOAA STAR (GOES-19, no key). STAR publishes 1200x1200 JPG
+  // stills every ~5 min at a deterministic CDN path; the panel cycles
+  // the last 24 frames (2h) at 500ms while the slide is visible, so
+  // the animation is a light progressive JPG loop — never the 20MB+
+  // animated GIF STAR also offers. Frame times sit on a 5-min grid
+  // whose offset drifts (observed :01/:06, i.e. 1 mod 5), so the newest
+  // frame is found by probing up to 10 candidate minutes back from
+  // now-10min; older frames then share that offset. A frame that 404s
+  // is skipped at display, and if no frame loads the screen skips
+  // silently like the other data-less specials. The list refreshes
+  // when it is older than 10 min, on the next appearance.
+  var GOE_FRAMES = 24;
+  var GOE_FRAME_MS = 500;
+  var GOE_REFRESH_MS = 10 * 60 * 1000;
+  var goeFrames = [];
+  var goeIdx = 0;
+  var goeTimer = null;
+  var goeReady = false;
+  var goeAt = 0;
+  var goeFailAt = 0;
+  var goePos = -1;
+  function goePad(n, w) { var s = '' + n; while (s.length < w) s = '0' + s; return s; }
+  function goeStamp(d) {
+    var start = Date.UTC(d.getUTCFullYear(), 0, 1);
+    var doy = Math.floor((Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()) - start) / 86400000) + 1;
+    return d.getUTCFullYear() + goePad(doy, 3) + goePad(d.getUTCHours(), 2) + goePad(d.getUTCMinutes(), 2);
+  }
+  function goeUrl(d) {
+    return 'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/SECTOR/se/GEOCOLOR/' + goeStamp(d) + '_GOES19-ABI-se-GEOCOLOR-1200x1200.jpg';
+  }
+  function goeBuildList(newest) {
+    var list = [];
+    for (var i = 0; i < GOE_FRAMES; i++) {
+      var d = new Date(newest.getTime() - i * 5 * 60 * 1000);
+      list.unshift({ t: d, url: goeUrl(d) });
+    }
+    return list;
+  }
+  function goeProbe(cands, i, cb) {
+    if (i >= cands.length) { cb(false, null); return; }
+    var im = new Image();
+    im.onload = function () { cb(true, goeBuildList(cands[i])); };
+    im.onerror = function () { goeProbe(cands, i + 1, cb); };
+    im.src = goeUrl(cands[i]);
+  }
+  function goeEnsure(cb) {
+    if (goeReady && goeFrames.length) { cb(true); return; }
+    if (goeFailAt && Date.now() - goeFailAt < 15 * 60 * 1000) { cb(false); return; }
+    var base = new Date(Date.now() - 10 * 60 * 1000);
+    base.setSeconds(0, 0);
+    var cands = [];
+    for (var k = 0; k < 10; k++) cands.push(new Date(base.getTime() - k * 60 * 1000));
+    goeProbe(cands, 0, function (ok, list) {
+      if (!ok) { goeFailAt = Date.now(); cb(false); return; }
+      goeFrames = list; goeReady = true; goeAt = Date.now(); goeIdx = 0; cb(true);
+    });
+  }
+  function goeRender() {
+    var el = goeSlide;
+    if (!el || !goeFrames.length) return;
+    var fr = goeFrames[goeIdx % goeFrames.length];
+    var img = q('.goe-photo', el);
+    if (img && img.getAttribute('src') !== fr.url) img.src = fr.url;
+    q('.goe-label', el).textContent = t('goeLabel');
+    q('.goe-meta', el).textContent = t('goeLatest') + ': ' + lauFmtTime(fr.t);
+    q('.goe-source', el).textContent = t('goeSource');
+    var nx = goeFrames[(goeIdx + 1) % goeFrames.length];
+    if (nx) { var pre = new Image(); pre.src = nx.url; }
+  }
+  function goeAdvance() {
+    if (curKind !== 'G' || !goeFrames.length) return;
+    goeIdx = (goeIdx + 1) % goeFrames.length;
+    goeRender();
+  }
+  function showGoesSlide() {
+    if (goeReady && Date.now() - goeAt > GOE_REFRESH_MS) goeReady = false;
+    if (!goeReady || !goeFrames.length) {
+      goePos = seqPos;
+      goeEnsure(function (ok) {
+        if (seqPos !== goePos) return;
+        if (!ok) { if (seq.length > 1) showSeq(seqPos + seqDir); return; }
+        showGoesSlide();
+      });
+      return;
+    }
+    restoreHeadlines();
+    curKind = 'G';
+    var el = goeSlide;
+    goeRender();
+    deactivateAll();
+    el.className = el.className.replace(/\bactive\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '') + ' active';
+    var tw = document.querySelector('.topbar .weather');
+    if (tw) tw.style.visibility = 'hidden';
+    restartProgress(slideMs());
+    resetRotate(slideMs());
+    if (goeTimer) clearInterval(goeTimer);
+    goeTimer = setInterval(goeAdvance, GOE_FRAME_MS);
+  }
   // ---- Personal photos (P): one item per appearance, in filename
   // order, looping. Photos are shown directly with a plain <img>
   // (Drive thumbnail URL); videos play muted with a plain <video>
@@ -3684,6 +3805,10 @@
   setInterval(loadSports, SPO_REFRESH_MS);
   loadLaunches();
   setInterval(loadLaunches, LAU_REFRESH_MS);
+  // Prefetch the GOES frame list at boot so the G slide never shows
+  // blank on first appearance; later appearances refresh it when it
+  // is older than 10 min (see showGoesSlide).
+  goeEnsure(function () {});
   // Preload lottery logos + countdown default photo at boot, so the
   // L and D slides never show blank image areas on first appearance.
   Object.keys(LOT_LOGOS).forEach(function (k) { var im = new Image(); im.src = LOT_LOGOS[k]; });
